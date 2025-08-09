@@ -1,0 +1,27 @@
+<% if (test === undefined) { %>
+No missing acceptance tests.
+
+<%= chalk.blue.underline.bold("Recommended Next Action:\n") %>
+
+> s4 status  # Check the status of the project and the next action to take
+
+<% } else { %>
+There are <%= count %> missing acceptance tests total. Among them <%= test.id %> has the highest priority:
+
+- [<%= test.id %>] <%= test.filePath %><%= "\n" %>
+
+Your job for now is to create the test file. Here are some details:
+
+- The test must strictly follow the GIVEN/WHEN/THEN structure.
+- Use simple, concise examples in the GIVEN section for clarity.
+- The final code should read like a well-written specification.
+- When you implement the application code under test, keep the design clean and simple. Refactor the code whenever you can.
+
+<%= chalk.blue.underline.bold("Recommended Next Action:\n") %>
+
+> s4 info FE-nnnn           # to see the feature details
+> s4 info AT-nnnn           # to see the acceptance test details
+> s4 guide acceptance-test  # to see the acceptance test writing guidelines
+
+Let's tackle one thing at a time. Focus just on <%= test.id %>.
+<% } %>

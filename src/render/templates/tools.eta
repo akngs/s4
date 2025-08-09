@@ -1,0 +1,14 @@
+<%~ chalk.blue.underline.bold("## Tools") %><%= "\n" %>
+
+<% const resultById = new Map(results.map(r => [r.id, r])) %>
+<% allTools.forEach(tool => { %>
+<%   const r = resultById.get(tool.id) %>
+<%   if (!r) { %>
+<%= chalk.yellow("⚠") %> <%= tool.id %>: skipped<%= "\n" %>
+<%   } else if (r.exitCode === 0) { %>
+<%= chalk.green("✔") %> <%= tool.id %>: success<%= "\n" %>
+<%   } else { %>
+<%= chalk.red("✘") %> <%= tool.id %>: failure<%= "\n" %>
+<%   } %>
+<%= chalk.grey('  ' + tool.command) %><%= "\n" %>
+<% }) %>

@@ -1,0 +1,31 @@
+<% if (count == 0) { %>
+All acceptance tests are passing.
+
+<%= chalk.blue.underline.bold("Recommended Next Action:\n") %>
+
+> s4 status  # Check the status of the project and the next action to take
+
+<% } else { %>
+Here are the first few failing acceptance tests:
+
+<% tests.forEach(test => { %>
+- <%= test.id %>: <%= chalk.green("GIVEN " + test.test.given) + "," %> <%= chalk.white("WHEN " + test.test.when + ",") %> <%= chalk.cyan("THEN " + test.test.then) %><%= "\n" %>
+<%   if (test.output) { %>
+<%= test.output.split("\n").map(line => `  > ${line}`).join("\n") %>
+<%   } %><%= "\n\n" %>
+<% }) %>
+Among these, the most important one to fix is <%= tests[0].id %>. Here are some details:
+
+- The test must strictly follow the GIVEN/WHEN/THEN structure.
+- Use simple, concise examples in the GIVEN section for clarity.
+- The final code should read like a well-written specification.
+- When you implement the application code under test, keep the design clean and simple. Refactor the code whenever you can.
+
+<%= chalk.blue.underline.bold("Recommended Next Action:\n") %>
+
+> s4 info AT-nnnn    # to see the acceptance test details
+> s4 info FE-nnnn    # to see the feature details
+> s4 run-at AT-nnnn  # to run the acceptance test
+
+Let's tackle one thing at a time. Focus just on <%= tests[0].id %>.
+<% } %>

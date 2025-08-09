@@ -1,0 +1,17 @@
+<% if (error._tag === "exec_error") { %>
+Failed to execute command: <%= error.command %>
+<% } else if (error._tag === "io_error") { %>
+Failed to read spec file: <%= error.filePath %>
+<% if (isDefaultSpec) { %>
+
+Spec file "s4.yaml" does not exist in the current directory.
+
+You have to create the spec file first. Run "s4 guide" for authoring instructions.
+<% } %>
+<% } else if (error._tag === "parse_error") { %>
+<%= error.message %>
+<% } else if (error._tag === "adapter_error") { %>
+Adapter error in <%= error.adapter %>: <%= causeText %>
+<% } else { %>
+Unknown error: <%= JSON.stringify(error) %>
+<% } %>

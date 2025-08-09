@@ -1,0 +1,37 @@
+title: Flash Cards
+mission: Help users study efficiently by practicing with simple flash cards.
+vision: A lightweight web app that makes memorization effortless through focused practice sessions.
+
+businessObjectives:
+  - id: BO-0001
+    description: Enable users to create and review flash cards to improve knowledge recall.
+
+features:
+  - id: FE-0001
+    title: Create and review flash cards
+    description: Users can add cards with a question and an answer, and review them in a study session.
+    covers: [BO-0001]
+    prerequisites: []
+
+acceptanceTests:
+  - id: AT-0001
+    covers: FE-0001
+    given: a deck with one card exists
+    when: the user starts a study session and answers the card
+    then: the system shows whether the answer is correct
+
+connectors:
+  listAcceptanceTests: |-
+    echo "AT-0001: GIVEN a deck with one card exists, WHEN the user starts a study session and answers the card, THEN the system shows whether the answer is correct"
+  locateAcceptanceTest: |-
+    echo "src/at/{ID}.test.ts"
+  runAcceptanceTest: |-
+    echo "ok 1 - src/at/AT-0001.test.ts > GIVEN a deck with one card exists, WHEN the user starts a study session and answers the card, THEN the system shows whether the answer is correct"
+  runAcceptanceTests: |-
+    echo "ok 1 - src/at/AT-0001.test.ts > GIVEN a deck with one card exists, WHEN the user starts a study session and answers the card, THEN the system shows whether the answer is correct"
+
+tools:
+  - id: echo-ok
+    command: echo "ok"
+  - id: some-other-tool
+    command: echo "ok"

@@ -1,0 +1,24 @@
+I am a CLI tool that provides AI agents with a complete overview of the task at hand. This includes both a high-level summary for context and a specific 'how-to' guide for execution. You are supposed to follow my guide on behalf of the user. The details are below.
+
+<%= chalk.blue.underline.bold("## Project Summary") %><%= "\n" %>
+
+<%= chalk.blue.underline.bold("# " + spec.title) %><%= "\n" %>
+
+- Mission: <%= spec.mission %><%= "\n" %>
+- Vision: <%= spec.vision %><%= "\n" %>
+
+<%= chalk.blue.underline.bold("## Business Objectives") %><%= "\n" %>
+
+<% spec.businessObjectives.forEach(objective => { %>
+- <%= objective.id %>: <%= objective.description %><%= "\n" %>
+<% }) %>
+
+<%= chalk.blue.underline.bold("## Features") %><%= "\n" %>
+
+<% features.forEach(feature => { %>
+<%= (feature.passed !== undefined && feature.passed === feature.total) ? chalk.green("✔") : chalk.red("✘") %> <%= feature.id %>: <%= feature.title %> (
+<%_ if (feature.passed === undefined) { %>?<% } else { %><%= feature.passed %><% } _%>
+/
+<%_ if (feature.total === undefined) { %>?<% } else { %><%= feature.total %><% } _%>
+)
+<% }) %>

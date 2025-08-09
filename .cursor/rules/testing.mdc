@@ -1,0 +1,13 @@
+---
+globs: **/*.test.ts
+alwaysApply: false
+---
+When writing tests, always follow these best practices:
+
+- Use 'vitest' as the test framework.
+- You don't need to import 'vitest' in your tests because it's already imported in the test runner.
+- Tests should be read as specifications or examples rather than implementation details.
+- Quality of tests should be the same as the code they test. Remove duplication and make tests as simple as possible.
+- Avoid mock whenever possible. It is a sign of a bad design. Try to refactor the code to make it easier to test.
+- When writing example data for tests, use the simplest possible data that still covers the test case to keep clarity.
+- When writing acceptance tests, do not use `describe()` since you just write a single test per file.

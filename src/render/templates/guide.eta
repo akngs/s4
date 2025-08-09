@@ -1,0 +1,23 @@
+<% if (view.kind === "brief") { %>
+<%= view.brief %>
+<% } else if (view.kind === "unknown_section") { %>
+Unknown section. Allowed: <%= view.allowed.join(", ") %>
+<% } else { %>
+<%= view.sectionText %>
+
+<% if (view.examples.length > 0) { %>
+
+<%= chalk.blue.underline.bold("## Examples\n") %>
+
+<% view.examples.forEach(ex => { %>
+<% if (ex.kind === "scalar") { %>
+- <%= chalk.green(ex.text) %>
+<% } else { %>
+```yaml
+<%= chalk.green(ex.text) %><%= "\n" %>
+```
+<% } %>
+
+<% }) %>
+<% } %>
+<% } %>

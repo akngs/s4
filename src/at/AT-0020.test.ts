@@ -1,0 +1,23 @@
+import { cleanupTempFile, createSpec, createTempFile, runS4 } from "../test-utils.ts"
+
+it('GIVEN a spec with invalid feature references in acceptance tests, WHEN the user runs "s4 validate", THEN error messages show which acceptance tests reference unknown feature IDs and provide actionable guidance', () => {
+  // Given a spec with invalid feature references in acceptance tests
+  const spec = createSpec({
+    acceptanceTests: [
+      { id: "AT-0001", covers: "FE-0001", given: "G", when: "W", then: "T" },
+      { id: "AT-0002", covers: "FE-9999", given: "G", when: "W", then: "T" },
+    ],
+  })
+  const tempFile = createTempFile(spec)
+
+  try {
+    // When the user runs "s4 validate --spec spec.yaml"
+    const result = runS4(`validate --spec ${tempFile}`)
+
+    // Then specific error messages indicate which acceptance tests reference unknown feature IDs
+    expect(result.status).toBe(1)
+    expect(result.stderr).toContain("[invalid_fe] Acceptance test AT-0002 references unknown feature FE-9999.")
+  } finally {
+    cleanupTempFile(tempFile)
+  }
+})

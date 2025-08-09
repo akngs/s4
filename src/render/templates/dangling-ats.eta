@@ -1,0 +1,19 @@
+<% if (count == 0) { %>
+No dangling acceptance tests.
+
+<%= chalk.blue.underline.bold("Recommended Next Action:\n") %>
+
+> s4 status  # Check the status of the project and the next action to take
+
+<% } else { %>
+There are <%= count %> dangling acceptance tests - these are not defined in the spec but exist in the filesystem:
+
+<% tests.forEach(test => { %>
+- <%= test.id %>: <%= test.filePath %>
+<% }) %><%= "\n" %>
+
+<%= chalk.blue.underline.bold("Recommended Next Action:\n") %>
+
+- Remove the test files from the filesystem since the spec is the source of truth.
+- Even if you are absolutely sure that defining acceptance tests in the spec is the right thing to do, consult your colleagues before making changes.
+<% } %>

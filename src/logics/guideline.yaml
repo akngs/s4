@@ -1,0 +1,173 @@
+brief: |-
+  An s4.yaml is the single source of truth that aligns humans and AI agents on what to build and how to validate it. It must be clear enough for agents to act without guesswork, and reviewable enough for humans to understand scope, priorities, and rationale. Favor precise language, stable IDs, and explicit relationships so changes are intentional and traceable.
+
+  Structure the spec around identity and intent (title, mission, vision), a shared glossary of concepts, outcome-focused Business Objectives (BO-####), buildable Features (FE-####) that cover those objectives, and deterministic Acceptance Tests (AT-####) that verify a single feature each using GIVEN/WHEN/THEN. Keep cross-references valid and avoid duplication. Treat IDs as stable references; append new ones rather than renumbering.
+
+  Make the spec executable with non-interactive tools to list, locate, and run acceptance tests locally and in CI. Use `s4 validate` to ensure internal consistency and `s4 status` to surface sync issues and next actions. Prefer small, focused features and tests that run fast and produce reliable signals.
+sections:
+  title: |-
+    Provide a single, memorable project name. Aim for 3-7 words without punctuation, versions, or niche acronyms. The title should describe what the project is, not how it is implemented or which stack it uses.
+
+    Choose a name that will remain valid as the system evolves. Prefer clarity over cleverness and avoid scope creep in the name itself.
+
+    - Do: reflect the product or capability at a high level.
+    - Avoid: mentioning technologies, internal codenames, or release numbers.
+  mission: |-
+    State why the project exists and for whom. Write one or two sentences in active voice that focus on the near-term outcome. Mention the primary users, the problem being solved, and any key constraints that meaningfully shape scope.
+
+    Keep it actionable and testable as a guiding statement for prioritization. Avoid technical details, implementation plans, KPIs, or roadmaps.
+    
+    - Do: make the purpose and primary users explicit; keep it actionable for prioritization.
+    - Avoid: technical details, solution designs, KPIs, or roadmaps.
+  vision: |-
+    Describe the desired future state if the mission succeeds. Write one or two sentences that are inspirational yet concrete, articulating the long-term value and the world the project enables.
+
+    Keep it stable over time and independent of specific implementation choices. Avoid timelines, metrics, or solution details; the vision guides direction rather than execution.
+    
+    - Do: articulate a concrete future state and long-term value.
+    - Avoid: timelines, metrics, or specific solution details.
+  businessObjective: |-
+    Define coarse-grained, outcome-oriented goals identified as BO-####. Each objective should state the user or business value being delivered and, when helpful, the signals that indicate progress without prescribing solutions.
+
+    Objectives must be non-overlapping and free of implementation language. Every BO should be covered by at least one Feature. Keep the set small and stable; revise with care to maintain traceability.
+
+    - Do: use precise, outcome language; ensure every BO is covered by one or more Features.
+    - Avoid: tasks or technical steps; leaving BOs uncovered.
+  feature: |-
+    Specify buildable units of capability identified as FE-####. Provide a short verb-phrase title and an outcome-oriented description that explains what the user gains and why it matters. Reference [[Concept]]s to reuse precise terminology.
+
+    Declare `covers: [BO-####]` to link each feature to the objectives it advances. Use `prerequisites: [FE-####]` only for true functional dependencies and keep the graph sparse to avoid cycles. Prefer small, independently testable features that can be validated by one or more ATs.
+
+    - Do: keep descriptions outcome-focused; prefer small, independently testable features.
+    - Avoid: long dependency chains and embedding designs/data models in the description.
+  acceptanceTest: |-
+    Author deterministic, atomic tests identified as AT-####. Each AT must cover exactly one Feature via `covers: FE-####` and consist of concise GIVEN, WHEN, and THEN statements that describe preconditions action, and observable result.
+
+    The canonical test title must be exactly: `GIVEN {given}, WHEN {when}, THEN {then}`. Keep tests independent, fast, and repeatable, avoiding reliance on global state or flaky external systems. Prefer several small ATs over one broad scenario.
+
+    - Do: keep one behavior per AT; make setup explicit in GIVEN and outcomes explicit in THEN.
+    - Avoid: compound assertions that mask failures; reliance on global state or flaky systems.
+  connectors: |-
+    Define non-interactive, deterministic, and fast shell commands that make the spec executable locally and in CI. Commands must:
+
+    - Print stable, parseable outputs
+    - Exit with accurate exit codes (0 on success, non-zero on failure)
+    - Avoid prompts and rely on project-local dependencies when possible
+    - Be portable across environments (macOS/Linux)
+
+    Required commands:
+
+    - `listAcceptanceTests`: Prints one line per test in the exact format `AT-####: TITLE`. The TITLE should be the canonical test title (`GIVEN ..., WHEN ..., THEN ...`).
+    - `locateAcceptanceTest`: Echoes the relative path for `{ID}` using the `{ID}` placeholder (e.g., `echo "src/at/{ID}.test.ts"`).
+    - `runAcceptanceTest`: Executes a single test by `{ID}` and returns the tool's stdout/stderr and exit code as-is.
+    - `runAcceptanceTests`: Executes the full suite and returns the tool's stdout/stderr and exit code as-is.
+
+    Keep commands stable and fast so agents can rely on them for local runs and CI.
+  tools: |-
+    Define a list of user tools that the CLI can run to assess or improve project health. Each tool must specify:
+
+    - `id`: Unique identifier used on the CLI (`s4 tool <id>`)
+    - `command`: Non-interactive shell command to execute
+    - `stopOnError`: If true, `s4 tools` stops running subsequent tools when this tool exits non-zero
+    - `recommendedNextActions`: A short message shown when the tool fails to guide remediation
+
+    Behavior:
+
+    - `s4 tool <id>` runs a single tool and surfaces stdout/stderr/exit code as-is
+    - `s4 tools` runs all tools in the order defined; honors `stopOnError`
+    - `s4 status` runs all tools at the end and includes failing tool outputs and recommended next actions
+examples:
+  - title: HabitFlow
+    mission: Help users build and maintain daily habits via lightweight tracking and adaptive reminders.
+    vision: Make habit formation effortless with timely nudges and insightful progress feedback.
+    businessObjective:
+      - id: BO-0001
+        description: Increase habit completion rates through streak reinforcement and timely reminders.
+      - id: BO-0002
+        description: Provide actionable insights with weekly trends to sustain long-term adherence.
+    feature:
+      - id: FE-0001
+        title: Create and manage habits
+        description: Users can add, edit, archive, and delete habits with schedules and goals.
+        covers: [BO-0001]
+        prerequisites: []
+      - id: FE-0002
+        title: Daily reminders and streak tracking
+        description: Sends reminders and tracks streaks to motivate completions; shows streak status.
+        covers: [BO-0001, BO-0002]
+        prerequisites: [FE-0001]
+    acceptanceTest:
+      - id: AT-0001
+        covers: FE-0002
+        given: a habit with daily schedule exists and reminders are enabled
+        when: the reminder time passes without completion
+        then: the user receives a notification and the streak remains unchanged
+    connectors:
+      listAcceptanceTests: |
+        npx --yes vitest list --project acceptance | awk '/^AT-\d{4}/ {print}'
+      locateAcceptanceTest: |
+        echo "src/at/{ID}.test.ts"
+      runAcceptanceTest: |
+        npm run --silent test:acceptance -- src/at/{ID}.test.ts
+      runAcceptanceTests: |
+        npm run --silent test:acceptance
+    tools:
+      - id: tsc
+        command: npm run --silent check:tsc
+        stopOnError: true
+        recommendedNextActions: Fix the TypeScript errors and run the tool again
+      - id: eslint
+        command: npm run --silent check:eslint
+        stopOnError: true
+        recommendedNextActions: Fix the ESLint issues and run the tool again
+      - id: depcruise
+        command: npm run --silent check:depcruise
+        stopOnError: true
+        recommendedNextActions: Fix the dependency violations and run the tool again
+  - title: NoteNest
+    mission: Help users capture, organize, and retrieve notes quickly with tags and full-text search.
+    vision: A second brain where ideas become instantly findable and meaningfully connected.
+    businessObjective:
+      - id: BO-0001
+        description: Enable rapid note capture across devices with minimal friction.
+      - id: BO-0002
+        description: Improve retrieval accuracy via full-text search and tag-based organization.
+    feature:
+      - id: FE-0001
+        title: Create and edit notes
+        description: Fast markdown note creation and editing with autosave.
+        covers: [BO-0001]
+        prerequisites: []
+      - id: FE-0002
+        title: Full-text search with tags and filters
+        description: Search notes by content, tags, and date ranges; supports boolean operators.
+        covers: [BO-0002]
+        prerequisites: [FE-0001]
+    acceptanceTest:
+      - id: AT-0001
+        covers: FE-0002
+        given: three notes exist, two tagged "project-x" and one untagged
+        when: the user searches for tag "project-x"
+        then: only the two tagged notes appear in the results
+    connectors:
+      listAcceptanceTests: |
+        npx --yes vitest list --project acceptance | awk '/^AT-\d{4}/ {print}'
+      locateAcceptanceTest: |
+        echo "src/at/{ID}.test.ts"
+      runAcceptanceTest: |
+        npm run --silent test:acceptance -- src/at/{ID}.test.ts
+      runAcceptanceTests: |
+        npm run --silent test:acceptance
+    tools:
+      - id: biome
+        command: npm run --silent check:biome
+        stopOnError: true
+        recommendedNextActions: Fix the biome issues and run the tool again
+      - id: jscpd
+        command: npm run --silent check:jscpd
+        stopOnError: true
+        recommendedNextActions: Reduce duplication and run the tool again
+      - id: unittest
+        command: npm run --silent test
+        stopOnError: true
+        recommendedNextActions: Fix failing tests and run the tool again

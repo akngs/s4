@@ -1,0 +1,341 @@
+title: >-
+  S4: A Framework for AI-Driven Software Development
+mission: >-
+  Enable an AI-driven yet human-steerable software development methodology by unifying specifications, tools, and processes into a cohesive framework.
+vision: >-
+  A world where the complexity of software creation is automated away, allowing innovators to translate their vision into working software effortlessly and reliably.
+businessObjectives:
+  - id: BO-0001
+    description: >-
+      Enable AI agents to work more effectively by providing a [[Semi-Structured Software Specification]] and tools optimized for [[AI-Driven Development]].
+  - id: BO-0002
+    description: >-
+      Ensure consistent understanding between humans and AI agents through [[Specification as Single Source of Truth]] that eliminates ambiguity and misalignment.
+  - id: BO-0003
+    description: >-
+      Maintain complete [[Traceability]] from business goals to implementation, ensuring every line of code serves a documented business purpose.
+concepts:
+  - id: Semi-Structured Software Specification
+    description: >-
+      A structured document format that describes software projects with clear [[Business Objective]]s, [[Feature]]s, and [[Acceptance Test]]s. It is designed to be both human-readable and machine-parseable. AI coding agents use this format to understand requirements and implement the [[Acceptance Test]]s and [[Feature]]s. Agents can also use CLI tools to validate the spec and keep it synchronized with the implementation.
+  - id: Business Objective
+    description: >-
+      A high-level goal that the business wants to achieve, identified by a "BO-####" ID format, representing the "why" behind feature development and providing context to AI agents and human stakeholders.
+  - id: Feature
+    description: >-
+      A concrete functionality that will be built to achieve business objectives, identified by a "FE-####" ID format, representing the "what" to be built and enabling AI agents and human stakeholders to understand the implementation scope.
+  - id: Acceptance Test
+    description: >-
+      A specific, testable condition that a feature must meet to be considered complete, identified by an "AT-####" ID format, written in Given-When-Then style. AI agents and human stakeholders use this to understand the acceptance criteria for a feature.
+  - id: Traceability
+    description: >-
+      The ability to track and verify the relationships between [[Business Objective]]s, [[Feature]]s, [[Acceptance Test]]s, and actual implementation code, ensuring that every business objective is covered by at least one feature, every feature is covered by at least one acceptance test, every acceptance test is implemented in code, and all dependencies are properly documented and validated throughout the entire AI-driven development lifecycle.
+  - id: Human-in-the-Loop
+    description: >-
+      A development process in which AI agents autonomously execute development tasks while human stakeholders provide validation, oversight, and decision-making at critical junctures, ensuring business alignment and quality control.
+  - id: AI-Driven Development
+    description: >-
+      A software development methodology where AI agents drive the entire development process from spec interpretation to implementation and testing, with humans providing strategic direction and validation in a [[Human-in-the-Loop]] manner.
+  - id: Specification as Single Source of Truth
+    description: >-
+      The [[Semi-Structured Software Specification]] serves as the authoritative source for all project requirements, design decisions, and development guidance. Code is a derived artifact that must conform to and implement the spec. When discrepancies arise between the spec and the code, the spec takes precedence and the code must be modified to align with it.
+features:
+  - id: FE-0001
+    title: Read spec from file
+    description: >-
+      The CLI accepts a `--spec` option that specifies the path to the spec file, defaulting to `s4.yaml` in the current directory. This lets users work with spec files directly instead of stdin.
+    covers: [BO-0001, BO-0002]
+  - id: FE-0002
+    title: Check internal consistency of the spec
+    description: >-
+      The CLI performs internal consistency validation by checking that specifications provided via the `--spec` option follow required structural rules, including proper ID formats, complete [[Traceability]] across [[Business Objective]]s, [[Feature]]s, and [[Acceptance Test]]s, and the absence of circular dependencies. Error messages guide the reader (AI or human) to modify the spec to resolve inconsistencies.
+    covers: [BO-0002, BO-0003]
+    prerequisites: [FE-0001]
+  - id: FE-0003
+    title: Show overvall status of the project with comprehensive context and recommended next actions
+    description: >-
+      The CLI analyzes the current state of the project and provides actionable guidance on the next actions. It first shows a summarized context containing the project title, mission, vision, business objectives, and a list of features with completion stats based on passing acceptance tests. After this summary, it recommends specific next steps, helping AI agents and humans prioritize their work by addressing validation, synchronization, tests, and code quality issues in order of priority.
+    covers: [BO-0001, BO-0002, BO-0003]
+    prerequisites: [FE-0002, FE-0010]
+  - id: FE-0004
+    title: Display detailed feature information
+    description: >-
+      The CLI can display detailed information about a specific feature including including its title, description, covered business objectives, prerequisites, dependent features, and acceptance tests in a well-formatted markdown output.
+    covers: [BO-0001, BO-0002]
+    prerequisites: [FE-0002]
+  - id: FE-0005
+    title: Display detailed acceptance test information
+    description: >-
+      The CLI can display detailed information about a specific acceptance test including its description, covered features, and related business objectives in a well-formatted markdown output.
+    covers: [BO-0001, BO-0002]
+    prerequisites: [FE-0002]
+  - id: FE-0008
+    title: Locate acceptance test files
+    description: >-
+      The CLI can locate acceptance test files by ID using the tools configuration, helping developers quickly find their implementations.
+    covers: [BO-0001]
+    prerequisites: [FE-0002]
+  - id: FE-0009
+    title: Run individual acceptance tests
+    description: >-
+      The CLI can execute individual acceptance tests by ID using the tools configuration, enabling targeted test execution during development.
+    covers: [BO-0001]
+    prerequisites: [FE-0002]
+  - id: FE-0010
+    title: Run all acceptance tests
+    description: >-
+      The CLI can execute all acceptance tests defined in a spec using the tools configuration, enabling comprehensive test execution.
+    covers: [BO-0001]
+    prerequisites: [FE-0002]
+  - id: FE-0013
+    title: Run user-defined tools
+    description: >-
+      The CLI can execute tools defined in the `tools` configuration, enabling developers to run custom scripts or commands as part of the development process.
+    covers: [BO-0003]
+    prerequisites: [FE-0002]
+  - id: FE-0014
+    title: Guide spec authoring from the ground up
+    description: >-
+      The CLI can guide AI agent and human spec authors to write a spec that is easy to understand and maintain.
+    covers: [BO-0001, BO-0002]
+    prerequisites: [FE-0002]
+acceptanceTests:
+  - id: AT-0001
+    covers: FE-0001
+    given: a spec file
+    when: the user runs "s4 validate --spec path-and-filename"
+    then: the spec is read from the file
+  - id: AT-0042
+    covers: FE-0001
+    given: a spec file "s4.yaml" exists in the current directory
+    when: the user runs "s4 validate" without specifying --spec
+    then: the system reads from "s4.yaml" by default
+  - id: AT-0050
+    covers: FE-0001
+    given: a non-existent spec file
+    when: the user runs "s4 validate --spec nonexistent.yaml"
+    then: the command fails with an error message indicating the file does not exist
+  - id: AT-0004
+    covers: FE-0001
+    given: a spec in YAML format
+    when: the user runs "s4 validate --spec spec.yaml --format yaml"
+    then: the spec is successfully parsed and validated
+  - id: AT-0005
+    covers: FE-0001
+    given: a spec in JSON format
+    when: the user runs "s4 validate --spec spec.json --format json"
+    then: the spec is successfully parsed and validated
+  - id: AT-0002
+    covers: FE-0002
+    given: a spec with multiple structural issues
+    when: the user runs "s4 validate"
+    then: all validation issues are detected and reported
+  - id: AT-0003
+    covers: FE-0002
+    given: a spec with no structural issues
+    when: the user runs "s4 validate"
+    then: the command exits successfully with no errors
+  - id: AT-0010
+    covers: FE-0002
+    given: a spec with no [[Business Objective]]s defined
+    when: the user runs "s4 validate"
+    then: error messages show that the spec has at least one [[Business Objective]] defined and provide actionable guidance
+  - id: AT-0006
+    covers: FE-0002
+    given: a spec with uncovered [[Business Objective]]s
+    when: the user runs "s4 validate"
+    then: error messages show which BO-#### IDs lack covering features and provide actionable guidance
+  - id: AT-0007
+    covers: FE-0002
+    given: a spec with circular feature dependencies
+    when: the user runs "s4 validate"
+    then: circular dependency is detected and reported with feature IDs
+  - id: AT-0017
+    covers: FE-0002
+    given: a spec with uncovered [[Feature]]s
+    when: the user runs "s4 validate"
+    then: error messages show which FE-#### IDs lack covering acceptance tests and provide actionable guidance
+  - id: AT-0018
+    covers: FE-0002
+    given: a spec with invalid prerequisite references
+    when: the user runs "s4 validate"
+    then: error messages show which features reference unknown prerequisite IDs and provide actionable guidance
+  - id: AT-0019
+    covers: FE-0002
+    given: a spec with invalid business objective references in features
+    when: the user runs "s4 validate"
+    then: error messages show which features reference unknown business objective IDs and provide actionable guidance
+  - id: AT-0020
+    covers: FE-0002
+    given: a spec with invalid feature references in acceptance tests
+    when: the user runs "s4 validate"
+    then: error messages show which acceptance tests reference unknown feature IDs and provide actionable guidance
+  - id: AT-0023
+    covers: FE-0002
+    given: a spec with invalid concept references in descriptions
+    when: the user runs "s4 validate"
+    then: error messages show which items reference undefined concepts and provide actionable guidance
+  - id: AT-0021
+    covers: FE-0002
+    given: a spec with duplicate IDs across business objectives, features, and acceptance tests
+    when: the user runs "s4 validate"
+    then: error messages show which IDs are duplicated and provide actionable guidance
+  - id: AT-0022
+    covers: FE-0002
+    given: a spec with duplicate concept labels
+    when: the user runs "s4 validate"
+    then: error messages show which concept labels are duplicated and provide actionable guidance
+  - id: AT-0024
+    covers: FE-0002
+    given: a spec with unused concepts
+    when: the user runs "s4 validate"
+    then: error messages show which concepts are defined but never referenced and provide actionable guidance
+  - id: AT-0043
+    covers: FE-0003
+    given: a spec
+    when: the user runs "s4 status"
+    then: the system displays the project title, mission, and vision
+  - id: AT-0044
+    covers: FE-0003
+    given: a spec
+    when: the user runs "s4 status"
+    then: the system displays all business objectives
+  - id: AT-0045
+    covers: FE-0003
+    given: a spec
+    when: the user runs "s4 status"
+    then: the system displays a list of all features with their completion stats
+  - id: AT-0035
+    covers: FE-0003
+    given: a spec with no issues
+    when: the user runs "s4 status"
+    then: the system displays the project is in good state
+  - id: AT-0032
+    covers: FE-0003
+    given: a spec with failing acceptance tests
+    when: the user runs "s4 status"
+    then: the system displays few failing acceptance tests and picks the most important one to fix
+  - id: AT-0008
+    covers: FE-0003
+    given: a spec with internal inconsistencies
+    when: the user runs "s4 status"
+    then: the system displays all detected issues along with actionable guidance for each
+  - id: AT-0009
+    covers: FE-0003
+    given: a spec with mismatching acceptance tests
+    when: the user runs "s4 status"
+    then: the system displays a message that the files should be fixed to match the spec
+  - id: AT-0030
+    covers: FE-0003
+    given: a spec with missing acceptance test files
+    when: the user runs "s4 status"
+    then: the system displays a message that missing acceptance tests need to be created first
+  - id: AT-0031
+    covers: FE-0003
+    given: a spec with dangling acceptance test files
+    when: the user runs "s4 status"
+    then: the system displays a message that dangling acceptance tests need to be removed first
+  - id: AT-0033
+    covers: FE-0013
+    given: a spec with a failing tool
+    when: the user runs "s4 status"
+    then: the system displays the tool failure
+  - id: AT-0038
+    covers: FE-0004
+    given: a spec with a feature "FE-0001"
+    when: the user runs "s4 info FE-0001"
+    then: the system displays detailed information about the feature in markdown format
+  - id: AT-0039
+    covers: FE-0004
+    given: a spec with no feature "FE-9999"
+    when: the user runs "s4 info FE-9999"
+    then: the system displays an error indicating that the feature does not exist
+  - id: AT-0040
+    covers: FE-0005
+    given: a spec with an acceptance test "AT-0001"
+    when: the user runs "s4 info AT-0001"
+    then: the system displays detailed information about the acceptance test in markdown format
+  - id: AT-0041
+    covers: FE-0005
+    given: a spec with no acceptance test "AT-9999"
+    when: the user runs "s4 info AT-9999"
+    then: the system displays an error indicating that the acceptance test does not exist
+  - id: AT-0013
+    covers: FE-0009
+    given: a spec with a tools configuration
+    when: the user runs "s4 run-at AT-####"
+    then: the system executes the specified acceptance test and returns the results
+  - id: AT-0014
+    covers: FE-0008
+    given: a spec with a tools configuration
+    when: the user runs "s4 locate-at AT-####"
+    then: the system returns the file path for the specified acceptance test
+  - id: AT-0015
+    covers: FE-0010
+    given: a spec with a tools configuration
+    when: the user runs "s4 run-ats"
+    then: the system executes all acceptance tests and returns the results
+  - id: AT-0046
+    covers: FE-0013
+    given: a spec with a tool "sometool"
+    when: the user runs "s4 tool sometool" and the tool exits with code 0
+    then: the system returns exit code 0
+  - id: AT-0047
+    covers: FE-0013
+    given: a spec with a tool "sometool"
+    when: the user runs "s4 tool sometool" and the tool exits with non-zero code
+    then: the system returns exit code 1 and provides custom message defined in "recommendedNextActions" field
+  - id: AT-0048
+    covers: FE-0013
+    given: a spec with multiple tools defined in order (e.g., "tool1", then "tool2")
+    when: the user runs "s4 tools"
+    then: the system executes all tools in the defined order
+  - id: AT-0049
+    covers: FE-0013
+    given: a spec with tools where a preceding tool has stopOnError set to true and exits with non-zero
+    when: the user runs "s4 tools"
+    then: the system stops executing subsequent tools after the failing tool
+  - id: AT-0051
+    covers: FE-0013
+    given: a spec with multiple tools
+    when: the user runs "s4 status"
+    then: the system runs all tools at the end of the process
+  - id: AT-0062
+    covers: FE-0014
+    given: in any occasion
+    when: the user runs "s4 guide"
+    then: the system displays the brief from `guideline.yaml`
+  - id: AT-0063
+    covers: FE-0014
+    given: no spec file exists in the current directory
+    when: the user runs "s4 status"
+    then: the system displays that the spec file has to be created first and suggest to run "s4 guide"
+  - id: AT-0064
+    covers: FE-0014
+    given: in any occasion
+    when: the user runs "s4 guide SECTION-NAME"
+    then: the system displays the content of the section from `guideline.yaml` with examples
+connectors:
+  listAcceptanceTests: |- # Prints ATs in the format: "AT-0001: TITLE"
+    npx vitest list --project=acceptance | awk -F'> ' '{split($1, parts, "/"); id=parts[length(parts)]; print id ": " $2}' | sed 's/\.test\.ts : /: /'
+  locateAcceptanceTest: |-
+    echo "src/at/{ID}.test.ts"
+  runAcceptanceTest: |-  # TAP-flat format
+    npm run --silent test:acceptance -- src/at/{ID}.test.ts
+  runAcceptanceTests: |-  # TAP-flat format
+    npm run --silent test:acceptance
+tools:
+  - id: biome
+    command: npm run --silent check:biome
+  - id: tsc
+    command: npm run --silent check:tsc
+  - id: eslint
+    command: npm run --silent check:eslint
+  - id: depcruise
+    command: npm run --silent check:depcruise
+  - id: knip
+    command: npm run --silent check:knip
+  - id: jscpd
+    command: npm run --silent check:jscpd
+  - id: unittest
+    command: npm run --silent test:coverage

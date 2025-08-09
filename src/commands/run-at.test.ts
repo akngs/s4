@@ -1,0 +1,34 @@
+import { ARCHETYPAL_SPEC, cleanupTempFile, createTempFile } from "../test-utils.ts"
+import runAt from "./run-at.ts"
+
+const SPEC_WITH_CONNECTORS = {
+  ...ARCHETYPAL_SPEC,
+  connectors: {
+    ...ARCHETYPAL_SPEC.connectors,
+    // ensure the command is deterministic and includes the id
+    runAcceptanceTest: 'bash -c "echo {ID}: ok"',
+  },
+}
+
+it("run-at command should succeed with valid acceptance test ID", async () => {
+  const tempFile = createTempFile(SPEC_WITH_CONNECTORS)
+  try {
+    const result = await runAt({ id: "AT-0001", spec: tempFile, format: "yaml" })
+    expect(result.exitCode).toBe(0)
+    expect(result.stdout).toBe("AT-0001: ok")
+    expect(result.stderr).toBe("")
+  } finally {
+    cleanupTempFile(tempFile)
+  }
+})
+
+it("run-at should return value_error when id is missing", async () => {
+  const tempFile = createTempFile(SPEC_WITH_CONNECTORS)
+  try {
+    const result = await runAt({ id: "", spec: tempFile, format: "yaml" })
+    expect(result.exitCode).toBe(1)
+    expect(result.stderr).toBe("value_error: Missing ID - Provide AT-nnnn")
+  } finally {
+    cleanupTempFile(tempFile)
+  }
+})

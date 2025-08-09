@@ -1,0 +1,19 @@
+<% if (count == 0) { %>
+No mismatching acceptance tests.
+
+<%= chalk.blue.underline.bold("Recommended Next Action:\n") %>
+
+> s4 status  # Check the status of the project and the next action to take
+
+<% } else { %>
+There are <%= count %> mismatching acceptance tests - the test file description does not match the spec description:
+
+<% tests.forEach(test => { %>
+- <%= test.id %>: Expected "<%= chalk.green(test.expected) %>" but "<%= chalk.red(test.actual) %>" in <%= test.filePath %>
+<% }) %><%= "\n" %>
+
+<%= chalk.blue.underline.bold("Recommended Next Action:\n") %>
+
+- Update the test file description to match the spec description. Do not change the spec description since the spec is the source of truth.
+- Even if you are absolutely sure that the spec description is wrong, consult your colleagues before making changes.
+<% } %>

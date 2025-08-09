@@ -1,0 +1,66 @@
+{
+  "name": "s4",
+  "module": "dist/index.js",
+  "type": "module",
+  "private": false,
+  "bin": {
+    "s4": "dist/index.js"
+  },
+  "scripts": {
+    "start": "node --experimental-strip-types src/index.ts",
+    "build": "tsup src/index.ts --format esm --dts --sourcemap --clean --shims --target node18 --out-dir dist",
+    "postbuild": "mkdir -p dist/templates && cp -R src/render/templates/* dist/templates/ && cp src/logics/guideline.yaml dist/guideline.yaml || true",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run build",
+    "check:biome": "biome check --error-on-warnings src",
+    "check:tsc": "tsc --noEmit",
+    "check:eslint": "eslint",
+    "check:depcruise": "depcruise src",
+    "check:knip": "knip",
+    "check:jscpd": "npm run --silent check:jscpd:src && npm run --silent check:jscpd:test",
+    "check:jscpd:src": "jscpd --min-lines 4 --min-tokens 60 --mode weak --format 'typescript' --exitCode 1 --pattern 'src/**/*.ts' --ignore '**/*.test.ts'",
+    "check:jscpd:test": "jscpd --min-lines 6 --min-tokens 80 --mode weak --format 'typescript' --exitCode 1 --pattern 'src/**/*.ts'",
+    "check": "npm run --silent check:biome && npm run --silent check:tsc && npm run --silent check:eslint && npm run --silent check:depcruise && npm run --silent check:knip && npm run --silent check:jscpd:src && npm run --silent check:jscpd:test",
+    "fix": "npm run --silent check:biome -- --write && npm run --silent check:eslint -- --fix",
+    "test": "vitest run --reporter dot --project unit",
+    "test:watch": "vitest --reporter dot --project unit",
+    "test:coverage": "vitest run --reporter dot --coverage --project unit --coverage.thresholds.perFile --coverage.thresholds.lines 80 --coverage.thresholds.statements 80 --coverage.thresholds.functions 80 --coverage.thresholds.branches 80",
+    "test:acceptance": "vitest run --project acceptance --reporter tap-flat"
+  },
+  "main": "dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "devDependencies": {
+    "@biomejs/biome": "^2.1.4",
+    "@eslint/js": "^9.33.0",
+    "@types/node": "^24.2.1",
+    "@vitest/coverage-v8": "^3.2.4",
+    "dedent": "^1.6.0",
+    "dependency-cruiser": "^17.0.1",
+    "eslint": "^9.33.0",
+    "eslint-plugin-jsdoc": "^52.0.4",
+    "eslint-plugin-sonarjs": "^3.0.4",
+    "jscpd": "^4.0.5",
+    "knip": "^5.62.0",
+    "tsup": "^8.0.1",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.39.0",
+    "vitest": "^3.2.4"
+  },
+  "dependencies": {
+    "@commander-js/extra-typings": "^14.0.0",
+    "chalk": "^5.5.0",
+    "commander": "^14.0.0",
+    "eta": "^3.5.0",
+    "yaml": "^2.8.0",
+    "zod": "^4.0.16"
+  }
+}

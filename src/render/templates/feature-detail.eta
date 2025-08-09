@@ -1,0 +1,41 @@
+<%= chalk.blue.underline.bold("# " + feature.id + ": " + feature.title + "\n") %>
+
+<%= feature.description + "\n" %>
+
+<% if (businessObjectives.length > 0) { %>
+<%= chalk.blue.underline.bold("## Business Objectives Covered by This Feature\n") %>
+
+<% businessObjectives.forEach(bo => { %>
+- <%= bo.id %>: <%= bo.description %><%= "\n" %>
+<% }) %>
+<% } %>
+
+<% if (prerequisites.length > 0) { %>
+<%= chalk.blue.underline.bold("## Prerequisites\n") %>
+
+<% prerequisites.forEach(prereq => { %>
+- <%= prereq.id %>: <%= prereq.title %><%= "\n" %>
+<% }) %>
+<% } _%>
+
+<% if (dependentFeatures.length > 0) { %>
+<%= chalk.blue.underline.bold("## Features That Depend On This Feature\n") %>
+
+<% dependentFeatures.forEach(dep => { %>
+- <%= dep.id %>: <%= dep.title %><%= "\n" %>
+<% }) %>
+<% } %>
+
+<% if (acceptanceTests.length > 0) { %>
+<%= chalk.blue.underline.bold("## Acceptance Tests Covering This Feature\n") %>
+
+<% acceptanceTests.forEach(test => { %>
+- <%= test.id %>: <%= chalk.green("GIVEN " + test.given) + "," %> <%= chalk.white("WHEN " + test.when + ",") %> <%= chalk.cyan("THEN " + test.then) %><%= "\n" %>
+<% }) %>
+<% } %>
+
+<%= chalk.blue.underline.bold("Recommended Next Action:\n") %>
+
+> s4 info AT-nnnn    # to see the acceptance test details
+> s4 run-at AT-nnnn  # to run the acceptance test
+> s4 status          # to check the status of the project and the next action to take

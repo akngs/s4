@@ -1,0 +1,8 @@
+---
+alwaysApply: true
+---
+The project develops a CLI tool "s4" which helps AI coding agents like you by providing just enough context of the task at hands and specific instructions on what to do next.
+
+Here's interesting thing: The project uses s4 itself to developing s4 further. @s4.yaml is S4 documentation about S4 project itself. All the information you need to know about this project is in that file.
+
+Always run `s4 status` to get the status of the project and the next action to take. This tool will give you the full context you need to know. Before stating you've completed the task, run `s4 status` again to make sure you've completed all the steps.

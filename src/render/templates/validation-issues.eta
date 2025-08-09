@@ -1,0 +1,122 @@
+<% if (count === 0) { %>
+There are no validation issues - the spec is consistent.
+
+<%= chalk.blue.underline.bold("Recommended Next Action:\n") %>
+
+> s4 status  # Check the status of the project and the next action to take
+
+<% } else { %>
+There are <%= count %> validation issues - the spec has internal inconsistencies.
+
+<% issues.forEach(issue => { %>
+<% if (issue._tag === "missing_section" && issue.section === "businessObjectives") { %>
+[missing_section] The spec must define at least one Business Objective.
+
+<%= chalk.blue.underline.bold("Recommended Next Action:\n") %>
+
+- Add at least one business objective under the "businessObjectives" section.
+- You may consult your colleagues for help.
+- Run `s4 guide businessObjective` to see the business objective writing guidelines.
+
+<% } else if (issue._tag === "uncovered_item" && issue.itemType === "BO") { %>
+[<%= issue._tag %>] Business objective <%= issue.id %> is not covered by any feature.
+
+<%= chalk.blue.underline.bold("Recommended Next Action:\n") %>
+
+- Define a new feature that covers <%= issue.id %>.
+- Modify the existing features' "covers" field to include <%= issue.id %>.
+- Remove <%= issue.id %> if you are absolutely sure it is not needed.
+- You may consult your colleagues for help.
+- Run `s4 guide feature` to see the feature writing guidelines.
+
+<% } else if (issue._tag === "uncovered_item" && issue.itemType === "FE") { %>
+[<%= issue._tag %>] Feature <%= issue.id %> is not covered by any acceptance test.
+
+<%= chalk.blue.underline.bold("Recommended Next Action:\n") %>
+
+- Add a new acceptance test that covers <%= issue.id %>.
+- Modify the existing acceptance tests' "covers" field to cover <%= issue.id %>.
+- Remove <%= issue.id %> if you are absolutely sure it is not needed.
+- You may consult your colleagues for help.
+- Run `s4 guide acceptance-test` to see the acceptance test writing guidelines.
+
+<% } else if (issue._tag === "invalid_prereq") { %>
+[<%= issue._tag %>] Feature <%= issue.id %> has a prerequisite <%= issue.referencedId %> that is not defined in the spec.
+
+<%= chalk.blue.underline.bold("Recommended Next Action:\n") %>
+
+- Define the prerequisite feature <%= issue.referencedId %> to the spec.
+- Modify <%= issue.id %>'s "prerequisites" field to reference existing feature.
+- Remove <%= issue.id %> if you are absolutely sure it is not needed.
+- You may consult your colleagues for help.
+- Run `s4 guide feature` to see the feature writing guidelines.
+
+<% } else if (issue._tag === "invalid_bo") { %>
+[<%= issue._tag %>] Feature <%= issue.id %> references unknown business objective <%= issue.referencedId %>.
+
+<%= chalk.blue.underline.bold("Recommended Next Action:\n") %>
+
+- Define the business objective <%= issue.referencedId %> to the spec.
+- Modify <%= issue.id %>'s "covers" field to reference existing business objective.
+- Remove <%= issue.id %> if you are absolutely sure it is not needed.
+- You may consult your colleagues for help.
+- Run `s4 guide businessObjective` to see the business objective writing guidelines.
+
+<% } else if (issue._tag === "invalid_fe") { %>
+[<%= issue._tag %>] Acceptance test <%= issue.id %> references unknown feature <%= issue.referencedId %>.
+
+<%= chalk.blue.underline.bold("Recommended Next Action:\n") %>
+
+- Define the feature <%= issue.referencedId %> to the spec.
+- Modify <%= issue.id %>'s "covers" field to reference existing feature.
+- Remove <%= issue.id %> if you are absolutely sure it is not needed.
+- You may consult your colleagues for help.
+- Run `s4 guide acceptanceTest` to see the acceptance test writing guidelines.
+
+<% } else if (issue._tag === "circular_dep") { %>
+[<%= issue._tag %>] Circular dependency detected involving feature <%= issue.id %>.
+
+<%= chalk.blue.underline.bold("Recommended Next Action:\n") %>
+
+- Carefully review "prerequisites" field of <%= issue.id %> to identify the circular dependency.
+- You may consult your colleagues for help.
+
+<% } else if (issue._tag === "invalid_concept_ref") { %>
+[<%= issue._tag %>] <%= issue.id %> references undefined concept "<%= issue.conceptLabel %>".
+
+<%= chalk.blue.underline.bold("Recommended Next Action:\n") %>
+
+- Define the concept "<%= issue.conceptLabel %>" to the spec's "concepts" field.
+- Modify <%= issue.id %>'s textual fields to remove "[[<%= issue.conceptLabel %>]]" references. You may just remove the brackets.
+
+<% } else if (issue._tag === "duplicate_id") { %>
+[<%= issue._tag %>] ID <%= issue.id %> is duplicated.
+
+<%= chalk.blue.underline.bold("Recommended Next Action:\n") %>
+
+- Modify one of the duplicate <%= issue.itemType %> <%= issue.id %> to have a unique id. Make sure to review all references to <%= issue.id %> and update them accordingly.
+- Remove one of the duplicate <%= issue.itemType %> <%= issue.id %>.
+- You may consult your colleagues for help.
+
+<% } else if (issue._tag === "duplicate_concept") { %>
+[<%= issue._tag %>] Concept "<%= issue.label %>" is defined multiple times.
+
+<%= chalk.blue.underline.bold("Recommended Next Action:\n") %>
+
+- Modify one of the duplicate concepts to have a unique label. Make sure to review all references to "<%= issue.label %>" and update them accordingly.
+- You may consult your colleagues for help.
+
+<% } else if (issue._tag === "unused_concept") { %>
+[<%= issue._tag %>] Concept "<%= issue.label %>" is not used in the spec.
+
+<%= chalk.blue.underline.bold("Recommended Next Action:\n") %>
+
+- Review textual fields of the spec and add "[[<%= issue.label %>]]" if appropriate.
+- Remove the unused concept "<%= issue.label %>" if you are absolutely sure it is not needed.
+- You may consult your colleagues for help.
+
+<% } else { %>
+[<%= issue._tag %>] Unknown issue. Please report this as a bug.
+<% } %>
+<% }) %>
+<% } %>

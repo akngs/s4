@@ -1,0 +1,10 @@
+# Project
+.env
+/dist
+
+# JS
+node_modules/
+coverage/
+
+# OS
+.DS_Store

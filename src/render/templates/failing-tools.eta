@@ -1,0 +1,16 @@
+There are errors reported by tools.
+
+<% it.failures.forEach(tool => { %>
+<%= chalk.blue.underline.bold("### " + tool.id + " (exit code: " + String(tool.exitCode) + ")") %><%= "\n" %>
+
+Output:
+
+<%   if (tool.stdout && tool.stdout.trim().length > 0) { %>
+<%= tool.stdout.trim().split("\n").map(line => `> ${line}`).join("\n") %><%= "\n\n" %>
+<%   } %>
+<%   if (tool.recommendedNextActions && tool.recommendedNextActions.trim().length > 0) { %>
+Recommended Next Action:
+
+<%= tool.recommendedNextActions.trim().split("\n").map(line => `> ${line}`).join("\n") %><%= "\n\n" %>
+<%   } %>
+<% }) %>

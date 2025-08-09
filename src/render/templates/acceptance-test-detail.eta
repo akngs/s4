@@ -1,0 +1,22 @@
+<%= chalk.blue.underline.bold("# " + acceptanceTest.id + "\n") %>
+
+<%= chalk.green("GIVEN " + acceptanceTest.given) + "," %> <%= chalk.white("WHEN " + acceptanceTest.when + ",") %> <%= chalk.cyan("THEN " + acceptanceTest.then) %><%= "\n" %>
+
+<%= chalk.blue.underline.bold("## Feature Covered by This Acceptance Test\n") %>
+
+- <%= coveredFeature.id %>: <%= coveredFeature.title %><%= "\n" %>
+
+<% if (relatedBusinessObjectives.length > 0) { %>
+<%= chalk.blue.underline.bold("## Related Business Objectives\n") %>
+
+<% relatedBusinessObjectives.forEach(bo => { %>
+- <%= bo.id %>: <%= bo.description %><%= "\n" %>
+<% }) %>
+<% } %>
+
+<%= chalk.blue.underline.bold("Recommended Next Action:\n") %>
+
+> s4 info FE-nnnn       # Get information about the feature this acceptance test covers
+> s4 run-at AT-nnnn     # Run the acceptance test
+> s4 locate-at AT-nnnn  # Locate the acceptance test file
+> s4 status             # Check the status of the project and the next action to take
