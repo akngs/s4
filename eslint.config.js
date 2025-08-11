@@ -9,7 +9,14 @@ export default tseslint.config(
   { ignores: ["dist/**/*", "coverage/**/*"] },
 
   // eslint
-  eslint.configs.recommended,
+  {
+    ...eslint.configs.recommended,
+    rules: {
+      ...eslint.configs.recommended.rules,
+      "max-params": ["error", { "max": 5 }],
+      "max-statements": ["error", { "max": 20 }], // sonarjs/max-lines-per-function과 다름
+    }
+  },
 
   // jsdoc
   {
@@ -54,7 +61,7 @@ export default tseslint.config(
       "sonarjs/no-os-command-from-path": "off",
       "sonarjs/prefer-regexp-exec": "off",
       "sonarjs/cognitive-complexity": ["error", 6],
-      "sonarjs/max-lines-per-function": ["error", {maximum: 40}],
+      "sonarjs/max-lines-per-function": ["error", {maximum: 40}], // max-statements와 다름
       "sonarjs/max-lines": ["error", {maximum: 185}],
       'sonarjs/elseif-without-else': "error",
       "sonarjs/no-collapsible-if": "error",
@@ -64,7 +71,15 @@ export default tseslint.config(
       "no-magic-numbers": "off",
       "@typescript-eslint/restrict-template-expressions": "off",
       "@typescript-eslint/switch-exhaustiveness-check": "error",
-      "@typescript-eslint/no-magic-numbers": ["error", {ignore: [-2, -1, 0, 1, 2, 10, 42, 100], ignoreEnums: true, ignoreNumericLiteralTypes: true, ignoreReadonlyClassProperties: true, ignoreTypeIndexes: true}],
+      "@typescript-eslint/no-magic-numbers": [
+        "error", {
+          ignore: [-2, -1, 0, 1, 2, 10, 16, 24, 32, 42, 60, 100, 255, 256, 512, 1024],
+          ignoreEnums: true,
+          ignoreNumericLiteralTypes: true,
+          ignoreReadonlyClassProperties: true,
+          ignoreTypeIndexes: true,
+        }
+      ],
     }
   },
 
