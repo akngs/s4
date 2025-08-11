@@ -2,25 +2,13 @@ import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
 import sonarjs from 'eslint-plugin-sonarjs';
 import jsdoc from 'eslint-plugin-jsdoc';
-
+import importPlugin from 'eslint-plugin-import';
 
 export default tseslint.config(
   { ignores: ["dist/**/*", "coverage/**/*"] },
-  {
-    ...eslint.configs.recommended,
-    files: ["src/**/*.ts"],
-  },
-  {
-    ...jsdoc.configs['flat/recommended-error'],
-    files: ["src/**/*.ts"],
-    rules: {
-      ...jsdoc.configs['flat/recommended-error'].rules,
-      "jsdoc/require-jsdoc": ["error", { "publicOnly": true }],
-      "jsdoc/require-param-type": "off",
-      "jsdoc/require-returns-type": "off",
-      "jsdoc/require-returns-check": "off",
-    },
-  },
+  eslint.configs.recommended,
+  jsdoc.configs['flat/recommended-error'],
+  { ...importPlugin.flatConfigs.recommended, files: ["src/**/*.ts"] },
   ...tseslint.configs.strictTypeChecked.map(config => ({
     ...config,
     files: ["src/**/*.ts"],
@@ -28,14 +16,13 @@ export default tseslint.config(
   {
     ...sonarjs.configs.recommended,
     files: ["src/**/*.ts"],
-    languageOptions: {
-      parserOptions: {
-        projectService: true,
-        tsconfigRootDir: import.meta.dirname,
-      },
-    },
+    languageOptions: { parserOptions: { projectService: true } },
     rules: {
       ...sonarjs.configs.recommended.rules,
+      "jsdoc/require-jsdoc": ["error", { "publicOnly": true }],
+      "jsdoc/require-param-type": "off",
+      "jsdoc/require-returns-type": "off",
+      "jsdoc/require-returns-check": "off",
       "sonarjs/todo-tag": "off",
       "sonarjs/pseudo-random": "off",
       "sonarjs/no-os-command-from-path": "off",
@@ -49,6 +36,10 @@ export default tseslint.config(
       "sonarjs/slow-regex": "off",
       "no-useless-escape": "off",
       "no-magic-numbers": "off",
+      "import/max-dependencies": ["error", {
+        "max": 8,
+        "ignoreTypeImports": false,
+      }],
       "@typescript-eslint/restrict-template-expressions": "off",
       "@typescript-eslint/switch-exhaustiveness-check": "error",
       "@typescript-eslint/no-magic-numbers": ["error", {ignore: [-2, -1, 0, 1, 2, 10, 42, 100], ignoreEnums: true, ignoreNumericLiteralTypes: true, ignoreReadonlyClassProperties: true, ignoreTypeIndexes: true}],

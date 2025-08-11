@@ -17,7 +17,7 @@ module.exports = {
         'One command should not depend on another command (in a separate file). ' +
         'Each command should be completely independent and self-contained, only depending on shared utilities.',
       severity: 'error',
-      from: { path: '^src/commands/[^_][^/]*[.]ts$', pathNot: '[.]test[.]ts$' },
+      from: { path: '^src/commands/[^_][^/]*[.]ts$', pathNot: 'index[.]ts$|[.]test[.]ts$' },
       to: { path: '^src/commands/[^_][^/]*[.]ts$', pathNot: '[.]test[.]ts$' }
     },
     {

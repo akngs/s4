@@ -46,6 +46,7 @@
     "dedent": "^1.6.0",
     "dependency-cruiser": "^17.0.1",
     "eslint": "^9.33.0",
+    "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsdoc": "^52.0.4",
     "eslint-plugin-sonarjs": "^3.0.4",
     "jscpd": "^4.0.5",
