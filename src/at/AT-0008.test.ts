@@ -47,20 +47,27 @@ it('GIVEN a spec with internal inconsistencies, WHEN the user runs "s4 status", 
     expect(result.stdout).toMatch(/There are \d+ validation issues - the spec has internal inconsistencies\./)
 
     // Check for specific validation issues and their guidance
-    expect(result.stdout).toContain("[uncovered_item] Business objective BO-0002 is not covered by any feature")
-    expect(result.stdout).toContain("Define a new feature that covers BO-0002")
+    expect(result.stdout).toContainInOrder([
+      "[uncovered_item] Business objective BO-0002 is not covered by any feature",
+      "Define a new feature that covers BO-0002",
+    ])
 
-    expect(result.stdout).toContain("[uncovered_item] Feature FE-0004 is not covered by any acceptance test")
-    expect(result.stdout).toContain("Add a new acceptance test that covers FE-0004")
+    expect(result.stdout).toContainInOrder([
+      "[uncovered_item] Feature FE-0004 is not covered by any acceptance test",
+      "Add a new acceptance test that covers FE-0004",
+    ])
 
-    expect(result.stdout).toContain("[invalid_prereq] Feature FE-0002 has a prerequisite FE-9999 that is not defined")
-    expect(result.stdout).toContain("Define the prerequisite feature FE-9999")
+    expect(result.stdout).toContainInOrder([
+      "[invalid_prereq] Feature FE-0002 has a prerequisite FE-9999 that is not defined",
+      "Define the prerequisite feature FE-9999",
+    ])
 
-    expect(result.stdout).toContain("[invalid_bo] Feature FE-0003 references unknown business objective BO-9999")
-    expect(result.stdout).toContain("Define the business objective BO-9999")
+    expect(result.stdout).toContainInOrder([
+      "[invalid_bo] Feature FE-0003 references unknown business objective BO-9999",
+      "Define the business objective BO-9999",
+    ])
 
-    expect(result.stdout).toContain("[invalid_fe] Acceptance test AT-0002 references unknown feature FE-9999")
-    expect(result.stdout).toContain("Define the feature FE-9999")
+    expect(result.stdout).toContainInOrder(["[invalid_fe] Acceptance test AT-0002 references unknown feature FE-9999", "Define the feature FE-9999"])
   } finally {
     cleanupTempFile(tempFile)
   }

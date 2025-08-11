@@ -17,8 +17,7 @@ it('GIVEN a spec with multiple tools defined in order (e.g., "tool1", then "tool
 
     // Then tools are executed in order and outputs are combined in order
     expect(result.status).toBe(0)
-    expect(result.stdout).toContain("✔ tool1: success")
-    expect(result.stdout).toContain("✔ tool2: success")
+    expect(result.stdout).toContainInOrder(["✔ tool1: success", "✔ tool2: success"])
   } finally {
     cleanupTempFile(tempFile)
   }

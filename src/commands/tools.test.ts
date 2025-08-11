@@ -12,9 +12,7 @@ it("should run all tools and render tools section when all succeed", async () =>
   await withTempSpecFile(spec, async temp => {
     const result = await tools({ spec: temp, format: "yaml" })
     expect(result.exitCode).toBe(0)
-    expect(result.stdout).toContain("## Tools")
-    expect(result.stdout).toContain("✔ t1")
-    expect(result.stdout).toContain("✔ t2")
+    expect(result.stdout).toContainInOrder(["## Tools", "✔ t1", "✔ t2"])
     expect(result.stderr).toBe("")
   })
 })
@@ -31,14 +29,9 @@ it("should stop on error when a tool fails with stopOnError=true and render fail
   await withTempSpecFile(spec, async temp => {
     const result = await tools({ spec: temp, format: "yaml" })
     expect(result.exitCode).toBe(1)
-    expect(result.stdout).toContain("## Tools")
-    expect(result.stdout).toContain("✔ ok")
-    expect(result.stdout).toContain("✘ fail")
-    expect(result.stdout).toContain("⚠ never: skipped")
+    expect(result.stdout).toContainInOrder(["## Tools", "✔ ok", "✘ fail", "⚠ never: skipped"])
     // Failing tools details section
-    expect(result.stdout).toContain("There are errors reported by tools.")
-    expect(result.stdout).toContain("### fail (exit code: 1)")
-    expect(result.stdout).toContain("Recommended Next Action:")
+    expect(result.stdout).toContainInOrder(["There are errors reported by tools.", "### fail (exit code: 1)", "Recommended Next Action:"])
     expect(result.stderr).toBe("error\n")
   })
 })
@@ -54,12 +47,9 @@ it("should continue after failure when stopOnError=false and reflect last exit c
   await withTempSpecFile(spec, async temp => {
     const result = await tools({ spec: temp, format: "yaml" })
     expect(result.exitCode).toBe(0)
-    expect(result.stdout).toContain("## Tools")
-    expect(result.stdout).toContain("✘ fail")
-    expect(result.stdout).toContain("✔ ok")
+    expect(result.stdout).toContainInOrder(["## Tools", "✘ fail", "✔ ok"])
     // Failing tools details should include section and the failing tool id
-    expect(result.stdout).toContain("There are errors reported by tools.")
-    expect(result.stdout).toContain("### fail (exit code: 1)")
+    expect(result.stdout).toContainInOrder(["There are errors reported by tools.", "### fail (exit code: 1)"])
     expect(result.stderr).toBe("")
   })
 })

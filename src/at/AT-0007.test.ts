@@ -19,7 +19,7 @@ it('GIVEN a spec with circular feature dependencies, WHEN the user runs "s4 vali
     expect(result.status).toBe(1)
 
     // Should contain specific validation issue messages with guidance
-    expect(result.stderr).toContain("[circular_dep] Circular dependency detected involving feature FE-0004.")
+    expect(result.stderr).toContainInOrder(["[circular_dep] Circular dependency detected involving feature FE-0004."])
   } finally {
     cleanupTempFile(tempFile)
   }

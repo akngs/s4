@@ -24,9 +24,11 @@ it('GIVEN a spec with duplicate IDs across business objectives, features, and ac
 
     // Then specific error messages indicate which IDs are duplicated
     expect(result.status).toBe(1)
-    expect(result.stderr).toContain("[duplicate_id] ID BO-0001 is duplicated.")
-    expect(result.stderr).toContain("[duplicate_id] ID FE-0001 is duplicated.")
-    expect(result.stderr).toContain("[duplicate_id] ID AT-0001 is duplicated.")
+    expect(result.stderr).toContainInOrder([
+      "[duplicate_id] ID BO-0001 is duplicated.",
+      "[duplicate_id] ID FE-0001 is duplicated.",
+      "[duplicate_id] ID AT-0001 is duplicated.",
+    ])
   } finally {
     cleanupTempFile(tempFile)
   }

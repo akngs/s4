@@ -20,8 +20,10 @@ it('GIVEN a spec with missing acceptance test files, WHEN the user runs "s4 stat
     const result = runS4(`status --spec ${tempFile}`)
 
     // Then the system displays missing acceptance tests need to be created first
-    expect(result.stdout).toContain("There are 1 missing acceptance tests total. Among them AT-9999 has the highest priority:")
-    expect(result.stdout).toContain("- [AT-9999] src/at/AT-9999.test.ts")
+    expect(result.stdout).toContainInOrder([
+      "There are 1 missing acceptance tests total. Among them AT-9999 has the highest priority:",
+      "- [AT-9999] src/at/AT-9999.test.ts",
+    ])
   } finally {
     cleanupTempFile(tempFile)
   }

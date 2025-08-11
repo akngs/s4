@@ -14,8 +14,7 @@ it('GIVEN a spec with no [[Business Objective]]s defined, WHEN the user runs "s4
 
     // Should contain specific validation message with guidance
     const output = result.stderr
-    expect(output).toContain("[missing_section] The spec must define at least one Business Objective.")
-    expect(output).toContain("Run `s4 guide businessObjective`")
+    expect(output).toContainInOrder(["[missing_section] The spec must define at least one Business Objective.", "Run `s4 guide businessObjective`"])
   } finally {
     cleanupTempFile(tempFile)
   }

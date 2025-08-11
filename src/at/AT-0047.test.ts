@@ -21,9 +21,7 @@ it('GIVEN a spec with a tool "sometool", WHEN the user runs "s4 tool sometool" a
     // Then the system returns the results as is and provides recommended next actions
     expect(result.status).toBe(1)
     // stdout should include the tool output followed by the recommended next actions
-    expect(result.stdout).toContain("COMMAND OUTPUT")
-    expect(result.stdout).toContain("CUSTOM MESSAGE")
-    expect(result.stdout.indexOf("COMMAND OUTPUT")).toBeLessThan(result.stdout.indexOf("CUSTOM MESSAGE"))
+    expect(result.stdout).toContainInOrder(["COMMAND OUTPUT", "CUSTOM MESSAGE"])
     // stderr should be passed through without modification (empty in our echo/false example)
     expect(result.stderr).toBe("")
   } finally {

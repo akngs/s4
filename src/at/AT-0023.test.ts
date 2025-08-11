@@ -11,7 +11,7 @@ it('GIVEN a spec with invalid concept references in descriptions, WHEN the user 
 
     // Then specific error messages indicate which items reference undefined concepts
     expect(result.status).toBe(1)
-    expect(result.stderr).toContain('[invalid_concept_ref] BO-0001 references undefined concept "Unknown".')
+    expect(result.stderr).toContainInOrder(['[invalid_concept_ref] BO-0001 references undefined concept "Unknown".'])
   } finally {
     cleanupTempFile(tempFile)
   }

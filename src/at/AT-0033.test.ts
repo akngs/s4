@@ -19,8 +19,7 @@ it('GIVEN a spec with a failing tool, WHEN the user runs "s4 status", THEN the s
     // When the user runs "s4 status --spec spec.yaml"
     const result = runS4(`status --spec ${tempFile}`)
     // Then the system displays the tool failure
-    expect(result.stdout).toContain("Lint errors found")
-    expect(result.stdout).toContain("Fix the lint errors and run the tool again")
+    expect(result.stdout).toContainInOrder(["Lint errors found", "Fix the lint errors and run the tool again"])
   } finally {
     cleanupTempFile(tempFile)
   }

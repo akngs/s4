@@ -20,15 +20,13 @@ it('GIVEN a spec with mismatching acceptance tests, WHEN the user runs "s4 statu
     const result = runS4(`status --spec ${tempFile}`)
 
     // Then the system displays the files should be fixed to match the spec
-    expect(result.stdout).toContain("There are 2 mismatching acceptance tests - the test file description does not match the spec description:")
-
-    // Check for specific mismatching test details
-    expect(result.stdout).toContain('- AT-0001: Expected "GIVEN G1, WHEN W1, THEN T1" but "GIVEN G3, WHEN W3, THEN T3" in src/at/AT-0001.test.ts')
-    expect(result.stdout).toContain('- AT-0002: Expected "GIVEN G2, WHEN W2, THEN T2" but "GIVEN G4, WHEN W4, THEN T4" in src/at/AT-0002.test.ts')
-
-    // Check for actionable guidance
-    expect(result.stdout).toContain("Update the test file description to match the spec description")
-    expect(result.stdout).toContain("Do not change the spec description since the spec is the source of truth")
+    expect(result.stdout).toContainInOrder([
+      "There are 2 mismatching acceptance tests - the test file description does not match the spec description:",
+      '- AT-0001: Expected "GIVEN G1, WHEN W1, THEN T1" but "GIVEN G3, WHEN W3, THEN T3" in src/at/AT-0001.test.ts',
+      '- AT-0002: Expected "GIVEN G2, WHEN W2, THEN T2" but "GIVEN G4, WHEN W4, THEN T4" in src/at/AT-0002.test.ts',
+      "Update the test file description to match the spec description",
+      "Do not change the spec description since the spec is the source of truth",
+    ])
   } finally {
     cleanupTempFile(tempFile)
   }

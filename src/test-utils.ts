@@ -14,7 +14,7 @@ import { type S4, S4Schema } from "./types.ts"
 function generateTempFilePath(extension: string): string {
   const tempDir = tmpdir()
   const base36 = 36
-  return join(tempDir, `s4-test-${String(Date.now())}-${Math.random().toString(base36).substring(2)}.${extension}`)
+  return join(tempDir, `s4-test-${Date.now()}-${Math.random().toString(base36).substring(2)}.${extension}`)
 }
 
 /**

@@ -10,12 +10,14 @@ it('GIVEN a spec with an acceptance test "AT-0001", WHEN the user runs "s4 info 
     const result = runS4(`info AT-0001 --spec ${tempFile}`)
     // Then the system displays detailed information about the acceptance test in markdown format
     const output = result.stdout || result.stderr || result.error?.message || ""
-    expect(output).toContain("# AT-0001")
-    expect(output).toContain("GIVEN G, WHEN W, THEN T")
-    expect(output).toContain("## Feature Covered by This Acceptance Test")
-    expect(output).toContain("FE-0001: Test Feature")
-    expect(output).toContain("## Related Business Objectives")
-    expect(output).toContain("BO-0001: Test business objective")
+    expect(output).toContainInOrder([
+      "# AT-0001",
+      "GIVEN G, WHEN W, THEN T",
+      "## Feature Covered by This Acceptance Test",
+      "FE-0001: Test Feature",
+      "## Related Business Objectives",
+      "BO-0001: Test business objective",
+    ])
   } finally {
     cleanupTempFile(tempFile)
   }

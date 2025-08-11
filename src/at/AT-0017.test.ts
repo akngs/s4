@@ -12,7 +12,7 @@ it('GIVEN a spec with uncovered [[Feature]]s, WHEN the user runs "s4 validate", 
 
   try {
     const result = runS4(`validate --spec ${tempFile}`)
-    expect(result.stderr).toContain("[uncovered_item] Feature FE-0002 is not covered by any acceptance test.")
+    expect(result.stderr).toContainInOrder(["[uncovered_item] Feature FE-0002 is not covered by any acceptance test."])
   } finally {
     cleanupTempFile(tempFile)
   }

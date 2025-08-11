@@ -17,8 +17,7 @@ it('GIVEN a spec with multiple tools, WHEN the user runs "s4 status", THEN the s
     // Then tools are run at the end; outputs appear at the end in order
     expect(result.status).toBe(0)
     // We render a summarized Tools section with success/failure, not raw outputs
-    expect(result.stdout).toContain("✔ t1: success")
-    expect(result.stdout).toContain("✔ t2: success")
+    expect(result.stdout).toContainInOrder(["✔ t1: success", "✔ t2: success"])
   } finally {
     cleanupTempFile(tempFile)
   }

@@ -17,8 +17,7 @@ it('GIVEN a spec with tools where a preceding tool has stopOnError set to true a
 
     // Then the system stops executing subsequent tools after the failing tool
     expect(result.status).toBe(1)
-    expect(result.stdout).toContain("✘ first: failure")
-    expect(result.stdout).toContain("⚠ second: skipped")
+    expect(result.stdout).toContainInOrder(["✘ first: failure", "⚠ second: skipped"])
   } finally {
     cleanupTempFile(tempFile)
   }

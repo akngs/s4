@@ -9,6 +9,5 @@ it('GIVEN in any occasion, WHEN the user runs "s4 guide SECTION-NAME", THEN the 
   // Then the system displays the section content with examples
   expect(result.status).toBe(0)
   expect(result.stderr).toBe("")
-  expect(result.stdout).toContain("Specify buildable units of capability identified as FE-####")
-  expect(result.stdout).toContain("## Examples")
+  expect(result.stdout).toContainInOrder(["Specify buildable units of capability identified as FE-####", "## Examples"])
 })

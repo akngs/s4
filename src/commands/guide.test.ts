@@ -84,8 +84,7 @@ describe("guide command", () => {
     const result = await runGuide("feature")
     expect(result.exitCode).toBe(0)
     expect(result.stderr).toBe("")
-    expect(result.stdout).toContain("Specify buildable units of capability identified as FE-####")
-    expect(result.stdout).toContain("## Examples")
+    expect(result.stdout).toContainInOrder(["Specify buildable units of capability identified as FE-####", "## Examples"])
   })
 
   it("should return value_error when an unknown section is provided", async () => {
