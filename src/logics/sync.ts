@@ -102,9 +102,7 @@ export function topologicalSortFeatures(features: { id: string; prerequisites: s
     if (visited.has(id)) return
 
     temp.add(id)
-
-    const prerequisites = featureMap.get(id) ?? []
-    for (const prereq of prerequisites) visit(prereq)
+    featureMap.get(id)?.forEach(visit)
 
     temp.delete(id)
     visited.add(id)
@@ -112,9 +110,7 @@ export function topologicalSortFeatures(features: { id: string; prerequisites: s
   }
 
   for (const feature of features) {
-    if (!visited.has(feature.id)) {
-      visit(feature.id)
-    }
+    if (!visited.has(feature.id)) visit(feature.id)
   }
   return order
 }
