@@ -1,14 +1,7 @@
-import { cleanupTempFile, makeSpec, makeTempFile, runS4 } from "../test-utils.ts"
+import { runSpec } from "../test-utils.ts"
 
 it('GIVEN a spec with a feature "FE-0001", WHEN the user runs "s4 info FE-0001", THEN the system displays detailed information about the feature in markdown format', () => {
-  // Given a spec with a feature 'FE-0001'
-  const spec = makeSpec()
-  const tempFile = makeTempFile(spec)
-
-  try {
-    // When the user runs "s4 info FE-0001"
-    const result = runS4(`info FE-0001 --spec ${tempFile}`)
-    // Then the system displays detailed information about the feature in markdown format
+  runSpec({}, "info FE-0001 --spec SPEC_FILE", result => {
     const output = result.stdout || result.stderr || result.error?.message || ""
     expect(output).toContainInOrder([
       "# FE-0001: Test Feature",
@@ -18,7 +11,5 @@ it('GIVEN a spec with a feature "FE-0001", WHEN the user runs "s4 info FE-0001",
       "## Acceptance Tests Covering This Feature",
       "AT-0001: GIVEN G, WHEN W, THEN T",
     ])
-  } finally {
-    cleanupTempFile(tempFile)
-  }
+  })
 })

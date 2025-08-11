@@ -1,8 +1,8 @@
-import { cleanupTempFile, makeSpec, makeTempFile, runS4 } from "../test-utils.ts"
+import { runSpec } from "../test-utils.ts"
 
 it('GIVEN a spec with multiple structural issues, WHEN the user runs "s4 validate", THEN all validation issues are detected and reported', () => {
   // Given a spec with structural issues
-  const spec = makeSpec({
+  const specOverrides = {
     concepts: [
       { id: "Y", description: "Test concept Y" }, // Duplicate concept
       { id: "Y", description: "Test concept Y" }, // Duplicate concept
@@ -31,23 +31,15 @@ it('GIVEN a spec with multiple structural issues, WHEN the user runs "s4 validat
       runAcceptanceTest: 'echo "Done"',
       runAcceptanceTests: 'echo "ok 1 - src/at/AT-0001.test.ts > GIVEN G, WHEN W, THEN T"',
     },
-  })
+  }
 
-  const tempFile = makeTempFile(spec)
-
-  try {
-    // When the user runs "s4 validate"
-    const result = runS4(`validate --spec ${tempFile}`)
-
-    // The command should fail with validation issues
+  runSpec(specOverrides, "validate --spec SPEC_FILE", result => {
     expect(result.status).toBe(1)
 
-    // Error messages should be reported
     const output = result.stdout || result.stderr || result.error?.message || ""
     expect(output).toBeTruthy()
     expect(output.length).toBeGreaterThan(0)
 
-    // Check for various types of validation issues that should be present in the invalid spec
     expect(output).toContain("[uncovered_item] Business objective BO-0002 is not covered by any feature.")
     expect(output).toContain("[uncovered_item] Feature FE-0002 is not covered by any acceptance test.")
     expect(output).toContain("[circular_dep] Circular dependency detected involving feature FE-0001.")
@@ -58,7 +50,5 @@ it('GIVEN a spec with multiple structural issues, WHEN the user runs "s4 validat
     expect(output).toContain("[duplicate_id] ID BO-0001 is duplicated.")
     expect(output).toContain('[duplicate_concept] Concept "Y" is defined multiple times.')
     expect(output).toContain('[unused_concept] Concept "Y" is not used in the spec.')
-  } finally {
-    cleanupTempFile(tempFile)
-  }
+  })
 })
