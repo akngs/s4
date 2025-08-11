@@ -1,4 +1,4 @@
-import { runAllToolsDetailed } from "../logics/index.ts"
+import { runAllToolsDetailed } from "../logics/tools.ts"
 import { renderFailingTools, renderTools } from "../render/index.ts"
 import type { CommandReturn, ToolRunResult } from "../types.ts"
 import { isLeft } from "../types.ts"
