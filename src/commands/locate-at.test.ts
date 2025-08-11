@@ -1,8 +1,8 @@
-import { ARCHETYPAL_SPEC, createSpec, withTempSpecFile } from "../test-utils.ts"
+import { ARCHETYPAL_SPEC, makeSpec, withTempSpecFile } from "../test-utils.ts"
 import locateAt from "./locate-at.ts"
 
 it("locate-at command should succeed with valid acceptance test ID", async () => {
-  const spec = createSpec({
+  const spec = makeSpec({
     ...ARCHETYPAL_SPEC,
     connectors: { ...ARCHETYPAL_SPEC.connectors, locateAcceptanceTest: 'echo "src/at/{ID}.test.ts"' },
   })
@@ -15,7 +15,7 @@ it("locate-at command should succeed with valid acceptance test ID", async () =>
 })
 
 it("locate-at command should handle non-existent acceptance test ID", async () => {
-  const spec = createSpec({
+  const spec = makeSpec({
     ...ARCHETYPAL_SPEC,
     acceptanceTests: [{ id: "AT-0001", covers: "FE-0001", given: "G", when: "W", then: "T" }],
     connectors: { ...ARCHETYPAL_SPEC.connectors, locateAcceptanceTest: 'echo "src/at/{ID}.test.ts"' },
@@ -29,7 +29,7 @@ it("locate-at command should handle non-existent acceptance test ID", async () =
 })
 
 it("locate-at should return value_error when id is missing", async () => {
-  const spec = createSpec({
+  const spec = makeSpec({
     ...ARCHETYPAL_SPEC,
   })
   await withTempSpecFile(spec, async tempFile => {

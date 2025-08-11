@@ -50,6 +50,7 @@ export default tseslint.config(
       "sonarjs/slow-regex": "off",
       "no-useless-escape": "off",
       "no-magic-numbers": "off",
+      "@typescript-eslint/restrict-template-expressions": "off",
       "@typescript-eslint/switch-exhaustiveness-check": "error",
       "@typescript-eslint/no-magic-numbers": ["error", {ignore: [-2, -1, 0, 1, 2, 10, 42, 100], ignoreEnums: true, ignoreNumericLiteralTypes: true, ignoreReadonlyClassProperties: true, ignoreTypeIndexes: true}],
     }

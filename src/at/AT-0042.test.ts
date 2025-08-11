@@ -2,14 +2,14 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { stringify } from "yaml"
-import { createSpec, runS4 } from "../test-utils.ts"
+import { makeSpec, runS4 } from "../test-utils.ts"
 
 it('GIVEN a spec file "s4.yaml" exists in the current directory, WHEN the user runs "s4 validate" without specifying --spec, THEN the system reads from "s4.yaml" by default', () => {
   // Create a temporary directory
   const tempDir = mkdtempSync(join(tmpdir(), "s4-test-"))
 
   // Create a spec and write it as s4.yaml in the temp directory
-  const spec = createSpec()
+  const spec = makeSpec()
   const yamlContent = stringify(spec)
   const tempFilePath = join(tempDir, "s4.yaml")
   writeFileSync(tempFilePath, yamlContent, "utf-8")

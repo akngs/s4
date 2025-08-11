@@ -1,8 +1,8 @@
-import { ARCHETYPAL_SPEC, createSpec, withTempSpecFile } from "../test-utils.ts"
+import { ARCHETYPAL_SPEC, makeSpec, withTempSpecFile } from "../test-utils.ts"
 import runAts from "./run-ats.ts"
 
 it("run-ats command should render failing tests summary when there are failures", async () => {
-  const spec = createSpec({
+  const spec = makeSpec({
     ...ARCHETYPAL_SPEC,
     acceptanceTests: [
       { id: "AT-0001", covers: "FE-0001", given: "G", when: "W", then: "T" },
@@ -29,7 +29,7 @@ it("run-ats command should fail with invalid spec", async () => {
 
 it("run-ats should propagate adapter error when adapter returns left (simulated via empty tests)", async () => {
   // simulate adapter producing no headers and plan only -> still right now, so instead we trigger list failure path via invalid spec
-  const spec = createSpec({
+  const spec = makeSpec({
     ...ARCHETYPAL_SPEC,
     connectors: { ...ARCHETYPAL_SPEC.connectors, runAcceptanceTests: "bash -c 'exit 1'" },
   })

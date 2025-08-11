@@ -96,7 +96,7 @@ function getFailingFeatures(featureStats: FeatureStats): Array<[string, { passed
  */
 function renderFailingFeaturesMessage(failingFeatures: Array<[string, { passed: number; total: number }]>): string {
   const failingFeatureIds = failingFeatures.map(([id]) => id).join(", ")
-  return `✘ There are ${String(failingFeatures.length)} failing features: ${failingFeatureIds}\n\n${chalk.blue.underline.bold("Recommended Next Action:\n")}\n> s4 run-ats  # Run all acceptance tests to see which tests are failing`
+  return `✘ There are ${failingFeatures.length} failing features: ${failingFeatureIds}\n\n${chalk.blue.underline.bold("Recommended Next Action:\n")}\n> s4 run-ats  # Run all acceptance tests to see which tests are failing`
 }
 
 /**
@@ -262,7 +262,7 @@ export function renderAcceptanceTestDetail(data: AcceptanceTestDetail): string {
  * @returns Rendered value error message
  */
 export function renderValueError(error: ValueError): string {
-  return `Invalid value: ${String(error.value)} - ${error.message}`
+  return `Invalid value: ${error.value} - ${error.message}`
 }
 
 /**

@@ -9,9 +9,11 @@ it('GIVEN no spec file exists in the current directory, WHEN the user runs "s4 s
     const result = runS4("status", { cwd: dir })
 
     expect(result.status).toBe(1)
-    expect(result.stderr).toContain("Failed to read spec file: s4.yaml")
-    expect(result.stderr).toContain('Spec file "s4.yaml" does not exist in the current directory.')
-    expect(result.stderr).toContain('Run "s4 guide"')
+    expect(result.stderr).toContainInOrder([
+      "Failed to read spec file: s4.yaml",
+      'Spec file "s4.yaml" does not exist in the current directory.',
+      'Run "s4 guide"',
+    ])
   } finally {
     rmSync(dir, { recursive: true, force: true })
   }

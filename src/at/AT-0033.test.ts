@@ -1,8 +1,7 @@
-import { cleanupTempFile, createSpec, createTempFile, runS4 } from "../test-utils.ts"
+import { runSpec } from "../test-utils.ts"
 
 it('GIVEN a spec with a failing tool, WHEN the user runs "s4 status", THEN the system displays the tool failure', () => {
-  // Given a spec with a failing tool
-  const spec = createSpec({
+  const specOverrides = {
     tools: [
       {
         id: "lint",
@@ -11,17 +10,9 @@ it('GIVEN a spec with a failing tool, WHEN the user runs "s4 status", THEN the s
         recommendedNextActions: "Fix the lint errors and run the tool again",
       },
     ],
-  })
-
-  const tempFile = createTempFile(spec)
-
-  try {
-    // When the user runs "s4 status --spec spec.yaml"
-    const result = runS4(`status --spec ${tempFile}`)
-    // Then the system displays the tool failure
-    expect(result.stdout).toContain("Lint errors found")
-    expect(result.stdout).toContain("Fix the lint errors and run the tool again")
-  } finally {
-    cleanupTempFile(tempFile)
   }
+
+  runSpec(specOverrides, "status --spec SPEC_FILE", result => {
+    expect(result.stdout).toContainInOrder(["Lint errors found", "Fix the lint errors and run the tool again"])
+  })
 })

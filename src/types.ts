@@ -273,5 +273,5 @@ export function mapLeft<LEFT, RIGHT, LEFT2>(either: Either<LEFT, RIGHT>, fn: (is
  * @returns Never (throws an error)
  */
 export function assertNever(_: never): never {
-  throw new Error(`Unexpected value: ${String(_)}`)
+  throw new Error(`Unexpected value: ${_}`)
 }

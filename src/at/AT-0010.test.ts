@@ -1,22 +1,13 @@
-import { cleanupTempFile, createSpec, createTempFile, runS4 } from "../test-utils.ts"
+import { runSpec } from "../test-utils.ts"
 
 it('GIVEN a spec with no [[Business Objective]]s defined, WHEN the user runs "s4 validate", THEN error messages show that the spec has at least one [[Business Objective]] defined and provide actionable guidance', () => {
-  // Given a spec with no business objectives defined
-  const spec = createSpec({ businessObjectives: [], features: [], acceptanceTests: [] })
-  const tempFile = createTempFile(spec)
+  const specOverrides = { businessObjectives: [], features: [], acceptanceTests: [] }
 
-  try {
-    // When the user runs "s4 validate"
-    const result = runS4(`validate --spec ${tempFile}`)
-
-    // The command should fail with validation issues
+  runSpec(specOverrides, "validate --spec SPEC_FILE", result => {
     expect(result.status).toBe(1)
-
-    // Should contain specific validation message with guidance
-    const output = result.stderr
-    expect(output).toContain("[missing_section] The spec must define at least one Business Objective.")
-    expect(output).toContain("Run `s4 guide businessObjective`")
-  } finally {
-    cleanupTempFile(tempFile)
-  }
+    expect(result.stderr).toContainInOrder([
+      "[missing_section] The spec must define at least one Business Objective.",
+      "Run `s4 guide businessObjective`",
+    ])
+  })
 })
