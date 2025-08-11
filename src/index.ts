@@ -1,15 +1,7 @@
 #!/usr/bin/env node
 
 import { Command, Option } from "@commander-js/extra-typings"
-import runGuide from "./commands/guide.ts"
-import runInfo from "./commands/info.ts"
-import runLocateAt from "./commands/locate-at.ts"
-import runAt from "./commands/run-at.ts"
-import runAts from "./commands/run-ats.ts"
-import runStatus from "./commands/status.ts"
-import runTool from "./commands/tool.ts"
-import runAllTools from "./commands/tools.ts"
-import runValidate from "./commands/validate.ts"
+import { runAllTools, runAt, runAts, runGuide, runInfo, runLocateAt, runStatus, runTool, runValidate } from "./commands/index.ts"
 import type { CommandReturn } from "./types.ts"
 
 // Default to running "s4 status" if no arguments are provided

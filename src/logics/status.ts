@@ -1,6 +1,16 @@
 import { getInstance as getRunAtsAdapter } from "../adapters/run-ats.ts"
-import type { Either, Issue, S4, StatusReport, SystemError, TestResult, ToolRunResult } from "../types.ts"
-import { isLeft, left, right } from "../types.ts"
+import {
+  type Either,
+  type Issue,
+  isLeft,
+  left,
+  right,
+  type S4,
+  type StatusReport,
+  type SystemError,
+  type TestResult,
+  type ToolRunResult,
+} from "../types.ts"
 import { executeCommand } from "./exec.ts"
 import { calcFeatureStats } from "./stats.ts"
 import { checkSyncIssues } from "./sync.ts"
