@@ -1,8 +1,8 @@
-import { ARCHETYPAL_SPEC, cleanupTempFile, createSpec, createTempFile, runS4 } from "../test-utils.ts"
+import { ARCHETYPAL_SPEC, cleanupTempFile, makeSpec, makeTempFile, runS4 } from "../test-utils.ts"
 
 it('GIVEN a spec with mismatching acceptance tests, WHEN the user runs "s4 status", THEN the system displays a message that the files should be fixed to match the spec', () => {
   // Given a spec with mismatching acceptance tests
-  const spec = createSpec({
+  const spec = makeSpec({
     acceptanceTests: [
       { id: "AT-0001", covers: "FE-0001", given: "G1", when: "W1", then: "T1" },
       { id: "AT-0002", covers: "FE-0001", given: "G2", when: "W2", then: "T2" },
@@ -13,7 +13,7 @@ it('GIVEN a spec with mismatching acceptance tests, WHEN the user runs "s4 statu
     },
   })
 
-  const tempFile = createTempFile(spec)
+  const tempFile = makeTempFile(spec)
 
   try {
     // When the user runs "s4 status"

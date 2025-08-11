@@ -1,13 +1,13 @@
-import { cleanupTempFile, createSpec, createTempFile, runS4 } from "../test-utils.ts"
+import { cleanupTempFile, makeSpec, makeTempFile, runS4 } from "../test-utils.ts"
 
 it('GIVEN a spec with invalid business objective references in features, WHEN the user runs "s4 validate", THEN error messages show which features reference unknown business objective IDs and provide actionable guidance', () => {
-  const spec = createSpec({
+  const spec = makeSpec({
     concepts: [{ id: "Test Concept", description: "A test concept" }],
     businessObjectives: [{ id: "BO-0001", description: "Test business objective" }],
     features: [{ id: "FE-0001", title: "Test Feature 1", description: "A test feature", covers: ["BO-9999"] }],
   })
 
-  const tempFile = createTempFile(spec)
+  const tempFile = makeTempFile(spec)
 
   try {
     const result = runS4(`validate --spec ${tempFile}`)

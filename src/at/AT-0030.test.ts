@@ -1,8 +1,8 @@
-import { ARCHETYPAL_SPEC, cleanupTempFile, createSpec, createTempFile, runS4 } from "../test-utils.ts"
+import { ARCHETYPAL_SPEC, cleanupTempFile, makeSpec, makeTempFile, runS4 } from "../test-utils.ts"
 
 it('GIVEN a spec with missing acceptance test files, WHEN the user runs "s4 status", THEN the system displays a message that missing acceptance tests need to be created first', () => {
   // Given a spec with missing acceptance test files
-  const spec = createSpec({
+  const spec = makeSpec({
     acceptanceTests: [
       { id: "AT-0001", covers: "FE-0001", given: "G", when: "W", then: "T" },
       { id: "AT-9999", covers: "FE-0001", given: "G", when: "W", then: "T" },
@@ -13,7 +13,7 @@ it('GIVEN a spec with missing acceptance test files, WHEN the user runs "s4 stat
     },
   })
 
-  const tempFile = createTempFile(spec)
+  const tempFile = makeTempFile(spec)
 
   try {
     // When the user runs "s4 status --spec spec.yaml"

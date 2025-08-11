@@ -1,9 +1,9 @@
-import { cleanupTempFile, createSpec, createTempFile, runS4 } from "../test-utils.ts"
+import { cleanupTempFile, makeSpec, makeTempFile, runS4 } from "../test-utils.ts"
 
 it('GIVEN a spec in YAML format, WHEN the user runs "s4 validate --spec spec.yaml --format yaml", THEN the spec is successfully parsed and validated', () => {
   // Given a spec in YAML format
-  const spec = createSpec()
-  const tempFile = createTempFile(spec, "yaml")
+  const spec = makeSpec()
+  const tempFile = makeTempFile(spec, "yaml")
 
   try {
     // When the user runs "s4 validate --spec spec.yaml --format yaml"

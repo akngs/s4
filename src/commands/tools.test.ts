@@ -1,8 +1,8 @@
-import { ARCHETYPAL_SPEC, createSpec, withTempSpecFile } from "../test-utils.ts"
+import { ARCHETYPAL_SPEC, makeSpec, withTempSpecFile } from "../test-utils.ts"
 import tools from "./tools.ts"
 
 it("should run all tools and render tools section when all succeed", async () => {
-  const spec = createSpec({
+  const spec = makeSpec({
     ...ARCHETYPAL_SPEC,
     tools: [
       { id: "t1", command: "echo 'one'", stopOnError: false, recommendedNextActions: "" },
@@ -20,7 +20,7 @@ it("should run all tools and render tools section when all succeed", async () =>
 })
 
 it("should stop on error when a tool fails with stopOnError=true and render failures", async () => {
-  const spec = createSpec({
+  const spec = makeSpec({
     ...ARCHETYPAL_SPEC,
     tools: [
       { id: "ok", command: "echo 'success'", stopOnError: false, recommendedNextActions: "" },
@@ -44,7 +44,7 @@ it("should stop on error when a tool fails with stopOnError=true and render fail
 })
 
 it("should continue after failure when stopOnError=false and reflect last exit code; render status", async () => {
-  const spec = createSpec({
+  const spec = makeSpec({
     ...ARCHETYPAL_SPEC,
     tools: [
       { id: "fail", command: "bash -c 'exit 1'", stopOnError: false, recommendedNextActions: "" },
@@ -65,7 +65,7 @@ it("should continue after failure when stopOnError=false and reflect last exit c
 })
 
 it("should handle empty tools array and still render tools header", async () => {
-  const spec = createSpec({ ...ARCHETYPAL_SPEC, tools: [] })
+  const spec = makeSpec({ ...ARCHETYPAL_SPEC, tools: [] })
   await withTempSpecFile(spec, async temp => {
     const result = await tools({ spec: temp, format: "yaml" })
     expect(result.exitCode).toBe(0)

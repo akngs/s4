@@ -1,9 +1,9 @@
-import { cleanupTempFile, createSpec, createTempFile, runS4 } from "../test-utils.ts"
+import { cleanupTempFile, makeSpec, makeTempFile, runS4 } from "../test-utils.ts"
 
 it('GIVEN a spec file, WHEN the user runs "s4 validate --spec path-and-filename", THEN the spec is read from the file', () => {
   // Given a spec with specific content
-  const spec = createSpec()
-  const tempFile = createTempFile(spec)
+  const spec = makeSpec()
+  const tempFile = makeTempFile(spec)
 
   try {
     // When the user runs "s4 validate --spec path-and-filename"

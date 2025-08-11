@@ -1,8 +1,8 @@
-import { cleanupTempFile, createSpec, createTempFile, runS4 } from "../test-utils.ts"
+import { cleanupTempFile, makeSpec, makeTempFile, runS4 } from "../test-utils.ts"
 
 it('GIVEN a spec with duplicate IDs across business objectives, features, and acceptance tests, WHEN the user runs "s4 validate", THEN error messages show which IDs are duplicated and provide actionable guidance', () => {
   // Given a spec with duplicate IDs across business objectives, features, and acceptance tests
-  const spec = createSpec({
+  const spec = makeSpec({
     businessObjectives: [
       { id: "BO-0001", description: "Business Objective 1" },
       { id: "BO-0001", description: "Duplicate Business Objective" },
@@ -16,7 +16,7 @@ it('GIVEN a spec with duplicate IDs across business objectives, features, and ac
       { id: "AT-0001", covers: "FE-0001", given: "G", when: "W", then: "T" },
     ],
   })
-  const tempFile = createTempFile(spec)
+  const tempFile = makeTempFile(spec)
 
   try {
     // When the user runs "s4 validate --spec spec.yaml"

@@ -1,9 +1,9 @@
-import { cleanupTempFile, createSpec, createTempFile, runS4 } from "../test-utils.ts"
+import { cleanupTempFile, makeSpec, makeTempFile, runS4 } from "../test-utils.ts"
 
 it('GIVEN a spec with no [[Business Objective]]s defined, WHEN the user runs "s4 validate", THEN error messages show that the spec has at least one [[Business Objective]] defined and provide actionable guidance', () => {
   // Given a spec with no business objectives defined
-  const spec = createSpec({ businessObjectives: [], features: [], acceptanceTests: [] })
-  const tempFile = createTempFile(spec)
+  const spec = makeSpec({ businessObjectives: [], features: [], acceptanceTests: [] })
+  const tempFile = makeTempFile(spec)
 
   try {
     // When the user runs "s4 validate"

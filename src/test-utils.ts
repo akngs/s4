@@ -32,14 +32,8 @@ function writeTextFile(path: string, content: string): void {
  * @param extension - The file extension (default: 'yaml', can be 'yaml', 'yml', 'json')
  * @returns The path to the created temporary file
  */
-export function createTempFile(obj: unknown, extension = "yaml"): string {
+export function makeTempFile(obj: unknown, extension = "yaml"): string {
   const content = extension === "json" ? JSON.stringify(obj, null, 2) : stringify(obj)
-  const tempFile = generateTempFilePath(extension)
-  writeTextFile(tempFile, content)
-  return tempFile
-}
-
-function createTempTextFile(content: string, extension = "yaml"): string {
   const tempFile = generateTempFilePath(extension)
   writeTextFile(tempFile, content)
   return tempFile
@@ -82,7 +76,7 @@ export const ARCHETYPAL_SPEC: S4 = {
  * @param overrides - Object containing properties to override in the archetypal spec
  * @returns A new spec object with the overrides applied
  */
-export function createSpec(overrides: Record<string, unknown> = {}): typeof ARCHETYPAL_SPEC {
+export function makeSpec(overrides: Record<string, unknown> = {}): typeof ARCHETYPAL_SPEC {
   return S4Schema.parse({ ...ARCHETYPAL_SPEC, ...overrides })
 }
 
@@ -93,7 +87,7 @@ export function createSpec(overrides: Record<string, unknown> = {}): typeof ARCH
  * @param extension - File extension (default: 'yaml')
  */
 export async function withTempSpecFile(spec: unknown, fn: (filePath: string) => Promise<void> | void, extension = "yaml"): Promise<void> {
-  const filePath = createTempFile(spec, extension)
+  const filePath = makeTempFile(spec, extension)
   try {
     await fn(filePath)
   } finally {
@@ -108,7 +102,9 @@ export async function withTempSpecFile(spec: unknown, fn: (filePath: string) => 
  * @param extension - File extension (default: 'yaml')
  */
 export async function withTempTextFile(content: string, fn: (filePath: string) => Promise<void> | void, extension = "yaml"): Promise<void> {
-  const filePath = createTempTextFile(content, extension)
+  const filePath = generateTempFilePath(extension)
+  writeTextFile(filePath, content)
+
   try {
     await fn(filePath)
   } finally {

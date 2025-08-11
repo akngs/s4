@@ -1,8 +1,8 @@
-import { cleanupTempFile, createSpec, createTempFile, runS4 } from "../test-utils.ts"
+import { cleanupTempFile, makeSpec, makeTempFile, runS4 } from "../test-utils.ts"
 
 it('GIVEN a spec with a tools configuration, WHEN the user runs "s4 run-at AT-####", THEN the system executes the specified acceptance test and returns the results', () => {
   // Create a spec with a tools configuration
-  const spec = createSpec({
+  const spec = makeSpec({
     connectors: {
       listAcceptanceTests: 'echo "AT-0001: Test"',
       locateAcceptanceTest: 'echo "src/at/{ID}.test.ts"',
@@ -10,7 +10,7 @@ it('GIVEN a spec with a tools configuration, WHEN the user runs "s4 run-at AT-##
       runAcceptanceTests: 'echo "All tests passed"',
     },
   })
-  const tempFile = createTempFile(spec)
+  const tempFile = makeTempFile(spec)
 
   try {
     // Run the specified acceptance test

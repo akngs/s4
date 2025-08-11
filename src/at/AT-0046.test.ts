@@ -1,12 +1,12 @@
-import { cleanupTempFile, createSpec, createTempFile, runS4 } from "../test-utils.ts"
+import { cleanupTempFile, makeSpec, makeTempFile, runS4 } from "../test-utils.ts"
 
 it('GIVEN a spec with a tool "sometool", WHEN the user runs "s4 tool sometool" and the tool exits with code 0, THEN the system returns exit code 0', () => {
   // Given a spec with a tool "sometool"
-  const spec = createSpec({
+  const spec = makeSpec({
     tools: [{ id: "sometool", command: 'echo "Tool ran successfully"' }],
   })
 
-  const tempFile = createTempFile(spec)
+  const tempFile = makeTempFile(spec)
 
   try {
     // When the user runs "s4 tool sometool"

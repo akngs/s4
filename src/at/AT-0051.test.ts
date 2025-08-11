@@ -1,14 +1,14 @@
-import { cleanupTempFile, createSpec, createTempFile, runS4 } from "../test-utils.ts"
+import { cleanupTempFile, makeSpec, makeTempFile, runS4 } from "../test-utils.ts"
 
 it('GIVEN a spec with multiple tools, WHEN the user runs "s4 status", THEN the system runs all tools at the end of the process', () => {
   // Given a spec with ordered tools
-  const spec = createSpec({
+  const spec = makeSpec({
     tools: [
       { id: "t1", command: 'echo "T1"' },
       { id: "t2", command: 'echo "T2"' },
     ],
   })
-  const tempFile = createTempFile(spec)
+  const tempFile = makeTempFile(spec)
 
   try {
     // When the user runs status

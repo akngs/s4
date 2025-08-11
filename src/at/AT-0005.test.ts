@@ -1,9 +1,9 @@
-import { cleanupTempFile, createSpec, createTempFile, runS4 } from "../test-utils.ts"
+import { cleanupTempFile, makeSpec, makeTempFile, runS4 } from "../test-utils.ts"
 
 it('GIVEN a spec in JSON format, WHEN the user runs "s4 validate --spec spec.json --format json", THEN the spec is successfully parsed and validated', () => {
   // Given a spec in JSON format
-  const spec = createSpec()
-  const tempFile = createTempFile(spec, "json")
+  const spec = makeSpec()
+  const tempFile = makeTempFile(spec, "json")
 
   try {
     // When the user runs "s4 validate --spec spec.json --format json"

@@ -1,4 +1,4 @@
-import { createSpec } from "../test-utils.ts"
+import { makeSpec } from "../test-utils.ts"
 import type { AcceptanceTestDetail, FeatureDetail, S4, ValidationIssue } from "../types.ts"
 import {
   renderAcceptanceTestDetail,
@@ -13,7 +13,7 @@ import {
 
 // Test data helpers
 const createValidSpec = (): S4 =>
-  createSpec({
+  makeSpec({
     title: "Test Project",
     mission: "Test mission",
     vision: "Test vision",

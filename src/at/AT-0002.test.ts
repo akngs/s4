@@ -1,8 +1,8 @@
-import { cleanupTempFile, createSpec, createTempFile, runS4 } from "../test-utils.ts"
+import { cleanupTempFile, makeSpec, makeTempFile, runS4 } from "../test-utils.ts"
 
 it('GIVEN a spec with multiple structural issues, WHEN the user runs "s4 validate", THEN all validation issues are detected and reported', () => {
   // Given a spec with structural issues
-  const spec = createSpec({
+  const spec = makeSpec({
     concepts: [
       { id: "Y", description: "Test concept Y" }, // Duplicate concept
       { id: "Y", description: "Test concept Y" }, // Duplicate concept
@@ -33,7 +33,7 @@ it('GIVEN a spec with multiple structural issues, WHEN the user runs "s4 validat
     },
   })
 
-  const tempFile = createTempFile(spec)
+  const tempFile = makeTempFile(spec)
 
   try {
     // When the user runs "s4 validate"

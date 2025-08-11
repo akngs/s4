@@ -1,11 +1,11 @@
-import { cleanupTempFile, createSpec, createTempFile, runS4 } from "../test-utils.ts"
+import { cleanupTempFile, makeSpec, makeTempFile, runS4 } from "../test-utils.ts"
 
 it('GIVEN a spec with invalid prerequisite references, WHEN the user runs "s4 validate", THEN error messages show which features reference unknown prerequisite IDs and provide actionable guidance', () => {
   // Given a spec with invalid prerequisite references
-  const spec = createSpec({
+  const spec = makeSpec({
     features: [{ id: "FE-0001", title: "Feature 1", description: "A test feature", covers: ["BO-0001"], prerequisites: ["FE-9999"] }],
   })
-  const tempFile = createTempFile(spec)
+  const tempFile = makeTempFile(spec)
 
   try {
     // When the user runs "s4 validate"

@@ -1,8 +1,8 @@
-import { cleanupTempFile, createSpec, createTempFile, runS4 } from "../test-utils.ts"
+import { cleanupTempFile, makeSpec, makeTempFile, runS4 } from "../test-utils.ts"
 
 it('GIVEN a spec with internal inconsistencies, WHEN the user runs "s4 status", THEN the system displays all detected issues along with actionable guidance for each', () => {
   // Given a spec with internal inconsistencies
-  const spec = createSpec({
+  const spec = makeSpec({
     businessObjectives: [
       { id: "BO-0001", description: "Test business objective" },
       { id: "BO-0002", description: "Uncovered business objective" },
@@ -37,7 +37,7 @@ it('GIVEN a spec with internal inconsistencies, WHEN the user runs "s4 status", 
     ],
   })
 
-  const tempFile = createTempFile(spec)
+  const tempFile = makeTempFile(spec)
 
   try {
     // When the user runs "s4 status"

@@ -1,8 +1,8 @@
-import { cleanupTempFile, createSpec, createTempFile, runS4 } from "../test-utils.ts"
+import { cleanupTempFile, makeSpec, makeTempFile, runS4 } from "../test-utils.ts"
 
 it('GIVEN a spec with a failing tool, WHEN the user runs "s4 status", THEN the system displays the tool failure', () => {
   // Given a spec with a failing tool
-  const spec = createSpec({
+  const spec = makeSpec({
     tools: [
       {
         id: "lint",
@@ -13,7 +13,7 @@ it('GIVEN a spec with a failing tool, WHEN the user runs "s4 status", THEN the s
     ],
   })
 
-  const tempFile = createTempFile(spec)
+  const tempFile = makeTempFile(spec)
 
   try {
     // When the user runs "s4 status --spec spec.yaml"

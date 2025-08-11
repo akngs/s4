@@ -1,9 +1,9 @@
 import dedent from "dedent"
-import { createSpec, withTempSpecFile, withTempTextFile } from "../test-utils.ts"
+import { makeSpec, withTempSpecFile, withTempTextFile } from "../test-utils.ts"
 import validate from "./validate.ts"
 
 it("validate command should succeed with valid spec", async () => {
-  await withTempSpecFile(createSpec(), async tempFile => {
+  await withTempSpecFile(makeSpec(), async tempFile => {
     const result = await validate({ spec: tempFile, format: "yaml" })
     expect(result.exitCode).toBe(0)
     expect(result.stderr).toBe("")
@@ -12,7 +12,7 @@ it("validate command should succeed with valid spec", async () => {
 
 it("validate command should work with JSON format", async () => {
   await withTempSpecFile(
-    createSpec(),
+    makeSpec(),
     async tempFile => {
       const result = await validate({ spec: tempFile, format: "json" })
       expect(result.exitCode).toBe(0)
@@ -45,7 +45,7 @@ it("validate command should handle invalid spec schema", async () => {
 })
 
 it("validate command should report validation issues", async () => {
-  const specWithDuplicateIds = createSpec({
+  const specWithDuplicateIds = makeSpec({
     businessObjectives: [
       { id: "BO-0001", description: "One" },
       { id: "BO-0001", description: "Duplicate" },

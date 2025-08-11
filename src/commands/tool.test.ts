@@ -1,7 +1,7 @@
-import { ARCHETYPAL_SPEC, createSpec, withTempSpecFile } from "../test-utils.ts"
+import { ARCHETYPAL_SPEC, makeSpec, withTempSpecFile } from "../test-utils.ts"
 import tool from "./tool.ts"
 
-const SPEC_WITH_TOOLS = createSpec({
+const SPEC_WITH_TOOLS = makeSpec({
   ...ARCHETYPAL_SPEC,
   tools: [
     { id: "echo-tool", command: "echo 'hello world'", stopOnError: false, recommendedNextActions: "Try running again if needed" },
@@ -47,7 +47,7 @@ it("should append recommended actions when tool command fails", async () => {
 })
 
 it("should include only recommended actions when command fails with empty stdout", async () => {
-  const spec = createSpec({
+  const spec = makeSpec({
     ...ARCHETYPAL_SPEC,
     tools: [{ id: "fail-actions-only", command: "bash -c 'exit 1'", stopOnError: false, recommendedNextActions: "Do this" }],
   })
@@ -60,7 +60,7 @@ it("should include only recommended actions when command fails with empty stdout
 })
 
 it("should pass-through output unchanged when command succeeds even if recommendedNextActions exist", async () => {
-  const spec = createSpec({
+  const spec = makeSpec({
     ...ARCHETYPAL_SPEC,
     tools: [{ id: "ok-with-actions", command: "echo content", stopOnError: false, recommendedNextActions: "some next" }],
   })

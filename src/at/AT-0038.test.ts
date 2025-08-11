@@ -1,9 +1,9 @@
-import { cleanupTempFile, createSpec, createTempFile, runS4 } from "../test-utils.ts"
+import { cleanupTempFile, makeSpec, makeTempFile, runS4 } from "../test-utils.ts"
 
 it('GIVEN a spec with a feature "FE-0001", WHEN the user runs "s4 info FE-0001", THEN the system displays detailed information about the feature in markdown format', () => {
   // Given a spec with a feature 'FE-0001'
-  const spec = createSpec()
-  const tempFile = createTempFile(spec)
+  const spec = makeSpec()
+  const tempFile = makeTempFile(spec)
 
   try {
     // When the user runs "s4 info FE-0001"

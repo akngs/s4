@@ -1,8 +1,8 @@
-import { cleanupTempFile, createSpec, createTempFile, runS4 } from "../test-utils.ts"
+import { cleanupTempFile, makeSpec, makeTempFile, runS4 } from "../test-utils.ts"
 
 it('GIVEN a spec with a tool "sometool", WHEN the user runs "s4 tool sometool" and the tool exits with non-zero code, THEN the system returns exit code 1 and provides custom message defined in "recommendedNextActions" field', () => {
   // Given a spec with a failing tool and recommended next actions
-  const spec = createSpec({
+  const spec = makeSpec({
     tools: [
       {
         id: "sometool",
@@ -12,7 +12,7 @@ it('GIVEN a spec with a tool "sometool", WHEN the user runs "s4 tool sometool" a
     ],
   })
 
-  const tempFile = createTempFile(spec)
+  const tempFile = makeTempFile(spec)
 
   try {
     // When the user runs the tool

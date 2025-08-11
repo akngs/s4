@@ -1,9 +1,9 @@
-import { cleanupTempFile, createSpec, createTempFile, runS4 } from "../test-utils.ts"
+import { cleanupTempFile, makeSpec, makeTempFile, runS4 } from "../test-utils.ts"
 
 it('GIVEN a spec with no acceptance test "AT-9999", WHEN the user runs "s4 info AT-9999", THEN the system displays an error indicating that the acceptance test does not exist', () => {
   // Given a spec with no acceptance test 'AT-9999'
-  const spec = createSpec()
-  const tempFile = createTempFile(spec)
+  const spec = makeSpec()
+  const tempFile = makeTempFile(spec)
 
   try {
     // When the user runs "s4 info AT-9999"

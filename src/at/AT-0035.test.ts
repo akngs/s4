@@ -1,9 +1,9 @@
-import { cleanupTempFile, createSpec, createTempFile, runS4 } from "../test-utils.ts"
+import { cleanupTempFile, makeSpec, makeTempFile, runS4 } from "../test-utils.ts"
 
 it('GIVEN a spec with no issues, WHEN the user runs "s4 status", THEN the system displays the project is in good state', () => {
   // Given a spec with no issues
-  const spec = createSpec()
-  const tempFile = createTempFile(spec)
+  const spec = makeSpec()
+  const tempFile = makeTempFile(spec)
 
   try {
     // When the user runs "s4 status --spec spec.yaml"

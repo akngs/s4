@@ -1,15 +1,15 @@
-import { ARCHETYPAL_SPEC, cleanupTempFile, createSpec, createTempFile, runS4 } from "../test-utils.ts"
+import { ARCHETYPAL_SPEC, cleanupTempFile, makeSpec, makeTempFile, runS4 } from "../test-utils.ts"
 
 it('GIVEN a spec with failing acceptance tests, WHEN the user runs "s4 status", THEN the system displays few failing acceptance tests and picks the most important one to fix', () => {
   // Given a spec with failing acceptance tests
-  const spec = createSpec({
+  const spec = makeSpec({
     connectors: {
       ...ARCHETYPAL_SPEC.connectors,
       runAcceptanceTests: "echo 'not ok 1 - src/at/AT-0001.test.ts > GIVEN A, WHEN B, THEN C'",
     },
   })
 
-  const tempFile = createTempFile(spec)
+  const tempFile = makeTempFile(spec)
 
   try {
     // When the user runs "s4 status --spec spec.yaml"
