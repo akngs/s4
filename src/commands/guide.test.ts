@@ -94,6 +94,48 @@ describe("guide command", () => {
     expect(result.stderr).toMatch(/^value_error: Unknown section:/)
   })
 
+  it("should include Error.message when io_error cause is an Error instance", async () => {
+    const modulePath = "./guide.ts"
+    vi.resetModules()
+    vi.doMock("../logics/guide.ts", () => ({
+      getGuidelineView: () =>
+        Promise.resolve({
+          _tag: "left",
+          L: { _tag: "io_error", filePath: "guideline.yaml", cause: new Error("kaboom") },
+        }),
+    }))
+
+    const mod = await vi.importActual<typeof import("./guide.ts")>(modulePath)
+    const result = await mod.default()
+    expect(result.exitCode).toBe(1)
+    expect(result.stdout).toBe("")
+    expect(result.stderr).toBe("io_error: Failed to read guideline.yaml: kaboom")
+
+    vi.restoreAllMocks()
+    vi.unmock("../logics/guide.ts")
+  })
+
+  it("should format unexpected system errors via default renderer branch", async () => {
+    const modulePath = "./guide.ts"
+    vi.resetModules()
+    vi.doMock("../logics/guide.ts", () => ({
+      getGuidelineView: () =>
+        Promise.resolve({
+          _tag: "left",
+          L: { _tag: "exec_error", command: "x", cause: "oops" },
+        }),
+    }))
+
+    const mod = await vi.importActual<typeof import("./guide.ts")>(modulePath)
+    const result = await mod.default()
+    expect(result.exitCode).toBe(1)
+    expect(result.stdout).toBe("")
+    expect(result.stderr).toBe("exec_error: oops")
+
+    vi.restoreAllMocks()
+    vi.unmock("../logics/guide.ts")
+  })
+
   it("should handle non-string section inputs when reporting unknown section", async () => {
     // Pass a number to exercise the non-string branch of renderUnknownSection
     const UNKNOWN_SECTION_NUM = 123
