@@ -5,12 +5,14 @@ import jsdoc from 'eslint-plugin-jsdoc';
 
 
 export default tseslint.config(
+  { ignores: ["dist/**/*", "coverage/**/*"] },
   {
     ...eslint.configs.recommended,
     files: ["src/**/*.ts"],
   },
   {
     ...jsdoc.configs['flat/recommended-error'],
+    files: ["src/**/*.ts"],
     rules: {
       ...jsdoc.configs['flat/recommended-error'].rules,
       "jsdoc/require-jsdoc": ["error", { "publicOnly": true }],
@@ -18,23 +20,20 @@ export default tseslint.config(
       "jsdoc/require-returns-type": "off",
       "jsdoc/require-returns-check": "off",
     },
-    files: ["src/**/*.ts"],
   },
   ...tseslint.configs.strictTypeChecked.map(config => ({
     ...config,
     files: ["src/**/*.ts"],
   })),
   {
+    ...sonarjs.configs.recommended,
+    files: ["src/**/*.ts"],
     languageOptions: {
       parserOptions: {
         projectService: true,
         tsconfigRootDir: import.meta.dirname,
       },
     },
-  },
-  {
-    ...sonarjs.configs.recommended,
-    files: ["src/**/*.ts"],
     rules: {
       ...sonarjs.configs.recommended.rules,
       "sonarjs/todo-tag": "off",
@@ -43,7 +42,7 @@ export default tseslint.config(
       "sonarjs/prefer-regexp-exec": "off",
       "sonarjs/cognitive-complexity": ["error", 6],
       "sonarjs/max-lines-per-function": ["error", {maximum: 50}],
-      "sonarjs/max-lines": ["error", {maximum: 250}],
+      "sonarjs/max-lines": ["error", {maximum: 200}],
       'sonarjs/elseif-without-else': "error",
       "sonarjs/no-collapsible-if": "error",
       "sonarjs/no-inconsistent-returns": "error",

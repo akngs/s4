@@ -1,14 +1,9 @@
 import { ARCHETYPAL_SPEC, makeSpec as makeArchetypalSpec } from "../test-utils.ts"
 import type { Either, S4, TestResult } from "../types.ts"
-import {
-  calcFeatureStats,
-  checkSyncIssues,
-  getAcceptanceTestDependencyOrder,
-  getAcceptanceTestDetail,
-  getFeatureDetail,
-  runAllToolsDetailed,
-  topologicalSortFeatures,
-} from "./index.ts"
+import { getAcceptanceTestDetail, getFeatureDetail } from "./details.ts"
+import { calcFeatureStats } from "./stats.ts"
+import { checkSyncIssues, getAcceptanceTestDependencyOrder, topologicalSortFeatures } from "./sync.ts"
+import { runAllToolsDetailed } from "./tools.ts"
 
 const VALID_SPEC: S4 = ARCHETYPAL_SPEC
 

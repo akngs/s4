@@ -1,4 +1,4 @@
-import { getGuidelineView } from "../logics/index.ts"
+import { getGuidelineView } from "../logics/guide.ts"
 import { renderGuide } from "../render/index.ts"
 import type { CommandReturn } from "../types.ts"
 import { isLeft } from "../types.ts"

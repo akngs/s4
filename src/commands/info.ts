@@ -1,4 +1,4 @@
-import { getAcceptanceTestDetail, getFeatureDetail } from "../logics/index.ts"
+import { getAcceptanceTestDetail, getFeatureDetail } from "../logics/details.ts"
 import { renderAcceptanceTestDetail, renderFeatureDetail } from "../render/index.ts"
 import type { CommandReturn, S4 } from "../types.ts"
 import { isLeft } from "../types.ts"

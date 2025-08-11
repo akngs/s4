@@ -1,4 +1,4 @@
-import { performOverallStatusCheck } from "../logics/index.ts"
+import { performOverallStatusCheck } from "../logics/status.ts"
 import { renderStatus } from "../render/index.ts"
 import type { CommandReturn } from "../types.ts"
 import { isLeft } from "../types.ts"

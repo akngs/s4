@@ -97,7 +97,7 @@ describe("guide command", () => {
   it("should include Error.message when io_error cause is an Error instance", async () => {
     const modulePath = "./guide.ts"
     vi.resetModules()
-    vi.doMock("../logics/index.ts", () => ({
+    vi.doMock("../logics/guide.ts", () => ({
       getGuidelineView: () =>
         Promise.resolve({
           _tag: "left",
@@ -112,13 +112,13 @@ describe("guide command", () => {
     expect(result.stderr).toBe("io_error: Failed to read guideline.yaml: kaboom")
 
     vi.restoreAllMocks()
-    vi.unmock("../logics/index.ts")
+    vi.unmock("../logics/guide.ts")
   })
 
   it("should format unexpected system errors via default renderer branch", async () => {
     const modulePath = "./guide.ts"
     vi.resetModules()
-    vi.doMock("../logics/index.ts", () => ({
+    vi.doMock("../logics/guide.ts", () => ({
       getGuidelineView: () =>
         Promise.resolve({
           _tag: "left",
@@ -133,7 +133,7 @@ describe("guide command", () => {
     expect(result.stderr).toBe("exec_error: oops")
 
     vi.restoreAllMocks()
-    vi.unmock("../logics/index.ts")
+    vi.unmock("../logics/guide.ts")
   })
 
   it("should handle non-string section inputs when reporting unknown section", async () => {
