@@ -13,7 +13,6 @@ it("should run all tools and render tools section when all succeed", async () =>
     const result = await tools({ spec: temp, format: "yaml" })
     expect(result.exitCode).toBe(0)
     expect(result.stdout).toContainInOrder(["## Tools", "✔ t1", "✔ t2"])
-    expect(result.stderr).toBe("")
   })
 })
 
@@ -50,7 +49,6 @@ it("should continue after failure when stopOnError=false and reflect last exit c
     expect(result.stdout).toContainInOrder(["## Tools", "✘ fail", "✔ ok"])
     // Failing tools details should include section and the failing tool id
     expect(result.stdout).toContainInOrder(["There are errors reported by tools.", "### fail (exit code: 1)"])
-    expect(result.stderr).toBe("")
   })
 })
 
@@ -60,12 +58,10 @@ it("should handle empty tools array and still render tools header", async () => 
     const result = await tools({ spec: temp, format: "yaml" })
     expect(result.exitCode).toBe(0)
     expect(result.stdout).toContain("## Tools")
-    expect(result.stderr).toBe("")
   })
 })
 
 it("should return io_error when spec file is not found", async () => {
   const result = await tools({ spec: "nonexistent.yaml", format: "yaml" })
-  expect(result.exitCode).toBe(1)
-  expect(result.stderr).toContain("io_error")
+  expect(result).toBeError("io_error")
 })

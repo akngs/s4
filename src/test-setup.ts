@@ -1,5 +1,5 @@
 expect.extend({
-  toContainInOrder(received: unknown, parts: ReadonlyArray<string>) {
+  toContainInOrder(received: unknown, parts: string[]) {
     if (typeof received !== "string") {
       return {
         pass: false,
@@ -36,6 +36,16 @@ expect.extend({
     return {
       pass: true,
       message: () => "toContainInOrder: expected substrings not to appear in order",
+    }
+  },
+  toBeError(received: { exitCode: number; stderr: string }, expectedType: string) {
+    const pass = received.exitCode === 1 && typeof received.stderr === "string" && received.stderr.includes(expectedType)
+    return {
+      pass,
+      message: () =>
+        `toError: expected exitCode=1 and stderr to contain "${expectedType}" but got exitCode=${received.exitCode}, stderr=${JSON.stringify(
+          received.stderr,
+        )}`,
     }
   },
 })

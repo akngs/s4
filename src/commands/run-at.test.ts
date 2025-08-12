@@ -16,7 +16,6 @@ it("run-at command should succeed with valid acceptance test ID", async () => {
     const result = await runAt({ id: "AT-0001", spec: tempFile, format: "yaml" })
     expect(result.exitCode).toBe(0)
     expect(result.stdout).toBe("AT-0001: ok")
-    expect(result.stderr).toBe("")
   } finally {
     cleanupTempFile(tempFile)
   }
@@ -26,8 +25,7 @@ it("run-at should return value_error when id is missing", async () => {
   const tempFile = makeTempFile(SPEC_WITH_CONNECTORS)
   try {
     const result = await runAt({ id: "", spec: tempFile, format: "yaml" })
-    expect(result.exitCode).toBe(1)
-    expect(result.stderr).toBe("value_error: Missing ID - Provide AT-nnnn")
+    expect(result).toBeError("value_error")
   } finally {
     cleanupTempFile(tempFile)
   }

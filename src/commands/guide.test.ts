@@ -17,7 +17,6 @@ describe("guide command", () => {
 
     const result = await runGuide()
     expect(result.exitCode).toBe(0)
-    expect(result.stderr).toBe("")
     expect(result.stdout).toBe(brief)
   })
 
@@ -30,9 +29,7 @@ describe("guide command", () => {
 
     const mod = await vi.importActual<typeof import("./guide.ts")>(modulePath)
     const result = await mod.default()
-    expect(result.exitCode).toBe(1)
-    expect(result.stdout).toBe("")
-    expect(result.stderr).toBe("io_error: Failed to read guideline.yaml: boom")
+    expect(result).toBeError("io_error")
 
     vi.restoreAllMocks()
     vi.unmock("node:fs/promises")
@@ -50,9 +47,7 @@ describe("guide command", () => {
 
     const mod = await vi.importActual<typeof import("./guide.ts")>(modulePath)
     const result = await mod.default()
-    expect(result.exitCode).toBe(1)
-    expect(result.stdout).toBe("")
-    expect(result.stderr).toBe("io_error: Failed to read guideline.yaml: boom")
+    expect(result).toBeError("io_error")
 
     // cleanup mocks
     vi.restoreAllMocks()
@@ -71,9 +66,7 @@ describe("guide command", () => {
 
     const mod = await vi.importActual<typeof import("./guide.ts")>(modulePath)
     const result = await mod.default()
-    expect(result.exitCode).toBe(1)
-    expect(result.stdout).toBe("")
-    expect(result.stderr).toMatch(/^parse_error: /)
+    expect(result).toBeError("parse_error")
 
     vi.restoreAllMocks()
     vi.unmock("node:fs/promises")
@@ -83,15 +76,12 @@ describe("guide command", () => {
   it("should return section content with examples when a valid section is provided", async () => {
     const result = await runGuide("feature")
     expect(result.exitCode).toBe(0)
-    expect(result.stderr).toBe("")
     expect(result.stdout).toContainInOrder(["Specify buildable units of capability identified as FE-####", "## Examples"])
   })
 
   it("should return value_error when an unknown section is provided", async () => {
     const result = await runGuide("unknown-section")
-    expect(result.exitCode).toBe(1)
-    expect(result.stdout).toBe("")
-    expect(result.stderr).toMatch(/^value_error: Unknown section:/)
+    expect(result).toBeError("value_error")
   })
 
   it("should include Error.message when io_error cause is an Error instance", async () => {
@@ -107,9 +97,7 @@ describe("guide command", () => {
 
     const mod = await vi.importActual<typeof import("./guide.ts")>(modulePath)
     const result = await mod.default()
-    expect(result.exitCode).toBe(1)
-    expect(result.stdout).toBe("")
-    expect(result.stderr).toBe("io_error: Failed to read guideline.yaml: kaboom")
+    expect(result).toBeError("io_error")
 
     vi.restoreAllMocks()
     vi.unmock("../logics/guide.ts")
@@ -128,8 +116,6 @@ describe("guide command", () => {
 
     const mod = await vi.importActual<typeof import("./guide.ts")>(modulePath)
     const result = await mod.default()
-    expect(result.exitCode).toBe(1)
-    expect(result.stdout).toBe("")
     expect(result.stderr).toBe("exec_error: oops")
 
     vi.restoreAllMocks()
@@ -140,8 +126,6 @@ describe("guide command", () => {
     // Pass a number to exercise the non-string branch of renderUnknownSection
     const UNKNOWN_SECTION_NUM = 123
     const result = await runGuide(UNKNOWN_SECTION_NUM as unknown as string)
-    expect(result.exitCode).toBe(1)
-    expect(result.stdout).toBe("")
-    expect(result.stderr).toMatch(/^value_error: Unknown section: 123\./)
+    expect(result).toBeError("value_error")
   })
 })

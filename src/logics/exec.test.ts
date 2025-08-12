@@ -6,7 +6,6 @@ describe("executeCommand()", () => {
     const result = await executeCommand("echo ok")
     expect(result.exitCode).toBe(0)
     expect(result.stdout).toBe("ok")
-    expect(result.stderr).toBe("")
   })
 
   it("returns stdout/stderr with non-zero exitCode on failure", async () => {

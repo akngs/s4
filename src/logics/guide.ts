@@ -19,7 +19,7 @@ export async function getGuidelineView(
   Either<
     SystemError,
     | { kind: "brief"; brief: string }
-    | { kind: "section"; sectionText: string; examples: ReadonlyArray<{ kind: "scalar" | "block"; text: string }> }
+    | { kind: "section"; sectionText: string; examples: { kind: "scalar" | "block"; text: string }[] }
     | { kind: "unknown_section"; allowed: string[] }
   >
 > {

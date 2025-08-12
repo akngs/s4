@@ -23,8 +23,7 @@ it("run-ats command should render failing tests summary when there are failures"
 
 it("run-ats command should fail with invalid spec", async () => {
   const result = await runAts({ spec: "nonexistent.yaml", format: "yaml" })
-  expect(result.exitCode).toBe(1)
-  expect(result.stderr).toBeDefined()
+  expect(result).toBeError("io_error")
 })
 
 it("run-ats should propagate adapter error when adapter returns left (simulated via empty tests)", async () => {

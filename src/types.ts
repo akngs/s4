@@ -169,7 +169,6 @@ export function isToolSetIssue(issue: Issue): issue is ToolSetIssue {
 // Unified issue type
 export type Issue = ValidationIssue | SyncIssue | ToolSetIssue
 
-/** Value error */
 export type ValueError = { _tag: "value_error"; value: unknown; message: string }
 
 export type AdapterError = { _tag: "adapter_error"; adapter: string; cause: unknown }
@@ -206,7 +205,6 @@ export type AcceptanceTestDetail = {
 /** Result type for status command */
 export type StatusReport = { issues: Issue[]; featureStats: FeatureStats; toolResults: ToolRunResult[] }
 
-/** A minimal Either type for representing success or failure */
 export type Either<LEFT, RIGHT> = { _tag: "left"; L: LEFT } | { _tag: "right"; R: RIGHT }
 
 export type Left<LEFT> = { _tag: "left"; L: LEFT }
