@@ -27,7 +27,7 @@ describe("getGuidelineView()", () => {
     const view = (
       res as {
         _tag: "right"
-        R: { kind: "section"; sectionText: string; examples: ReadonlyArray<{ kind: "scalar" | "block"; text: string }> }
+        R: { kind: "section"; sectionText: string; examples: { kind: "scalar" | "block"; text: string }[] }
       }
     ).R
 

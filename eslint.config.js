@@ -89,7 +89,7 @@ export default tseslint.config(
     rules: {
       "sonarjs/max-lines-per-function": ["error", {maximum: 150}],
       "sonarjs/cognitive-complexity": ["error", 3],
-      "sonarjs/max-lines": ["error", {maximum: 500}],
+      "sonarjs/max-lines": ["error", {maximum: 300}],
     }
   }
 );

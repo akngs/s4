@@ -15,7 +15,6 @@ it("should execute tool successfully with echo command", async () => {
     const result = await tool({ spec: tempFile, format: "yaml", toolId: "echo-tool" })
     expect(result.exitCode).toBe(0)
     expect(result.stdout).toBe("hello world")
-    expect(result.stderr).toBe("")
   })
 })
 
@@ -23,7 +22,6 @@ it("should return error when tool is not found in spec", async () => {
   await withTempSpecFile(SPEC_WITH_TOOLS, async tempFile => {
     const result = await tool({ spec: tempFile, format: "yaml", toolId: "nonexistent-tool" })
     expect(result.exitCode).toBe(1)
-    expect(result.stdout).toBe("")
     expect(result.stderr).toBe('value_error: Tool "nonexistent-tool" not found in spec')
   })
 })

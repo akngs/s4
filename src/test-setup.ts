@@ -1,5 +1,5 @@
 expect.extend({
-  toContainInOrder(received: unknown, parts: ReadonlyArray<string>) {
+  toContainInOrder(received: unknown, parts: string[]) {
     if (typeof received !== "string") {
       return {
         pass: false,

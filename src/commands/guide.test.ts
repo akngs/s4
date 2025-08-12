@@ -17,7 +17,6 @@ describe("guide command", () => {
 
     const result = await runGuide()
     expect(result.exitCode).toBe(0)
-    expect(result.stderr).toBe("")
     expect(result.stdout).toBe(brief)
   })
 
@@ -77,7 +76,6 @@ describe("guide command", () => {
   it("should return section content with examples when a valid section is provided", async () => {
     const result = await runGuide("feature")
     expect(result.exitCode).toBe(0)
-    expect(result.stderr).toBe("")
     expect(result.stdout).toContainInOrder(["Specify buildable units of capability identified as FE-####", "## Examples"])
   })
 

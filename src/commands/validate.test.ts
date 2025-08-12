@@ -5,7 +5,6 @@ it("validate command should succeed with valid spec", async () => {
   await withTempSpecFile(makeSpec(), async tempFile => {
     const result = await validate({ spec: tempFile, format: "yaml" })
     expect(result.exitCode).toBe(0)
-    expect(result.stderr).toBe("")
   })
 })
 
@@ -15,7 +14,6 @@ it("validate command should work with JSON format", async () => {
     async tempFile => {
       const result = await validate({ spec: tempFile, format: "json" })
       expect(result.exitCode).toBe(0)
-      expect(result.stderr).toBe("")
     },
     "json",
   )

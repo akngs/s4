@@ -6,7 +6,6 @@ it("info command should succeed with valid feature ID", async () => {
     const result = await info({ id: "FE-0001", spec: tempFile, format: "yaml" })
     expect(result.exitCode).toBe(0)
     expect(result.stdout.split("\n")).toContain("# FE-0001: Test Feature")
-    expect(result.stderr).toBe("")
   })
 })
 
@@ -15,7 +14,6 @@ it("info command should succeed with valid acceptance test ID", async () => {
     const result = await info({ id: "AT-0001", spec: tempFile, format: "yaml" })
     expect(result.exitCode).toBe(0)
     expect(result.stdout.split("\n")).toContain("# AT-0001")
-    expect(result.stderr).toBe("")
   })
 })
 

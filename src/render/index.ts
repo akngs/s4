@@ -31,7 +31,7 @@ eta.configure({
  * @param tools - Tool execution results
  * @returns Rendered project status
  */
-export function renderStatus(spec: S4, featureStats: FeatureStats, issues: Issue[], tools: ReadonlyArray<ToolRunResult>): string {
+export function renderStatus(spec: S4, featureStats: FeatureStats, issues: Issue[], tools: ToolRunResult[]): string {
   const features = spec.features.map(f => ({ ...f, ...(featureStats.get(f.id) ?? {}) }))
   const summary = render("project-summary", { spec, features })
   const toolsSection = renderTools(spec.tools, tools)
@@ -47,7 +47,7 @@ export function renderStatus(spec: S4, featureStats: FeatureStats, issues: Issue
  * @param results - Tool execution results
  * @returns Rendered tools section
  */
-export function renderTools(allTools: ReadonlyArray<Tool>, results: ReadonlyArray<ToolRunResult>): string {
+export function renderTools(allTools: Tool[], results: ToolRunResult[]): string {
   return render("tools", { allTools, results })
 }
 
@@ -56,7 +56,7 @@ export function renderTools(allTools: ReadonlyArray<Tool>, results: ReadonlyArra
  * @param failures - Tool run results with non-zero exit codes
  * @returns Rendered failing tools details
  */
-export function renderFailingTools(failures: ReadonlyArray<ToolRunResult>): string {
+export function renderFailingTools(failures: ToolRunResult[]): string {
   return render("failing-tools", { failures })
 }
 
@@ -294,14 +294,13 @@ function render(templateId: string, data: Record<string, unknown>): string {
 export function renderGuide(
   view:
     | { kind: "brief"; brief: string }
-    | { kind: "section"; sectionText: string; examples: ReadonlyArray<{ kind: "scalar" | "block"; text: string }> }
+    | { kind: "section"; sectionText: string; examples: { kind: "scalar" | "block"; text: string }[] }
     | { kind: "unknown_section"; allowed: string[] },
 ): string {
   try {
     // Preserve exact brief text for tests and spec fidelity
     if (view.kind === "brief") return view.brief
-    const raw = render("guide", { view })
-    return normalizeMultilineText(raw)
+    return render("guide", { view })
   } catch {
     // Fallback plain rendering when the templating pipeline fails (e.g., JSON.stringify is mocked to throw in tests)
     if (view.kind === "brief") return view.brief
@@ -317,31 +316,6 @@ export function renderGuide(
         return `- |\n${indented}`
       })
       .join("\n")
-    return normalizeMultilineText(`${view.sectionText}\n\nExamples:\n\n${examples}`)
+    return `${view.sectionText}\n\nExamples:\n\n${examples}`
   }
-}
-
-function normalizeMultilineText(text: string): string {
-  const trimmed = text.trim()
-  const withoutTrailingSpaces = trimmed
-    .split("\n")
-    .map(line => stripTrailingSpaces(line))
-    .join("\n")
-  return `${withoutTrailingSpaces}\n`
-}
-
-function stripTrailingSpaces(line: string): string {
-  const SPACE = 32
-  const TAB = 9
-  let end = line.length
-  while (end > 0) {
-    const ch = line.charCodeAt(end - 1)
-    // 32 = space, 9 = tab
-    if (ch === SPACE || ch === TAB) {
-      end -= 1
-      continue
-    }
-    break
-  }
-  return end === line.length ? line : line.slice(0, end)
 }

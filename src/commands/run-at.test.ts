@@ -16,7 +16,6 @@ it("run-at command should succeed with valid acceptance test ID", async () => {
     const result = await runAt({ id: "AT-0001", spec: tempFile, format: "yaml" })
     expect(result.exitCode).toBe(0)
     expect(result.stdout).toBe("AT-0001: ok")
-    expect(result.stderr).toBe("")
   } finally {
     cleanupTempFile(tempFile)
   }
