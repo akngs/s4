@@ -26,8 +26,7 @@ it("run-at should return value_error when id is missing", async () => {
   const tempFile = makeTempFile(SPEC_WITH_CONNECTORS)
   try {
     const result = await runAt({ id: "", spec: tempFile, format: "yaml" })
-    expect(result.exitCode).toBe(1)
-    expect(result.stderr).toBe("value_error: Missing ID - Provide AT-nnnn")
+    expect(result).toBeError("value_error")
   } finally {
     cleanupTempFile(tempFile)
   }

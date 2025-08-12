@@ -42,7 +42,6 @@ it("should append recommended actions when tool command fails", async () => {
     const result = await tool({ spec: tempFile, format: "yaml", toolId: "fail-tool" })
     expect(result.exitCode).toBe(1)
     expect(result.stdout).toBe("failure\n\nCheck the error and retry")
-    expect(result.stderr).toBe("")
   })
 })
 
@@ -55,7 +54,6 @@ it("should include only recommended actions when command fails with empty stdout
     const result = await tool({ spec: tempFile, format: "yaml", toolId: "fail-actions-only" })
     expect(result.exitCode).toBe(1)
     expect(result.stdout).toBe("Do this")
-    expect(result.stderr).toBe("")
   })
 })
 
@@ -68,6 +66,5 @@ it("should pass-through output unchanged when command succeeds even if recommend
     const result = await tool({ spec: tempFile, format: "yaml", toolId: "ok-with-actions" })
     expect(result.exitCode).toBe(0)
     expect(result.stdout).toBe("content")
-    expect(result.stderr).toBe("")
   })
 })

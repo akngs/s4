@@ -66,6 +66,5 @@ it("should handle empty tools array and still render tools header", async () => 
 
 it("should return io_error when spec file is not found", async () => {
   const result = await tools({ spec: "nonexistent.yaml", format: "yaml" })
-  expect(result.exitCode).toBe(1)
-  expect(result.stderr).toContain("io_error")
+  expect(result).toBeError("io_error")
 })

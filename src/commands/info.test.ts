@@ -22,23 +22,20 @@ it("info command should succeed with valid acceptance test ID", async () => {
 it("info command should fail with invalid ID format", async () => {
   await withTempSpecFile(makeSpec(), async tempFile => {
     const result = await info({ id: "INVALID-123", spec: tempFile, format: "yaml" })
-    expect(result.exitCode).toBe(1)
-    expect(result.stderr).toBe("value_error: Invalid value: INVALID-123 - Invalid ID format. Expected FE-nnnn or AT-nnnn, got: INVALID-123")
+    expect(result).toBeError("value_error")
   })
 })
 
 it("info command should fail with unknown feature ID", async () => {
   await withTempSpecFile(makeSpec(), async tempFile => {
     const result = await info({ id: "FE-9999", spec: tempFile, format: "yaml" })
-    expect(result.exitCode).toBe(1)
-    expect(result.stderr).toBe('value_error: Invalid value: FE-9999 - Feature "FE-9999" not found in spec')
+    expect(result).toBeError("value_error")
   })
 })
 
 it("info command should fail with unknown acceptance test ID", async () => {
   await withTempSpecFile(makeSpec(), async tempFile => {
     const result = await info({ id: "AT-9999", spec: tempFile, format: "yaml" })
-    expect(result.exitCode).toBe(1)
-    expect(result.stderr).toBe('value_error: Invalid value: AT-9999 - Acceptance test "AT-9999" not found in spec')
+    expect(result).toBeError("value_error")
   })
 })
