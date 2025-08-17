@@ -12,7 +12,7 @@
     "postbuild": "mkdir -p dist/templates && cp -R src/render/templates/* dist/templates/ && cp src/logics/guideline.yaml dist/guideline.yaml || true",
     "prepare": "npm run build",
     "prepublishOnly": "npm run build",
-    "check:biome": "biome check --error-on-warnings src",
+    "check:biome": "biome check --error-on-warnings .",
     "check:tsc": "tsc --noEmit",
     "check:eslint": "eslint",
     "check:depcruise": "depcruise src",

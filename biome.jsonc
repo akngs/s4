@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.1.3/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.1.4/schema.json",
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
@@ -8,6 +8,7 @@
   },
   "javascript": {
     "formatter": {
+      "quoteStyle": "double",
       "semicolons": "asNeeded",
       "trailingCommas": "all",
       "arrowParentheses": "asNeeded"
@@ -35,11 +36,6 @@
     "enabled": false
   },
   "files": {
-    "includes": [
-      "src/**/*.ts",
-      "**/*.json",
-      "**/*.jsonc",
-      "!**/node_modules"
-    ]
+    "includes": ["eslint.config.js", "src/**/*.ts", "src/**/*.json", "!node_modules/", "!coverage/", "!dist/"]
   }
 }
