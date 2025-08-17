@@ -268,7 +268,6 @@ export function mapLeft<LEFT, RIGHT, LEFT2>(either: Either<LEFT, RIGHT>, fn: (is
 /**
  * Assert that a value is never (exhaustiveness check)
  * @param _ - The value that should never be reached
- * @returns Never (throws an error)
  */
 export function assertNever(_: never): never {
   throw new Error(`Unexpected value: ${_}`)

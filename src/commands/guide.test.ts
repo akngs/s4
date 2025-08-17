@@ -27,6 +27,7 @@ describe("guide command", () => {
       readFile: () => Promise.reject(new Error("boom")),
     }))
 
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
     const mod = await vi.importActual<typeof import("./guide.ts")>(modulePath)
     const result = await mod.default()
     expect(result).toBeError("io_error")
@@ -45,6 +46,7 @@ describe("guide command", () => {
       },
     }))
 
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
     const mod = await vi.importActual<typeof import("./guide.ts")>(modulePath)
     const result = await mod.default()
     expect(result).toBeError("io_error")
@@ -64,6 +66,7 @@ describe("guide command", () => {
       parse: () => ({ brief: "Good brief" }),
     }))
 
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
     const mod = await vi.importActual<typeof import("./guide.ts")>(modulePath)
     const result = await mod.default()
     expect(result).toBeError("parse_error")
@@ -95,6 +98,7 @@ describe("guide command", () => {
         }),
     }))
 
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
     const mod = await vi.importActual<typeof import("./guide.ts")>(modulePath)
     const result = await mod.default()
     expect(result).toBeError("io_error")
@@ -114,6 +118,7 @@ describe("guide command", () => {
         }),
     }))
 
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
     const mod = await vi.importActual<typeof import("./guide.ts")>(modulePath)
     const result = await mod.default()
     expect(result.stderr).toBe("exec_error: oops")

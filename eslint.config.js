@@ -1,95 +1,102 @@
-import eslint from "@eslint/js";
-import tseslint from "typescript-eslint";
-import sonarjs from 'eslint-plugin-sonarjs';
-import jsdoc from 'eslint-plugin-jsdoc';
-import importPlugin from 'eslint-plugin-import';
+import js from "@eslint/js"
+import { globalIgnores } from "eslint/config"
+import importPlugin from "eslint-plugin-import"
+import jsdoc from "eslint-plugin-jsdoc"
+import sonarjs from "eslint-plugin-sonarjs"
+import ts from "typescript-eslint"
 
-export default tseslint.config(
+// eslint.defineConfig() has a types incompatibility issue
+export default ts.config([
   // global ignores
-  { ignores: ["dist/**/*", "coverage/**/*"] },
+  globalIgnores([".cursor/", ".github/", "dist/", "coverage/", ".dependency-cruiser.cjs", "eslint.config.js"]),
 
-  // eslint
+  // check for typescript files
+  { name: "s4/ts", files: ["src/**/*.ts"] },
+
+  // js/recommended with custom rules
   {
-    ...eslint.configs.recommended,
+    name: "s4/js-recomm-mod",
+    extends: [js.configs.recommended],
     rules: {
-      ...eslint.configs.recommended.rules,
-      "max-params": ["error", { "max": 5 }],
-      "max-statements": ["error", { "max": 20 }], // sonarjs/max-lines-per-function과 다름
-    }
+      "no-undef": "off",
+      "max-params": ["error", { max: 5 }],
+      "max-statements": ["error", { max: 20 }],
+    },
   },
 
   // jsdoc
   {
-    ...jsdoc.configs['flat/recommended-error'],
+    name: "s4/jsdoc-recomm-mod",
+    extends: [jsdoc.configs["flat/recommended-error"]],
     rules: {
-      ...jsdoc.configs['flat/recommended-error'].rules,
-      "jsdoc/require-jsdoc": ["error", { "publicOnly": true }],
+      "jsdoc/require-jsdoc": ["error", { publicOnly: true }],
       "jsdoc/require-param-type": "off",
       "jsdoc/require-returns-type": "off",
-      "jsdoc/require-returns-check": "off",
-    }
+      "jsdoc/require-returns-check": "error",
+    },
   },
 
   // import
   {
-    ...importPlugin.flatConfigs.recommended,
-    files: ["src/**/*.ts"],
+    name: "s4/import-recomm-mod",
+    extends: [importPlugin.flatConfigs.recommended],
+    ignores: ["eslint.config.js"],
     rules: {
-      ...importPlugin.flatConfigs.recommended.rules,
-      "import/max-dependencies": ["error", {
-        "max": 8,
-        "ignoreTypeImports": false,
-      }],
+      "import/max-dependencies": ["error", { max: 8, ignoreTypeImports: false }],
     },
   },
-  
-  // typescript-eslint
-  ...tseslint.configs.strictTypeChecked.map(config => ({
-    ...config,
-    files: ["src/**/*.ts"],
-  })),
 
-  // sonarjs
+  // typescript-eslint
   {
-    ...sonarjs.configs.recommended,
-    files: ["src/**/*.ts"],
+    name: "s4/ts-strict-type-checked-mod",
+    extends: [ts.configs.strictTypeChecked],
     languageOptions: { parserOptions: { projectService: true } },
     rules: {
-      ...sonarjs.configs.recommended.rules,
-      "sonarjs/todo-tag": "off",
-      "sonarjs/pseudo-random": "off",
-      "sonarjs/no-os-command-from-path": "off",
-      "sonarjs/prefer-regexp-exec": "off",
-      "sonarjs/cognitive-complexity": ["error", 6],
-      "sonarjs/max-lines-per-function": ["error", {maximum: 40}], // max-statements와 다름
-      "sonarjs/max-lines": ["error", {maximum: 185}],
-      'sonarjs/elseif-without-else': "error",
-      "sonarjs/no-collapsible-if": "error",
-      "sonarjs/no-inconsistent-returns": "error",
-      "sonarjs/slow-regex": "off",
-      "no-useless-escape": "off",
-      "no-magic-numbers": "off",
       "@typescript-eslint/restrict-template-expressions": "off",
       "@typescript-eslint/switch-exhaustiveness-check": "error",
+      "@typescript-eslint/consistent-type-imports": "error",
       "@typescript-eslint/no-magic-numbers": [
-        "error", {
+        "error",
+        {
           ignore: [-2, -1, 0, 1, 2, 10, 16, 24, 32, 42, 60, 100, 255, 256, 512, 1024],
           ignoreEnums: true,
           ignoreNumericLiteralTypes: true,
           ignoreReadonlyClassProperties: true,
           ignoreTypeIndexes: true,
-        }
+        },
       ],
-    }
+    },
   },
 
-  // sonarjs for tests
+  // sonarjs
   {
+    name: "s4/sonarjs-recomm-mod",
+    extends: [sonarjs.configs.recommended],
+    rules: {
+      "sonarjs/todo-tag": "off",
+      "sonarjs/pseudo-random": "off",
+      "sonarjs/no-os-command-from-path": "off",
+      "sonarjs/prefer-regexp-exec": "off",
+      "sonarjs/cognitive-complexity": ["error", 6],
+      "sonarjs/max-lines-per-function": ["error", { maximum: 40 }],
+      "sonarjs/max-lines": ["error", { maximum: 185 }],
+      "sonarjs/elseif-without-else": "error",
+      "sonarjs/no-collapsible-if": "error",
+      "sonarjs/no-inconsistent-returns": "error",
+      "sonarjs/slow-regex": "off",
+      "no-useless-escape": "off",
+      "no-magic-numbers": "off",
+    },
+  },
+
+  // sonarjs for tests (overrides s4/sonarjs-recomm-mod)
+  {
+    name: "s4/sonarjs-test-mod",
     files: ["src/**/*.test.ts"],
     rules: {
-      "sonarjs/max-lines-per-function": ["error", {maximum: 150}],
+      "sonarjs/max-lines-per-function": ["error", { maximum: 150 }],
       "sonarjs/cognitive-complexity": ["error", 3],
-      "sonarjs/max-lines": ["error", {maximum: 300}],
-    }
-  }
-);
+      "sonarjs/max-lines": ["error", { maximum: 300 }],
+    },
+  },
+])
