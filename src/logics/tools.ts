@@ -8,17 +8,11 @@ import { executeCommand } from "./exec.ts"
  * @returns Detailed results for each tool
  */
 export async function runAllToolsDetailed(spec: S4): Promise<ToolRunResult[]> {
-  const perTool: ToolRunResult[] = []
+  const results: ToolRunResult[] = []
   for (const tool of spec.tools) {
     const result = await executeCommand(tool.command)
-    perTool.push({
-      id: tool.id,
-      stdout: result.stdout,
-      stderr: result.stderr,
-      exitCode: result.exitCode,
-      recommendedNextActions: tool.recommendedNextActions,
-    })
+    results.push({ id: tool.id, ...result, recommendedNextActions: tool.recommendedNextActions })
     if (result.exitCode !== 0 && tool.stopOnError) break
   }
-  return perTool
+  return results
 }

@@ -11,7 +11,7 @@ it('GIVEN a spec with circular feature dependencies, WHEN the user runs "s4 vali
     "validate --spec SPEC_FILE",
     result => {
       expect(result.status).toBe(1)
-      expect(result.stderr).toContainInOrder(["[circular_dep] Circular dependency detected involving feature FE-0004."])
+      expect(result.stderr).toContain("[circular_dep] Circular dependency detected involving feature FE-0004.")
     },
   )
 })

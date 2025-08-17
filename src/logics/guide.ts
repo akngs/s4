@@ -67,12 +67,8 @@ async function loadGuideline(): Promise<Either<SystemError, Guideline>> {
 
   if (raw === undefined) return left({ _tag: "io_error", filePath: "guideline.yaml", cause: lastError })
 
-  const obj = yaml.parse(raw) as unknown
-  const parsed = GuidelineSchema.safeParse(obj)
-  if (!parsed.success) {
-    return left({ _tag: "parse_error", message: parsed.error.message, cause: parsed.error })
-  }
-  return right(parsed.data)
+  const parsed = GuidelineSchema.safeParse(yaml.parse(raw) as unknown)
+  return parsed.success ? right(parsed.data) : left({ _tag: "parse_error", message: parsed.error.message, cause: parsed.error })
 }
 
 /**

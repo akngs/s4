@@ -31,21 +31,18 @@ it('GIVEN a spec with multiple structural issues, WHEN the user runs "s4 validat
     "validate --spec SPEC_FILE",
     result => {
       expect(result.status).toBe(1)
-
-      const output = result.stdout || result.stderr || result.error?.message || ""
-      expect(output).toBeTruthy()
-      expect(output.length).toBeGreaterThan(0)
-
-      expect(output).toContain("[uncovered_item] Business objective BO-0002 is not covered by any feature.")
-      expect(output).toContain("[uncovered_item] Feature FE-0002 is not covered by any acceptance test.")
-      expect(output).toContain("[circular_dep] Circular dependency detected involving feature FE-0001.")
-      expect(output).toContain("[circular_dep] Circular dependency detected involving feature FE-0002.")
-      expect(output).toContain('[invalid_concept_ref] BO-0001 references undefined concept "X".')
-      expect(output).toContain('[invalid_concept_ref] FE-0001 references undefined concept "X".')
-      expect(output).toContain('[invalid_concept_ref] AT-0001 references undefined concept "X".')
-      expect(output).toContain("[duplicate_id] ID BO-0001 is duplicated.")
-      expect(output).toContain('[duplicate_concept] Concept "Y" is defined multiple times.')
-      expect(output).toContain('[unused_concept] Concept "Y" is not used in the spec.')
+      expect(result.stderr).toContainInOrder([
+        "[uncovered_item] Business objective BO-0002 is not covered by any feature.",
+        "[uncovered_item] Feature FE-0002 is not covered by any acceptance test.",
+        "[circular_dep] Circular dependency detected involving feature FE-0001.",
+        "[circular_dep] Circular dependency detected involving feature FE-0002.",
+        '[invalid_concept_ref] BO-0001 references undefined concept "X".',
+        '[invalid_concept_ref] FE-0001 references undefined concept "X".',
+        '[invalid_concept_ref] AT-0001 references undefined concept "X".',
+        "[duplicate_id] ID BO-0001 is duplicated.",
+        '[duplicate_concept] Concept "Y" is defined multiple times.',
+        '[unused_concept] Concept "Y" is not used in the spec.',
+      ])
     },
   )
 })

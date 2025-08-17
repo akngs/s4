@@ -39,9 +39,7 @@ export async function performOverallStatusCheck(spec: S4): Promise<Either<System
 
   const toolResults: ToolRunResult[] = await runAllToolsDetailed(spec)
   const failures = toolResults.filter(t => t.exitCode !== 0)
-  if (failures.length > 0) {
-    issues.push({ _tag: "failing_tools", failures })
-  }
+  if (failures.length > 0) issues.push({ _tag: "failing_tools", failures })
 
   return right({ issues, featureStats: calcFeatureStats(spec, testResults), toolResults })
 }

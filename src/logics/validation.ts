@@ -85,8 +85,8 @@ export function validateConceptReferences(spec: S4): ValidationIssue[] {
   const items = [...spec.concepts, ...spec.businessObjectives, ...spec.features, ...spec.acceptanceTests]
 
   return items.flatMap(item => {
-    const references = extractConceptReferences("description" in item ? item.description : `${item.given} ${item.when} ${item.then}`)
-    return references.filter(ref => !conceptLabels.has(ref)).map(ref => ({ _tag: "invalid_concept_ref" as const, id: item.id, conceptLabel: ref }))
+    const refs = extractConceptReferences("description" in item ? item.description : `${item.given} ${item.when} ${item.then}`)
+    return refs.filter(ref => !conceptLabels.has(ref)).map(ref => ({ _tag: "invalid_concept_ref" as const, id: item.id, conceptLabel: ref }))
   })
 }
 

@@ -9,8 +9,7 @@ it('GIVEN a spec with invalid business objective references in features, WHEN th
     },
     "validate --spec SPEC_FILE",
     result => {
-      const output = result.stdout || result.stderr || result.error?.message || ""
-      expect(output).toContainInOrder(["[invalid_bo] Feature FE-0001 references unknown business objective BO-9999."])
+      expect(result.stderr).toContainInOrder(["[invalid_bo] Feature FE-0001 references unknown business objective BO-9999."])
     },
   )
 })

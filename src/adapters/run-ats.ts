@@ -11,37 +11,45 @@ class TapFlatAdapter implements Adapter {
 
   parse(tests: AcceptanceTest[], raw: CommandReturn): Either<AdapterError, TestResult[]> {
     const results: TestResult[] = []
-    const state: { id: string | null; passed: boolean | null; output: string[] } = {
-      id: null,
-      passed: null,
-      output: [],
-    }
-
+    const state = { id: null, passed: null, output: [] }
     const lines = (raw.stdout + raw.stderr).split("\n")
-    for (const rawLine of lines) {
-      const noComment = this.stripComment(rawLine)
-      const trimmed = noComment.trim()
-
-      // Header -> start a new test (flush previous)
-      const header = this.matchHeader(trimmed)
-      if (header) {
-        this.flush(results, tests, state)
-        state.id = header.testId
-        state.passed = header.passed
-        state.output = []
-        continue
-      }
-
-      // Inside a test -> collect non-noise lines (including empty ones)
-      if (state.id !== null && !this.isTapNoise(trimmed)) {
-        state.output.push(noComment)
-      }
-
-      // Otherwise ignore
-    }
+    for (const rawLine of lines) this.processLine(rawLine, results, tests, state)
 
     this.flush(results, tests, state)
+
     return right(results)
+  }
+
+  private processLine(
+    rawLine: string,
+    results: TestResult[],
+    tests: AcceptanceTest[],
+    state: { id: string | null; passed: boolean | null; output: string[] },
+  ): void {
+    const noComment = this.stripComment(rawLine)
+    const trimmed = noComment.trim()
+    const header = this.matchHeader(trimmed)
+    if (header) {
+      this.handleTestHeader(header, results, tests, state)
+    } else {
+      this.collectTestOutput(state, noComment, trimmed)
+    }
+  }
+
+  private handleTestHeader(
+    header: { testId: string; passed: boolean },
+    results: TestResult[],
+    tests: AcceptanceTest[],
+    state: { id: string | null; passed: boolean | null; output: string[] },
+  ): void {
+    this.flush(results, tests, state)
+    state.id = header.testId
+    state.passed = header.passed
+    state.output = []
+  }
+
+  private collectTestOutput(state: { id: string | null; passed: boolean | null; output: string[] }, noComment: string, trimmed: string): void {
+    if (state.id !== null && !this.isTapNoise(trimmed)) state.output.push(noComment)
   }
 
   private stripComment(line: string): string {
@@ -78,11 +86,7 @@ class TapFlatAdapter implements Adapter {
     }
 
     const outputText = s.output.join("\n")
-    if (outputText.length > 0) {
-      results.push({ id: s.id, test, passed: false, output: outputText })
-    } else {
-      results.push({ id: s.id, test, passed: false })
-    }
+    results.push({ id: s.id, test, passed: false, output: outputText.length > 0 ? outputText : undefined })
   }
 }
 

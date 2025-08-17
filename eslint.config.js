@@ -20,7 +20,7 @@ export default ts.config([
     rules: {
       "no-undef": "off",
       "max-params": ["error", { max: 5 }],
-      "max-statements": ["error", { max: 20 }],
+      "max-statements": ["error", { max: 15 }],
     },
   },
 
@@ -78,8 +78,7 @@ export default ts.config([
       "sonarjs/no-os-command-from-path": "off",
       "sonarjs/prefer-regexp-exec": "off",
       "sonarjs/cognitive-complexity": ["error", 6],
-      "sonarjs/max-lines-per-function": ["error", { maximum: 40 }],
-      "sonarjs/max-lines": ["error", { maximum: 185 }],
+      "sonarjs/max-lines": ["error", { maximum: 200 }],
       "sonarjs/elseif-without-else": "error",
       "sonarjs/no-collapsible-if": "error",
       "sonarjs/no-inconsistent-returns": "error",
@@ -89,12 +88,12 @@ export default ts.config([
     },
   },
 
-  // sonarjs for tests (overrides s4/sonarjs-recomm-mod)
+  // tests (overrides previous rules)
   {
-    name: "s4/sonarjs-test-mod",
+    name: "s4/test",
     files: ["src/**/*.test.ts"],
     rules: {
-      "sonarjs/max-lines-per-function": ["error", { maximum: 150 }],
+      "max-statements": ["error", { max: 20 }],
       "sonarjs/cognitive-complexity": ["error", 3],
       "sonarjs/max-lines": ["error", { maximum: 300 }],
     },
