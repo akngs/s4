@@ -344,3 +344,9 @@ tools:
     command: npm run --silent check:jscpd
   - id: unittest
     command: npm run --silent test:coverage
+  - id: tloc
+    command: npm run --silent check:tloc
+    recommendedNextActions: |-
+      Test-to-code ratio is larger than 150%. Simplify tests while keeping test coverage about the same. Run following command to check the longest test files:
+
+      tokei -f -s code | grep "test.ts" | head -n 15
