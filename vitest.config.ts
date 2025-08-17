@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-unresolved
 import { coverageConfigDefaults, defineConfig } from "vitest/config"
 
 export default defineConfig({
@@ -12,22 +13,18 @@ export default defineConfig({
           name: "unit",
           include: ["src/**/*.test.ts"],
           exclude: ["src/at/**/*.test.ts"],
-        }
+        },
       },
       {
         extends: true,
         test: {
           name: "acceptance",
           include: ["src/at/**/*.test.ts"],
-        }
-      }
+        },
+      },
     ],
     coverage: {
-      exclude: [
-        ...coverageConfigDefaults.exclude,
-        "src/test-utils.ts",
-        "src/index.ts",
-      ],
+      exclude: [...coverageConfigDefaults.exclude, "src/test-utils.ts", "src/index.ts"],
     },
   },
 })

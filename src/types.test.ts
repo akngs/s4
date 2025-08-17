@@ -45,6 +45,7 @@ describe("Extra", () => {
   it("type guards should discriminate union types", () => {
     const v = { _tag: "uncovered_item", id: "BO-0001", itemType: "BO" } as const
     const s = { _tag: "missing_at", id: "AT-0001", filePath: "p" } as const
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
     const t = { _tag: "failing_tests", testResults: [] as unknown as import("./types.ts").TestResult[] } as const
     expect(isValidationIssue(v)).toBe(true)
     expect(isSyncIssue(s)).toBe(true)
