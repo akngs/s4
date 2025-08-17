@@ -18,9 +18,7 @@ function tapLine(ok: boolean, id: string, text: string): string {
 }
 
 describe("performOverallStatusCheck()", () => {
-  beforeEach(() => {
-    vi.restoreAllMocks()
-  })
+  beforeEach(() => vi.restoreAllMocks())
 
   it("includes failing_tests and failing_tools when they occur", async () => {
     // Ensure we have a tool so failing_tools can be generated
@@ -45,6 +43,7 @@ describe("performOverallStatusCheck()", () => {
 
     const result = await performOverallStatusCheck(spec)
     expect(result._tag).toBe("right")
+
     const issues = (result as { _tag: "right"; R: { issues: { _tag: string }[] } }).R.issues
     const tags = new Set(issues.map(i => i._tag))
     expect(tags.has("failing_tests")).toBe(true)

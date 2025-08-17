@@ -43,13 +43,9 @@ describe("Either utilities", () => {
 
 describe("Extra", () => {
   it("type guards should discriminate union types", () => {
-    const v = { _tag: "uncovered_item", id: "BO-0001", itemType: "BO" } as const
-    const s = { _tag: "missing_at", id: "AT-0001", filePath: "p" } as const
-    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-    const t = { _tag: "failing_tests", testResults: [] as unknown as import("./types.ts").TestResult[] } as const
-    expect(isValidationIssue(v)).toBe(true)
-    expect(isSyncIssue(s)).toBe(true)
-    expect(isToolSetIssue(t)).toBe(true)
+    expect(isValidationIssue({ _tag: "uncovered_item", id: "BO-0001", itemType: "BO" })).toBe(true)
+    expect(isSyncIssue({ _tag: "missing_at", id: "AT-0001", filePath: "p" })).toBe(true)
+    expect(isToolSetIssue({ _tag: "failing_tests", testResults: [] })).toBe(true)
   })
 
   it("map/mapLeft should not alter Left/Right opposite sides", () => {

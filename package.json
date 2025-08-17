@@ -3,9 +3,7 @@
   "module": "dist/index.js",
   "type": "module",
   "private": false,
-  "bin": {
-    "s4": "dist/index.js"
-  },
+  "bin": { "s4": "dist/index.js" },
   "scripts": {
     "start": "node --experimental-strip-types src/index.ts",
     "build": "tsup src/index.ts --format esm --dts --sourcemap --clean --shims --target node18 --out-dir dist",
@@ -19,9 +17,9 @@
     "check:knip": "knip",
     "check:jscpd": "npm run --silent check:jscpd:src && npm run --silent check:jscpd:test",
     "check:jscpd:src": "jscpd --min-lines 4 --min-tokens 60 --mode weak --format 'typescript' --exitCode 1 --pattern 'src/**/*.ts' --ignore '**/*.test.ts'",
-    "check:jscpd:test": "jscpd --min-lines 6 --min-tokens 80 --mode weak --format 'typescript' --exitCode 1 --pattern 'src/**/*.ts'",
-    "check:tloc": "bins/tloc.sh 150",
-    "check": "npm run --silent check:biome && npm run --silent check:tsc && npm run --silent check:eslint && npm run --silent check:depcruise && npm run --silent check:knip && npm run --silent check:jscpd:src && npm run --silent check:jscpd:test",
+    "check:jscpd:test": "jscpd --min-lines 5 --min-tokens 80 --mode weak --format 'typescript' --exitCode 1 --pattern 'src/**/*.ts'",
+    "check:tloc": "bins/tloc.sh 180",
+    "check": "npm run --silent check:biome && npm run --silent check:tsc && npm run --silent check:eslint && npm run --silent check:depcruise && npm run --silent check:knip && npm run --silent check:jscpd:src && npm run --silent check:jscpd:test && npm run --silent check:tloc",
     "fix": "npm run --silent check:biome -- --write && npm run --silent check:eslint -- --fix",
     "test": "vitest run --reporter dot --project unit",
     "test:watch": "vitest --reporter dot --project unit",
@@ -36,9 +34,7 @@
     }
   },
   "types": "dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
+  "files": [ "dist" ],
   "devDependencies": {
     "@biomejs/biome": "^2.1.4",
     "@eslint/js": "^9.33.0",

@@ -8,8 +8,7 @@ it("locate-at command should succeed with valid acceptance test ID", async () =>
   })
   await withTempSpecFile(spec, async tempFile => {
     const result = await locateAt({ id: "AT-0001", spec: tempFile, format: "yaml" })
-    expect(result.exitCode).toBe(0)
-    expect(result.stdout).toBe("src/at/AT-0001.test.ts")
+    expect(result).toMatchObject({ exitCode: 0, stdout: "src/at/AT-0001.test.ts" })
   })
 })
 
@@ -21,8 +20,7 @@ it("locate-at command should handle non-existent acceptance test ID", async () =
   })
   await withTempSpecFile(spec, async tempFile => {
     const result = await locateAt({ id: "AT-9999", spec: tempFile, format: "yaml" })
-    expect(result.exitCode).toBe(0)
-    expect(result.stdout).toBe("src/at/AT-9999.test.ts")
+    expect(result).toMatchObject({ exitCode: 0, stdout: "src/at/AT-9999.test.ts" })
   })
 })
 

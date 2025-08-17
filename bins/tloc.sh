@@ -13,13 +13,13 @@ elif [ $# -eq 1 ]; then
     else
         echo "error: invalid ratio '$1'. Please provide an integer (e.g., 150 for 150%)"
         echo "usage: $0 [ratio_threshold]"
-        echo "  ratio_threshold: test-to-code ratio threshold as percentage (default: 150)"
+        echo "  ratio_threshold: test-to-production code ratio threshold as percentage (default: 150)"
         exit 1
     fi
 else
     echo "error: too many arguments"
     echo "usage: $0 [ratio_threshold]"
-    echo "  ratio_threshold: test-to-code ratio threshold as percentage (default: 150)"
+    echo "  ratio_threshold: test-to-production code ratio threshold as percentage (default: 150)"
     exit 1
 fi
 
@@ -54,17 +54,17 @@ ratio=$((test_loc * 100 / code_loc))
 
 # Check if ratio is more than the threshold
 if [ "$ratio" -gt "$RATIO_THRESHOLD" ]; then
-    echo "error: test-to-code ratio is $ratio% (more than ${RATIO_THRESHOLD}%)"
-    echo "  Code LOC: $code_loc"
+    echo "error: test-to-production code ratio is $ratio% (more than ${RATIO_THRESHOLD}%)"
+    echo "  Production LOC: $code_loc"
     echo "  Test LOC: $test_loc"
-    echo "  Ratio: $ratio%"
+    echo "  P/T Ratio: $ratio%"
     echo "  Threshold: ${RATIO_THRESHOLD}%"
     exit 1
 else
-    echo "success: test-to-code ratio is $ratio% (within acceptable range)"
-    echo "  Code LOC: $code_loc"
+    echo "success: test-to-production code ratio is $ratio% (within acceptable range)"
+    echo "  Production LOC: $code_loc"
     echo "  Test LOC: $test_loc"
-    echo "  Ratio: $ratio%"
+    echo "  P/T Ratio: $ratio%"
     echo "  Threshold: ${RATIO_THRESHOLD}%"
     exit 0
 fi

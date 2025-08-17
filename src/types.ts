@@ -266,6 +266,26 @@ export function mapLeft<LEFT, RIGHT, LEFT2>(either: Either<LEFT, RIGHT>, fn: (is
 }
 
 /**
+ * Unwrap the left value from an Either
+ * @param e - The Either value to unwrap
+ * @returns The left value
+ */
+export function unwrapLeft<L, R>(e: Either<L, R>): L {
+  if (!isLeft(e)) throw new Error(`Expected left value, got right: ${JSON.stringify(e)}`)
+  return e.L
+}
+
+/**
+ * Unwrap the right value from an Either
+ * @param e - The Either value to unwrap
+ * @returns The right value
+ */
+export function unwrapRight<L, R>(e: Either<L, R>): R {
+  if (!isRight(e)) throw new Error(`Expected right value, got left: ${JSON.stringify(e)}`)
+  return e.R
+}
+
+/**
  * Assert that a value is never (exhaustiveness check)
  * @param _ - The value that should never be reached
  */

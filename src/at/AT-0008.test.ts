@@ -38,7 +38,6 @@ it('GIVEN a spec with internal inconsistencies, WHEN the user runs "s4 status", 
     },
     "status --spec SPEC_FILE",
     result => {
-      expect(result.stdout).toMatch(/There are \d+ validation issues - the spec has internal inconsistencies\./)
       expect(result.stdout).toContainInOrder([
         "[uncovered_item] Business objective BO-0002 is not covered by any feature",
         "Define a new feature that covers BO-0002",

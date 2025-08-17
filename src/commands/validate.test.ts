@@ -3,8 +3,7 @@ import validate from "./validate.ts"
 
 it("validate command should succeed with valid spec", async () => {
   await withTempSpecFile(makeSpec(), async tempFile => {
-    const result = await validate({ spec: tempFile, format: "yaml" })
-    expect(result.exitCode).toBe(0)
+    expect(await validate({ spec: tempFile, format: "yaml" })).toMatchObject({ exitCode: 0 })
   })
 })
 
@@ -12,29 +11,25 @@ it("validate command should work with JSON format", async () => {
   await withTempSpecFile(
     makeSpec(),
     async tempFile => {
-      const result = await validate({ spec: tempFile, format: "json" })
-      expect(result.exitCode).toBe(0)
+      expect(await validate({ spec: tempFile, format: "json" })).toMatchObject({ exitCode: 0 })
     },
     "json",
   )
 })
 
 it("validate command should handle file not found error", async () => {
-  const result = await validate({ spec: "nonexistent.yaml", format: "yaml" })
-  expect(result).toBeError("io_error")
+  expect(await validate({ spec: "nonexistent.yaml", format: "yaml" })).toBeError("io_error")
 })
 
 it("validate command should handle invalid file formats", async () => {
   await withTempTextFile("invalid: yaml: content: [", async tempFile => {
-    const result = await validate({ spec: tempFile, format: "yaml" })
-    expect(result).toBeError("parse_error")
+    expect(await validate({ spec: tempFile, format: "yaml" })).toBeError("parse_error")
   })
 })
 
 it("validate command should handle invalid spec schema", async () => {
   await withTempTextFile("title: Invalid Spec\n", async tempFile => {
-    const result = await validate({ spec: tempFile, format: "yaml" })
-    expect(result).toBeError("parse_error")
+    expect(await validate({ spec: tempFile, format: "yaml" })).toBeError("parse_error")
   })
 })
 
@@ -47,7 +42,6 @@ it("validate command should report validation issues", async () => {
   })
 
   await withTempSpecFile(specWithDuplicateIds, async tempFile => {
-    const result = await validate({ spec: tempFile, format: "yaml" })
-    expect(result).toBeError("duplicate_id")
+    expect(await validate({ spec: tempFile, format: "yaml" })).toBeError("duplicate_id")
   })
 })

@@ -11,9 +11,11 @@ it('GIVEN a spec with dangling acceptance test files, WHEN the user runs "s4 sta
     },
     "status --spec SPEC_FILE",
     result => {
-      expect(result.stdout).toContain("There are 1 dangling acceptance tests - these are not defined in the spec but exist in the filesystem:")
-      expect(result.stdout).toContain("- AT-0002: src/at/AT-0002.test.ts")
-      expect(result.stdout).toContain("- Remove the test files from the filesystem since the spec is the source of truth.")
+      expect(result.stdout).toContainInOrder([
+        "There are 1 dangling acceptance tests",
+        "- AT-0002: src/at/AT-0002.test.ts",
+        "- Remove the test files",
+      ])
     },
   )
 })

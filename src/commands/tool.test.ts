@@ -13,33 +13,28 @@ const SPEC_WITH_TOOLS = makeSpec({
 it("should execute tool successfully with echo command", async () => {
   await withTempSpecFile(SPEC_WITH_TOOLS, async tempFile => {
     const result = await tool({ spec: tempFile, format: "yaml", toolId: "echo-tool" })
-    expect(result.exitCode).toBe(0)
-    expect(result.stdout).toBe("hello world")
+    expect(result).toMatchObject({ exitCode: 0, stdout: "hello world" })
   })
 })
 
 it("should return error when tool is not found in spec", async () => {
   await withTempSpecFile(SPEC_WITH_TOOLS, async tempFile => {
     const result = await tool({ spec: tempFile, format: "yaml", toolId: "nonexistent-tool" })
-    expect(result.exitCode).toBe(1)
-    expect(result.stderr).toBe('value_error: Tool "nonexistent-tool" not found in spec')
+    expect(result).toMatchObject({ exitCode: 1, stderr: 'value_error: Tool "nonexistent-tool" not found in spec' })
   })
 })
 
 it("should return command output when tool command fails with no recommended actions", async () => {
   await withTempSpecFile(SPEC_WITH_TOOLS, async tempFile => {
     const result = await tool({ spec: tempFile, format: "yaml", toolId: "fail-no-actions" })
-    expect(result.exitCode).toBe(1)
-    expect(result.stdout).toBe("")
-    expect(result.stderr).toBe("")
+    expect(result).toMatchObject({ exitCode: 1, stdout: "", stderr: "" })
   })
 })
 
 it("should append recommended actions when tool command fails", async () => {
   await withTempSpecFile(SPEC_WITH_TOOLS, async tempFile => {
     const result = await tool({ spec: tempFile, format: "yaml", toolId: "fail-tool" })
-    expect(result.exitCode).toBe(1)
-    expect(result.stdout).toBe("failure\n\nCheck the error and retry")
+    expect(result).toMatchObject({ exitCode: 1, stdout: "failure\n\nCheck the error and retry" })
   })
 })
 
@@ -62,7 +57,6 @@ it("should pass-through output unchanged when command succeeds even if recommend
   })
   await withTempSpecFile(spec, async tempFile => {
     const result = await tool({ spec: tempFile, format: "yaml", toolId: "ok-with-actions" })
-    expect(result.exitCode).toBe(0)
-    expect(result.stdout).toBe("content")
+    expect(result).toMatchObject({ exitCode: 0, stdout: "content" })
   })
 })

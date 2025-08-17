@@ -1,5 +1,6 @@
 import { ARCHETYPAL_SPEC, makeSpec as makeArchetypalSpec } from "../test-utils.ts"
-import type { Either, S4 } from "../types.ts"
+import type { S4 } from "../types.ts"
+import { unwrapLeft, unwrapRight } from "../types.ts"
 import { getAcceptanceTestDetail, getFeatureDetail } from "./details.ts"
 
 const VALID_SPEC: S4 = ARCHETYPAL_SPEC
@@ -22,15 +23,6 @@ const QUERY_TEST_SPEC: S4 = makeArchetypalSpec({
   connectors: ARCHETYPAL_SPEC.connectors,
 })
 const makeSpec = (overrides: Partial<S4>): S4 => makeArchetypalSpec({ ...VALID_SPEC, ...overrides })
-
-const unwrapRight = <L, R>(e: Either<L, R>): R => {
-  expect(e._tag).toBe("right")
-  return (e as { _tag: "right"; R: R }).R
-}
-const unwrapLeft = <L, R>(e: Either<L, R>): L => {
-  expect(e._tag).toBe("left")
-  return (e as { _tag: "left"; L: L }).L
-}
 
 describe("getFeatureDetail()", () => {
   it("should return feature information with all relationships", () => {

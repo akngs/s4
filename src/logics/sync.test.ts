@@ -1,15 +1,12 @@
 import { ARCHETYPAL_SPEC, makeSpec as makeArchetypalSpec } from "../test-utils.ts"
-import type { Either, S4 } from "../types.ts"
+import type { S4 } from "../types.ts"
+import { unwrapRight } from "../types.ts"
 import { checkSyncIssues, getAcceptanceTestDependencyOrder, topologicalSortFeatures } from "./sync.ts"
 
 const VALID_SPEC: S4 = ARCHETYPAL_SPEC
 
 // Test helpers
 const makeFeature = (id: string, prerequisites: string[] = []) => ({ id, title: id, description: id, covers: ["BO-0001"], prerequisites })
-const unwrapRight = <L, R>(e: Either<L, R>): R => {
-  expect(e._tag).toBe("right")
-  return (e as { _tag: "right"; R: R }).R
-}
 
 describe("topologicalSortFeatures()", () => {
   const cases: Array<[string, { id: string; prerequisites: string[] }[], string[]]> = [
@@ -33,8 +30,7 @@ describe("topologicalSortFeatures()", () => {
   ]
 
   it.each(cases)("should sort features in %s", (_, features, expected) => {
-    const result = topologicalSortFeatures(features)
-    expect(result).toEqual(expected)
+    expect(topologicalSortFeatures(features)).toEqual(expected)
   })
 
   it("should handle circular dependencies gracefully", () => {
@@ -45,7 +41,6 @@ describe("topologicalSortFeatures()", () => {
     const result = topologicalSortFeatures(features)
     expect(result).toContain("FE-0001")
     expect(result).toContain("FE-0002")
-    expect(result).toHaveLength(2)
   })
 })
 describe("getAcceptanceTestDependencyOrder()", () => {

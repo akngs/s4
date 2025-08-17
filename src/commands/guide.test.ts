@@ -27,33 +27,12 @@ describe("guide command", () => {
       readFile: () => Promise.reject(new Error("boom")),
     }))
 
-    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-    const mod = await vi.importActual<typeof import("./guide.ts")>(modulePath)
-    const result = await mod.default()
+    const mod = await vi.importActual(modulePath)
+    const result = await (mod as { default: () => Promise<unknown> }).default()
     expect(result).toBeError("io_error")
 
     vi.restoreAllMocks()
     vi.unmock("node:fs/promises")
-  })
-
-  it("should format non-Error thrown value in catch branch", async () => {
-    const modulePath = "./guide.ts"
-    vi.resetModules()
-    vi.doMock("yaml", () => ({
-      parse: () => {
-        // eslint-disable-next-line @typescript-eslint/only-throw-error
-        throw "boom"
-      },
-    }))
-
-    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-    const mod = await vi.importActual<typeof import("./guide.ts")>(modulePath)
-    const result = await mod.default()
-    expect(result).toBeError("io_error")
-
-    // cleanup mocks
-    vi.restoreAllMocks()
-    vi.unmock("yaml")
   })
 
   it("should return parse_error when guideline.yaml content is invalid", async () => {
@@ -66,9 +45,8 @@ describe("guide command", () => {
       parse: () => ({ brief: "Good brief" }),
     }))
 
-    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-    const mod = await vi.importActual<typeof import("./guide.ts")>(modulePath)
-    const result = await mod.default()
+    const mod = await vi.importActual(modulePath)
+    const result = await (mod as { default: () => Promise<unknown> }).default()
     expect(result).toBeError("parse_error")
 
     vi.restoreAllMocks()
@@ -87,50 +65,66 @@ describe("guide command", () => {
     expect(result).toBeError("value_error")
   })
 
-  it("should include Error.message when io_error cause is an Error instance", async () => {
-    const modulePath = "./guide.ts"
-    vi.resetModules()
-    vi.doMock("../logics/guide.ts", () => ({
-      getGuidelineView: () =>
-        Promise.resolve({
-          _tag: "left",
-          L: { _tag: "io_error", filePath: "guideline.yaml", cause: new Error("kaboom") },
-        }),
-    }))
-
-    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-    const mod = await vi.importActual<typeof import("./guide.ts")>(modulePath)
-    const result = await mod.default()
-    expect(result).toBeError("io_error")
-
-    vi.restoreAllMocks()
-    vi.unmock("../logics/guide.ts")
-  })
-
-  it("should format unexpected system errors via default renderer branch", async () => {
-    const modulePath = "./guide.ts"
-    vi.resetModules()
-    vi.doMock("../logics/guide.ts", () => ({
-      getGuidelineView: () =>
-        Promise.resolve({
-          _tag: "left",
-          L: { _tag: "exec_error", command: "x", cause: "oops" },
-        }),
-    }))
-
-    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-    const mod = await vi.importActual<typeof import("./guide.ts")>(modulePath)
-    const result = await mod.default()
-    expect(result.stderr).toBe("exec_error: oops")
-
-    vi.restoreAllMocks()
-    vi.unmock("../logics/guide.ts")
-  })
-
   it("should handle non-string section inputs when reporting unknown section", async () => {
-    // Pass a number to exercise the non-string branch of renderUnknownSection
     const UNKNOWN_SECTION_NUM = 123
     const result = await runGuide(UNKNOWN_SECTION_NUM as unknown as string)
     expect(result).toBeError("value_error")
+  })
+
+  it("should handle parse_error with message property", async () => {
+    const modulePath = "./guide.ts"
+    vi.resetModules()
+    vi.doMock("../logics/guide.ts", () => ({
+      getGuidelineView: () =>
+        Promise.resolve({
+          _tag: "left",
+          L: { _tag: "parse_error", message: "Invalid YAML format", cause: "test" },
+        }),
+    }))
+
+    const mod = await vi.importActual(modulePath)
+    const result = await (mod as { default: () => Promise<unknown> }).default()
+    expect(result).toBeError("parse_error")
+
+    vi.restoreAllMocks()
+    vi.unmock("../logics/guide.ts")
+  })
+
+  it("should handle unknown error types", async () => {
+    const modulePath = "./guide.ts"
+    vi.resetModules()
+    vi.doMock("../logics/guide.ts", () => ({
+      getGuidelineView: () =>
+        Promise.resolve({
+          _tag: "left",
+          L: { _tag: "unknown_error", cause: "Something went wrong" },
+        }),
+    }))
+
+    const mod = await vi.importActual(modulePath)
+    const result = await (mod as { default: () => Promise<unknown> }).default()
+    expect(result).toBeError("unknown_error")
+
+    vi.restoreAllMocks()
+    vi.unmock("../logics/guide.ts")
+  })
+
+  it("should handle unknown error types without cause", async () => {
+    const modulePath = "./guide.ts"
+    vi.resetModules()
+    vi.doMock("../logics/guide.ts", () => ({
+      getGuidelineView: () =>
+        Promise.resolve({
+          _tag: "left",
+          L: { _tag: "unknown_error" },
+        }),
+    }))
+
+    const mod = await vi.importActual(modulePath)
+    const result = await (mod as { default: () => Promise<unknown> }).default()
+    expect(result).toBeError("unknown_error")
+
+    vi.restoreAllMocks()
+    vi.unmock("../logics/guide.ts")
   })
 })

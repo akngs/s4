@@ -49,7 +49,6 @@ describe("runAllToolsDetailed()", () => {
   })
 
   it("should handle empty tools array", async () => {
-    const result = await runAllToolsDetailed(makeSpec({ ...SPEC_WITH_TOOLS, tools: [] }))
-    expect(result).toHaveLength(0)
+    expect(await runAllToolsDetailed(makeSpec({ ...SPEC_WITH_TOOLS, tools: [] }))).toHaveLength(0)
   })
 })

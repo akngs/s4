@@ -1,0 +1,19 @@
+name: 'Install External Tools'
+description: 'Install tokei and jq tools and run npm check'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install tokei (code statistics tool)
+      shell: bash
+      run: |
+        curl -L --output /tmp/tokei.tar.gz https://github.com/XAMPPRocky/tokei/releases/download/v12.1.2/tokei-x86_64-unknown-linux-gnu.tar.gz
+        tar -xzf /tmp/tokei.tar.gz -C /tmp
+        sudo mv /tmp/tokei /usr/local/bin/
+    
+    - name: Install jq (JSON processor)
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y jq
+    

@@ -22,16 +22,10 @@ jobs:
           node-version: ${{ matrix.node }}
           cache: npm
       - run: npm ci
-      - name: Run quality tools
-        run: |
-          npm run --silent check:biome
-          npm run --silent check:tsc
-          npm run --silent check:eslint
-          npm run --silent check:depcruise
-          npm run --silent check:knip
-          npm run --silent check:jscpd
-      - name: Unit tests
-        run: npm run test
+      - uses: ./.github/actions/install-external-tools
+      - name: Run npm check
+        shell: bash
+        run: npm run --silent check
       - name: Coverage (unit)
         run: npm run test:coverage
       - name: Upload coverage artifact
@@ -49,6 +43,7 @@ jobs:
           node-version: 24.x
           cache: npm
       - run: npm ci
+      - uses: ./.github/actions/install-external-tools
       - name: Run s4 status
         run: |
           node dist/index.js status

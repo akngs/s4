@@ -22,21 +22,18 @@ it("status command should work with JSON format", async () => {
 })
 
 it("status command should handle file not found error", async () => {
-  const result = await status({ spec: "nonexistent.yaml", format: "yaml" })
-  expect(result).toBeError("io_error")
+  expect(await status({ spec: "nonexistent.yaml", format: "yaml" })).toBeError("io_error")
 })
 
 it("status command should handle invalid file formats", async () => {
   await withTempTextFile("invalid: yaml: content: [", async tempFile => {
-    const result = await status({ spec: tempFile, format: "yaml" })
-    expect(result).toBeError("parse_error")
+    expect(await status({ spec: tempFile, format: "yaml" })).toBeError("parse_error")
   })
 })
 
 it("status command should handle invalid spec schema", async () => {
   await withTempTextFile("title: Invalid Spec\n", async tempFile => {
-    const result = await status({ spec: tempFile, format: "yaml" })
-    expect(result).toBeError("parse_error")
+    expect(await status({ spec: tempFile, format: "yaml" })).toBeError("parse_error")
   })
 })
 
@@ -52,7 +49,6 @@ it("status command should handle spec with validation issues", async () => {
   })
 
   await withTempSpecFile(invalidSpec, async tempFile => {
-    const result = await status({ spec: tempFile, format: "yaml" })
-    expect(result).toBeError("adapter_error")
+    expect(await status({ spec: tempFile, format: "yaml" })).toBeError("adapter_error")
   })
 })

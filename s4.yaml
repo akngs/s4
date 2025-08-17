@@ -343,10 +343,16 @@ tools:
   - id: jscpd
     command: npm run --silent check:jscpd
   - id: unittest
+    command: npm run --silent test
+  - id: coverage
     command: npm run --silent test:coverage
   - id: tloc
     command: npm run --silent check:tloc
     recommendedNextActions: |-
-      Test-to-code ratio is larger than 150%. Simplify tests while keeping test coverage about the same. Run following command to check the longest test files:
+      Test-to-production code ratio is too high. Simplify tests while keeping test coverage about the same.
 
-      tokei -f -s code | grep "test.ts" | head -n 15
+      Here are some tips:
+
+      - Simplify assertions by define DSLs using `expect.extend({})`
+      - Comments and empty lines are not counted in the code calculation, so there's no need to remove them.
+      - Run this command to check the longest test files: `tokei -f -s test | grep "test.ts" | head -n 10`

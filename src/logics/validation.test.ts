@@ -17,83 +17,61 @@ import {
 } from "./validation.ts"
 
 describe("extractConceptReferences", () => {
-  it("should extract concept references from description", () => {
-    const description = "This is a [[concept]] and another [[concept2]]"
-    expect(extractConceptReferences(description)).toEqual(["concept", "concept2"])
-  })
-
-  it("should return empty array when no concept references", () => {
-    const description = "This is a plain description without concepts"
-    expect(extractConceptReferences(description)).toEqual([])
-  })
-
-  it("should handle empty string", () => {
-    expect(extractConceptReferences("")).toEqual([])
-  })
-
-  it("should handle nested brackets", () => {
-    const description = "This has [[concept]] and [[nested [brackets]]]"
-    expect(extractConceptReferences(description)).toEqual(["concept", "nested [brackets"])
+  it.each([
+    ["This is a [[concept]] and another [[concept2]]", ["concept", "concept2"]],
+    ["This is a plain description without concepts", []],
+    ["", []],
+    ["This has [[concept]] and [[nested [brackets]]]", ["concept", "nested [brackets"]],
+  ])("should extract concept references from '%s'", (description, expected) => {
+    expect(extractConceptReferences(description)).toEqual(expected)
   })
 })
 
 describe("findDuplicates", () => {
-  it("should find duplicate items", () => {
-    const data = ["a", "b", "a", "c", "b"]
-    expect(findDuplicates(data)).toEqual(["a", "b"])
-  })
-
-  it("should return empty array when no duplicates", () => {
-    const data = ["a", "b", "c"]
-    expect(findDuplicates(data)).toEqual([])
-  })
-
-  it("should handle empty array", () => {
-    expect(findDuplicates([])).toEqual([])
-  })
-
-  it("should handle single item", () => {
-    expect(findDuplicates(["a"])).toEqual([])
-  })
-
-  it("should work with numbers", () => {
-    const data = [0, 1, 2, 1, 2]
-    expect(findDuplicates(data)).toEqual([1, 2])
+  it.each([
+    [
+      ["a", "b", "a", "c", "b"],
+      ["a", "b"],
+    ],
+    [["a", "b", "c"], []],
+    [[], []],
+    [["a"], []],
+    [
+      ["0", "1", "2", "1", "2"],
+      ["1", "2"],
+    ],
+  ])("should find duplicates in %p", (data, expected) => {
+    expect(findDuplicates(data)).toEqual(expected)
   })
 })
 
 describe("hasCircularDependency", () => {
-  it("should detect circular dependency", () => {
-    const featureMap = new Map([
-      ["A", ["B"]],
-      ["B", ["C"]],
-      ["C", ["A"]],
-    ])
-    expect(hasCircularDependency("A", featureMap)).toBe(true)
-  })
-
-  it("should not detect circular dependency when none exists", () => {
-    const featureMap = new Map([
-      ["A", ["B"]],
-      ["B", ["C"]],
-      ["C", []],
-    ])
-    expect(hasCircularDependency("A", featureMap)).toBe(false)
-  })
-
-  it("should handle self-reference", () => {
-    const featureMap = new Map([["A", ["A"]]])
-    expect(hasCircularDependency("A", featureMap)).toBe(true)
-  })
-
-  it("should handle empty prerequisites", () => {
-    const featureMap = new Map([["A", []]])
-    expect(hasCircularDependency("A", featureMap)).toBe(false)
-  })
-
-  it("should handle unknown feature", () => {
-    const featureMap = new Map([["A", ["B"]]])
-    expect(hasCircularDependency("B", featureMap)).toBe(false)
+  it.each([
+    [
+      new Map([
+        ["A", ["B"]],
+        ["B", ["C"]],
+        ["C", ["A"]],
+      ]),
+      "A",
+      true,
+      "circular dependency",
+    ],
+    [
+      new Map([
+        ["A", ["B"]],
+        ["B", ["C"]],
+        ["C", []],
+      ]),
+      "A",
+      false,
+      "no circular dependency",
+    ],
+    [new Map([["A", ["A"]]]), "A", true, "self-reference"],
+    [new Map([["A", []]]), "A", false, "empty prerequisites"],
+    [new Map([["A", ["B"]]]), "B", false, "unknown feature"],
+  ])("should detect %s", (featureMap, start, expected) => {
+    expect(hasCircularDependency(start, featureMap)).toBe(expected)
   })
 })
 
@@ -125,64 +103,66 @@ describe("validateFeatureCircularDependencies", () => {
 })
 
 describe("validateCoverage", () => {
-  it("should detect uncovered items", () => {
-    const items = [
-      { id: "A", name: "Item A" },
-      { id: "B", name: "Item B" },
-      { id: "C", name: "Item C" },
-    ]
-    const coveringItems = [{ covers: ["A"] }, { covers: ["B"] }]
-    const result = validateCoverage(items, coveringItems)
-    expect(result).toEqual([{ _tag: "uncovered_item", id: "C", itemType: "FE" }])
-  })
-
-  it("should detect business objectives correctly", () => {
-    const items = [
-      { id: "BO-0001", name: "Business Objective 1" },
-      { id: "BO-0002", name: "Business Objective 2" },
-    ]
-    const coveringItems = [{ covers: ["BO-0001"] }]
-    const result = validateCoverage(items, coveringItems)
-    expect(result).toEqual([{ _tag: "uncovered_item", id: "BO-0002", itemType: "BO" }])
-  })
-
-  it("should return empty array when all items are covered", () => {
-    const items = [
-      { id: "A", name: "Item A" },
-      { id: "B", name: "Item B" },
-    ]
-    const coveringItems = [{ covers: ["A", "B"] }]
-    const result = validateCoverage(items, coveringItems)
-    expect(result).toEqual([])
+  it.each([
+    [
+      [
+        { id: "A", name: "Item A" },
+        { id: "B", name: "Item B" },
+        { id: "C", name: "Item C" },
+      ],
+      [{ covers: ["A"] }, { covers: ["B"] }],
+      [{ _tag: "uncovered_item", id: "C", itemType: "FE" }],
+      "uncovered items",
+    ],
+    [
+      [
+        { id: "BO-0001", name: "Business Objective 1" },
+        { id: "BO-0002", name: "Business Objective 2" },
+      ],
+      [{ covers: ["BO-0001"] }],
+      [{ _tag: "uncovered_item", id: "BO-0002", itemType: "BO" }],
+      "business objectives",
+    ],
+    [
+      [
+        { id: "A", name: "Item A" },
+        { id: "B", name: "Item B" },
+      ],
+      [{ covers: ["A", "B"] }],
+      [],
+      "all items covered",
+    ],
+  ])("should detect %s", (items, coveringItems, expected) => {
+    expect(validateCoverage(items, coveringItems)).toEqual(expected)
   })
 })
 
 describe("validateReferenceExistence", () => {
-  it("should detect invalid references", () => {
-    const items = [
-      { id: "item1", refs: ["valid1", "invalid1"] },
-      { id: "item2", refs: ["valid2", "invalid2"] },
-    ]
-    const validIds = ["valid1", "valid2"]
+  it.each([
+    [
+      [
+        { id: "item1", refs: ["valid1", "invalid1"] },
+        { id: "item2", refs: ["valid2", "invalid2"] },
+      ],
+      ["valid1", "valid2"],
+      [
+        { _tag: "invalid_prereq", id: "item1", referencedId: "invalid1" },
+        { _tag: "invalid_prereq", id: "item2", referencedId: "invalid2" },
+      ],
+      "invalid references",
+    ],
+    [
+      [
+        { id: "item1", refs: ["valid1"] },
+        { id: "item2", refs: ["valid2"] },
+      ],
+      ["valid1", "valid2"],
+      [],
+      "all references valid",
+    ],
+  ])("should detect %s", (items, validIds, expected) => {
     const getReferences = (item: (typeof items)[0]) => item.refs
-
-    const result = validateRefExistence(items, getReferences, validIds, "invalid_prereq")
-    expect(result).toEqual([
-      { _tag: "invalid_prereq", id: "item1", referencedId: "invalid1" },
-      { _tag: "invalid_prereq", id: "item2", referencedId: "invalid2" },
-    ])
-  })
-
-  it("should return empty array when all references are valid", () => {
-    const items = [
-      { id: "item1", refs: ["valid1"] },
-      { id: "item2", refs: ["valid2"] },
-    ]
-    const validIds = ["valid1", "valid2"]
-    const getReferences = (item: (typeof items)[0]) => item.refs
-
-    const result = validateRefExistence(items, getReferences, validIds, "invalid_prereq")
-    expect(result).toEqual([])
+    expect(validateRefExistence(items, getReferences, validIds, "invalid_prereq")).toEqual(expected)
   })
 })
 
@@ -196,8 +176,7 @@ describe("validateBusinessObjectiveCoverage", () => {
       ],
       features: [{ id: "FE-0001", title: "Feature", description: "Description", covers: ["BO-0001"], prerequisites: [] }],
     }
-    const result = validateBusinessObjectiveCoverage(spec)
-    expect(result).toEqual([{ _tag: "uncovered_item", id: "BO-0002", itemType: "BO" }])
+    expect(validateBusinessObjectiveCoverage(spec)).toEqual([{ _tag: "uncovered_item", id: "BO-0002", itemType: "BO" }])
   })
 })
 
@@ -211,8 +190,7 @@ describe("validateFeatureCoverage", () => {
       ],
       acceptanceTests: [{ id: "AT-0001", covers: "FE-0001", given: "G", when: "W", then: "T" }],
     }
-    const result = validateFeatureCoverage(spec)
-    expect(result).toEqual([{ _tag: "uncovered_item", id: "FE-0002", itemType: "FE" }])
+    expect(validateFeatureCoverage(spec)).toEqual([{ _tag: "uncovered_item", id: "FE-0002", itemType: "FE" }])
   })
 })
 
@@ -241,8 +219,7 @@ describe("validateIdUniqueness", () => {
         { id: "DUPLICATE", description: "Second" },
       ],
     }
-    const result = validateIdUniqueness(spec)
-    expect(result).toEqual([{ _tag: "duplicate_id", id: "DUPLICATE" }])
+    expect(validateIdUniqueness(spec)).toEqual([{ _tag: "duplicate_id", id: "DUPLICATE" }])
   })
 })
 
@@ -255,8 +232,7 @@ describe("validateConceptLabelUniqueness", () => {
         { id: "DUPLICATE", description: "Second concept" },
       ],
     }
-    const result = validateConceptLabelUniqueness(spec)
-    expect(result).toEqual([{ _tag: "duplicate_concept", label: "DUPLICATE" }])
+    expect(validateConceptLabelUniqueness(spec)).toEqual([{ _tag: "duplicate_concept", label: "DUPLICATE" }])
   })
 })
 
@@ -269,8 +245,7 @@ describe("validateConceptReferences", () => {
         { id: "FE-0001", title: "Feature", description: "Uses [[valid-concept]] and [[invalid-concept]]", covers: ["BO-0001"], prerequisites: [] },
       ],
     }
-    const result = validateConceptReferences(spec)
-    expect(result).toEqual([{ _tag: "invalid_concept_ref", id: "FE-0001", conceptLabel: "invalid-concept" }])
+    expect(validateConceptReferences(spec)).toEqual([{ _tag: "invalid_concept_ref", id: "FE-0001", conceptLabel: "invalid-concept" }])
   })
 })
 
@@ -284,8 +259,7 @@ describe("validateUnusedConcepts", () => {
       ],
       features: [{ id: "FE-0001", title: "Feature", description: "Uses [[used-concept]]", covers: ["BO-0001"], prerequisites: [] }],
     }
-    const result = validateUnusedConcepts(spec)
-    expect(result).toEqual([{ _tag: "unused_concept", label: "unused-concept" }])
+    expect(validateUnusedConcepts(spec)).toEqual([{ _tag: "unused_concept", label: "unused-concept" }])
   })
 })
 
