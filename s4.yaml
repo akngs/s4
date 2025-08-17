@@ -14,6 +14,7 @@ businessObjectives:
   - id: BO-0003
     description: >-
       Maintain complete [[Traceability]] from business goals to implementation, ensuring every line of code serves a documented business purpose.
+# MARK: Concepts
 concepts:
   - id: Semi-Structured Software Specification
     description: >-
@@ -39,6 +40,7 @@ concepts:
   - id: Specification as Single Source of Truth
     description: >-
       The [[Semi-Structured Software Specification]] serves as the authoritative source for all project requirements, design decisions, and development guidance. Code is a derived artifact that must conform to and implement the spec. When discrepancies arise between the spec and the code, the spec takes precedence and the code must be modified to align with it.
+# MARK: Features
 features:
   - id: FE-0001
     title: Read spec from file
@@ -99,6 +101,7 @@ features:
       The CLI can guide AI agent and human spec authors to write a spec that is easy to understand and maintain.
     covers: [BO-0001, BO-0002]
     prerequisites: [FE-0002]
+# MARK: Acceptance Tests
 acceptanceTests:
   - id: AT-0001
     covers: FE-0001
@@ -315,6 +318,7 @@ acceptanceTests:
     given: in any occasion
     when: the user runs "s4 guide SECTION-NAME"
     then: the system displays the content of the section from `guideline.yaml` with examples
+# MARK: Connectors
 connectors:
   listAcceptanceTests: |- # Prints ATs in the format: "AT-0001: TITLE"
     npx vitest list --project=acceptance | awk -F'> ' '{split($1, parts, "/"); id=parts[length(parts)]; print id ": " $2}' | sed 's/\.test\.ts : /: /'
@@ -324,6 +328,7 @@ connectors:
     npm run --silent test:acceptance -- src/at/{ID}.test.ts
   runAcceptanceTests: |-  # TAP-flat format
     npm run --silent test:acceptance
+# MARK: Tools
 tools:
   - id: biome
     command: npm run --silent check:biome
