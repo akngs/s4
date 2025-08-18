@@ -4,11 +4,10 @@
 <% allTools.forEach(tool => { %>
 <%   const r = resultById.get(tool.id) %>
 <%   if (!r) { %>
-<%= chalk.yellow("⚠") %> <%= tool.id %>: skipped<%= "\n" %>
+<%= chalk.yellow("⚠ skipped") %> <%= `${tool.id}`.padEnd(15, " ") %> <%= chalk.grey(tool.command) %><%= "\n" %>
 <%   } else if (r.exitCode === 0) { %>
-<%= chalk.green("✔") %> <%= tool.id %>: success<%= "\n" %>
+<%= chalk.green("✔ success") %> <%= `${tool.id}`.padEnd(15, " ") %> <%= chalk.grey(tool.command) %><%= "\n" %>
 <%   } else { %>
-<%= chalk.red("✘") %> <%= tool.id %>: failure<%= "\n" %>
+<%= chalk.red("✘ failure") %> <%= `${tool.id}`.padEnd(15, " ") %> <%= chalk.grey(tool.command) %><%= "\n" %>
 <%   } %>
-<%= chalk.grey('  ' + tool.command) %><%= "\n" %>
 <% }) %>

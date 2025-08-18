@@ -11,7 +11,7 @@ it('GIVEN a spec with multiple tools defined in order (e.g., "tool1", then "tool
     "tools --spec SPEC_FILE",
     result => {
       expect(result.status).toBe(0)
-      expect(result.stdout).toContainInOrder(["✔ tool1: success", "✔ tool2: success"])
+      expect(result.stdout).toContainInOrder(["✔ success tool1", "✔ success tool2"])
     },
   )
 })

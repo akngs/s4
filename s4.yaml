@@ -344,6 +344,8 @@ tools:
     command: npm run --silent check:jscpd
   - id: unittest
     command: npm run --silent test
+    recommendedNextActions: |-
+      There are failing tests. Run `npm run test` to see the details.
   - id: coverage
     command: npm run --silent test:coverage
   - id: tloc
@@ -355,4 +357,4 @@ tools:
 
       - Simplify assertions by define DSLs using `expect.extend({})`
       - Comments and empty lines are not counted in the code calculation, so there's no need to remove them.
-      - Run this command to check the longest test files: `tokei -f -s test | grep "test.ts" | head -n 10`
+      - Run this command to check the longest test files: `tokei --type TypeScript -f -s code | grep "test.ts" | head -n 10`

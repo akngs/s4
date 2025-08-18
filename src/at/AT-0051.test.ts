@@ -11,7 +11,7 @@ it('GIVEN a spec with multiple tools, WHEN the user runs "s4 status", THEN the s
     "status --spec SPEC_FILE",
     result => {
       expect(result.status).toBe(0)
-      expect(result.stdout).toContainInOrder(["✔ t1: success", "✔ t2: success"])
+      expect(result.stdout).toContainInOrder(["## Features", "## Tools", "✔ success t1", "✔ success t2"])
     },
   )
 })

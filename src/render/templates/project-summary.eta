@@ -16,7 +16,7 @@ I am a CLI tool that provides AI agents with a complete overview of the task at 
 <%= chalk.blue.underline.bold("## Features") %><%= "\n" %>
 
 <% features.forEach(feature => { %>
-<%= (feature.passed !== undefined && feature.passed === feature.total) ? chalk.green("✔") : chalk.red("✘") %> <%= feature.id %>: <%= feature.title %> (
+<%= (feature.passed !== undefined && feature.passed === feature.total) ? chalk.green(`✔ ${feature.id}`) : chalk.red(`✘ ${feature.id}`) %>: <%= feature.title %> (
 <%_ if (feature.passed === undefined) { %>?<% } else { %><%= feature.passed %><% } _%>
 /
 <%_ if (feature.total === undefined) { %>?<% } else { %><%= feature.total %><% } _%>
