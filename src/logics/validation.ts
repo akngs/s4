@@ -118,16 +118,11 @@ export function validateConceptLabelUniqueness(spec: S4): ValidationIssue[] {
  */
 export function validateUnusedConcepts(spec: S4): ValidationIssue[] {
   const conceptLabels = new Set(spec.concepts.map(c => c.id))
-  const items = [...spec.concepts, ...spec.businessObjectives, ...spec.features, ...spec.acceptanceTests]
-
-  const usedConcepts = new Set<string>()
-  items.forEach(item => {
-    const refs = extractConceptReferences("description" in item ? item.description : `${item.given} ${item.when} ${item.then}`)
-    refs.forEach(ref => {
-      usedConcepts.add(ref)
-    })
-  })
-
+  const usedConcepts = new Set(
+    [...spec.concepts, ...spec.businessObjectives, ...spec.features, ...spec.acceptanceTests].flatMap(item =>
+      extractConceptReferences("description" in item ? item.description : `${item.given} ${item.when} ${item.then}`),
+    ),
+  )
   const unusedConcepts = [...conceptLabels].filter(label => !usedConcepts.has(label))
 
   return unusedConcepts.map(label => ({ _tag: "unused_concept" as const, label }))
