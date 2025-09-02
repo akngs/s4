@@ -1,9 +1,6 @@
-import { ARCHETYPAL_SPEC, makeSpec as makeArchetypalSpec } from "../test-utils.ts"
-import type { S4 } from "../types.ts"
+import { makeSpec } from "../test-utils.ts"
 import { unwrapRight } from "../types.ts"
 import { checkSyncIssues, getAcceptanceTestDependencyOrder, topologicalSortFeatures } from "./sync.ts"
-
-const VALID_SPEC: S4 = ARCHETYPAL_SPEC
 
 // Test helpers
 const makeFeature = (id: string, prerequisites: string[] = []) => ({ id, title: id, description: id, covers: ["BO-0001"], prerequisites })
@@ -45,7 +42,7 @@ describe("topologicalSortFeatures()", () => {
 })
 describe("getAcceptanceTestDependencyOrder()", () => {
   it("should calculate dependency order for acceptance tests", () => {
-    const spec = makeArchetypalSpec({
+    const spec = makeSpec({
       features: [makeFeature("FE-0001", ["FE-0002"]), makeFeature("FE-0002")],
       acceptanceTests: [
         { id: "AT-0001", covers: "FE-0001", given: "G", when: "W", then: "T" },
@@ -67,7 +64,7 @@ describe("checkSyncIssues()", () => {
     ],
     ["matching titles", { listAcceptanceTests: "echo 'AT-0001: GIVEN G, WHEN W, THEN T'" }, []],
   ])("should detect %s", async (_, toolOverrides, expectedIssues) => {
-    const spec = makeArchetypalSpec({ connectors: { ...VALID_SPEC.connectors, ...toolOverrides } })
+    const spec = makeSpec({ connectors: { ...makeSpec().connectors, ...toolOverrides } })
     const issues = unwrapRight(await checkSyncIssues(spec))
     expect(issues).toEqual(expectedIssues)
   })

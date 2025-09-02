@@ -1,7 +1,6 @@
 // Tests for performOverallStatusCheck focusing on branch coverage
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { makeSpec } from "../test-utils.ts"
-import type { S4 } from "../types.ts"
 import * as execMod from "./exec.ts"
 import { performOverallStatusCheck } from "./status.ts"
 
@@ -22,7 +21,7 @@ describe("performOverallStatusCheck()", () => {
 
   it("includes failing_tests and failing_tools when they occur", async () => {
     // Ensure we have a tool so failing_tools can be generated
-    const spec: S4 = makeSpec({
+    const spec = makeSpec({
       tools: [{ id: "lint", command: "lint-cmd", stopOnError: true, recommendedNextActions: "fix" }],
     })
 
@@ -51,7 +50,7 @@ describe("performOverallStatusCheck()", () => {
   })
 
   it("returns left when sync detection fails", async () => {
-    const spec: S4 = makeSpec()
+    const spec = makeSpec()
 
     const execSpy = vi.spyOn(execMod, "executeCommand")
 

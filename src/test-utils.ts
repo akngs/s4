@@ -27,31 +27,6 @@ function writeTextFile(path: string, content: string): void {
 }
 
 /**
- * Creates a temporary file from a JavaScript object in YAML or JSON format.
- * @param obj - The JavaScript object to serialize
- * @param extension - The file extension (default: 'yaml', can be 'yaml', 'yml', 'json')
- * @returns The path to the created temporary file
- */
-export function makeTempFile(obj: unknown, extension = "yaml"): string {
-  const content = extension === "json" ? JSON.stringify(obj, null, 2) : stringify(obj)
-  const tempFile = generateTempFilePath(extension)
-  writeTextFile(tempFile, content)
-  return tempFile
-}
-
-/**
- * Cleans up a temporary file
- * @param filePath - The path to the temporary file to delete
- */
-export function cleanupTempFile(filePath: string): void {
-  try {
-    unlinkSync(filePath)
-  } catch {
-    // Ignore errors if file doesn't exist
-  }
-}
-
-/**
  * Archetypal spec object that can be used as a base for all acceptance tests
  */
 export const ARCHETYPAL_SPEC: S4 = {
@@ -76,7 +51,7 @@ export const ARCHETYPAL_SPEC: S4 = {
  * @param overrides - Object containing properties to override in the archetypal spec
  * @returns A new spec object with the overrides applied
  */
-export function makeSpec(overrides: Record<string, unknown> = {}): typeof ARCHETYPAL_SPEC {
+export function makeSpec(overrides: Record<string, unknown> = {}): S4 {
   return S4Schema.parse({ ...ARCHETYPAL_SPEC, ...overrides })
 }
 
@@ -97,22 +72,13 @@ class TempFile implements Disposable {
 
 /**
  * Creates a temporary spec file that will be automatically cleaned up
- * @param spec - Spec object to serialize
+ * @param overrides - Overrides to apply to the archetypal spec via makeSpec(), or undefined to use default archetypal spec
  * @param extension - File extension (default: 'yaml')
  * @returns A disposable TempFile object
  */
-export function createTempSpecFile(spec: unknown, extension = "yaml"): TempFile {
-  const filePath = makeTempFile(spec, extension)
-  return new TempFile(filePath)
-}
-
-/**
- * Creates a temporary text file that will be automatically cleaned up
- * @param content - Text content to write
- * @param extension - File extension (default: 'yaml')
- * @returns A disposable TempFile object
- */
-export function createTempTextFile(content: string, extension = "yaml"): TempFile {
+export function createTempSpecFile(overrides?: Record<string, unknown>, extension = "yaml"): TempFile {
+  const spec = makeSpec(overrides)
+  const content = extension === "json" ? JSON.stringify(spec, null, 2) : stringify(spec)
   const filePath = generateTempFilePath(extension)
   writeTextFile(filePath, content)
   return new TempFile(filePath)
@@ -153,11 +119,10 @@ export function runS4(args: string, options: SpawnSyncOptions = {}): SpawnSyncRe
  * @returns The CLI execution result
  */
 export function runSpec(overrides: Record<string, unknown>, commandTemplate: string): SpawnSyncReturns<string> {
-  const spec = makeSpec(overrides)
   const isJson = /--format\s+json(\s|$)/.test(commandTemplate)
   const extension = isJson ? "json" : "yaml"
 
-  using tempFile = createTempSpecFile(spec, extension)
+  using tempFile = createTempSpecFile(overrides, extension)
   const command = commandTemplate.replace(/SPEC_FILE/g, tempFile.path)
   return runS4(command)
 }

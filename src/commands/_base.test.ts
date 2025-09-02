@@ -1,9 +1,7 @@
 import { stringify as stringifyYaml } from "yaml"
-import { ARCHETYPAL_SPEC } from "../test-utils.ts"
-import { right, type S4, unwrapLeft } from "../types.ts"
+import { ARCHETYPAL_SPEC, makeSpec } from "../test-utils.ts"
+import { right, unwrapLeft } from "../types.ts"
 import { deserializeSpec, parseSpec } from "./_base.ts"
-
-const VALID_SPEC: S4 = ARCHETYPAL_SPEC
 
 describe("deserialize()", () => {
   const testData = { test: "value" }
@@ -31,12 +29,12 @@ describe("deserialize()", () => {
 
 describe("parse()", () => {
   it("should parse valid spec", () => {
-    const result = parseSpec(VALID_SPEC)
-    expect(result).toEqual(right(VALID_SPEC))
+    const result = parseSpec(makeSpec())
+    expect(result).toEqual(right(makeSpec()))
   })
 
   it("should handle invalid spec", () => {
-    const invalidSpec = { ...VALID_SPEC, title: undefined }
+    const invalidSpec = { ...ARCHETYPAL_SPEC, title: undefined }
     const result = parseSpec(invalidSpec)
     expect(unwrapLeft(result)).toMatchObject({ _tag: "parse_error" })
   })

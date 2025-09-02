@@ -1,8 +1,6 @@
-import { ARCHETYPAL_SPEC, makeSpec as makeArchetypalSpec } from "../test-utils.ts"
+import { makeSpec } from "../test-utils.ts"
 import type { S4 } from "../types.ts"
 import { runAllToolsDetailed } from "./tools.ts"
-
-const makeSpec = (overrides: Partial<S4>): S4 => makeArchetypalSpec({ ...ARCHETYPAL_SPEC, ...overrides })
 
 describe("runAllToolsDetailed()", () => {
   const SPEC_WITH_TOOLS: S4 = makeSpec({
