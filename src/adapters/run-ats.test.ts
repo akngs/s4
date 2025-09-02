@@ -9,15 +9,6 @@ describe("TapFlatAdapter.parse()", () => {
     { id: "AT-0003", covers: "FE-0001", given: "G", when: "W", then: "T" },
   ]
 
-  /**
-   * Assert IDs and pass flags of parsed results
-   * @param result - Adapter parse result Either
-   * @param expected - Expected id/pass pairs in order
-   */
-  function assertIdsAndPassStatus(result: Either<AdapterError, TestResult[]>, expected: Array<{ id: string; passed: boolean }>): void {
-    expect(unwrapRight(result).map(r => ({ id: r.id, passed: r.passed }))).toEqual(expected)
-  }
-
   it("should parse valid TAP-flat output", () => {
     const raw = dedent`
       ok 1 - src/at/AT-0001.test.ts > GIVEN a spec file, WHEN I validate it, THEN it should pass
@@ -60,4 +51,13 @@ describe("TapFlatAdapter.parse()", () => {
       output: "Error: Validation failed\n  Error message (with intentional two new lines)\n\n  Another message",
     })
   })
+
+  /**
+   * Assert IDs and pass flags of parsed results
+   * @param result - Adapter parse result Either
+   * @param expected - Expected id/pass pairs in order
+   */
+  function assertIdsAndPassStatus(result: Either<AdapterError, TestResult[]>, expected: Array<{ id: string; passed: boolean }>): void {
+    expect(unwrapRight(result).map(r => ({ id: r.id, passed: r.passed }))).toEqual(expected)
+  }
 })

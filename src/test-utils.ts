@@ -81,44 +81,47 @@ export function makeSpec(overrides: Record<string, unknown> = {}): typeof ARCHET
 }
 
 /**
- * Creates a temporary spec file and runs the provided callback, ensuring cleanup
- * @param spec - Spec object to serialize
- * @param fn - Callback receiving the temporary file path
- * @param extension - File extension (default: 'yaml')
+ * A disposable temporary file that automatically cleans up when disposed
  */
-export async function withTempSpecFile(spec: unknown, fn: (filePath: string) => Promise<void> | void, extension = "yaml"): Promise<void> {
-  const filePath = makeTempFile(spec, extension)
-  try {
-    await fn(filePath)
-  } finally {
-    cleanupTempFile(filePath)
+class TempFile implements Disposable {
+  constructor(public readonly path: string) {}
+
+  [Symbol.dispose](): void {
+    try {
+      unlinkSync(this.path)
+    } catch {
+      // Ignore errors if file doesn't exist
+    }
   }
 }
 
 /**
- * Creates a temporary text file and runs the provided callback, ensuring cleanup
- * @param content - Text content to write
- * @param fn - Callback receiving the temporary file path
+ * Creates a temporary spec file that will be automatically cleaned up
+ * @param spec - Spec object to serialize
  * @param extension - File extension (default: 'yaml')
+ * @returns A disposable TempFile object
  */
-export async function withTempTextFile(content: string, fn: (filePath: string) => Promise<void> | void, extension = "yaml"): Promise<void> {
+export function createTempSpecFile(spec: unknown, extension = "yaml"): TempFile {
+  const filePath = makeTempFile(spec, extension)
+  return new TempFile(filePath)
+}
+
+/**
+ * Creates a temporary text file that will be automatically cleaned up
+ * @param content - Text content to write
+ * @param extension - File extension (default: 'yaml')
+ * @returns A disposable TempFile object
+ */
+export function createTempTextFile(content: string, extension = "yaml"): TempFile {
   const filePath = generateTempFilePath(extension)
   writeTextFile(filePath, content)
-
-  try {
-    await fn(filePath)
-  } finally {
-    cleanupTempFile(filePath)
-  }
+  return new TempFile(filePath)
 }
 
 /**
  * Runs the s4 CLI with the provided argument string.
  * - Locally it executes the installed binary `s4`.
  * - In GitHub CI it executes `node dist/index.js` to avoid relying on PATH/bin linking.
- * Usage examples:
- * - runS4("validate --spec /abs/path/to/spec.yaml")
- * - runS4("status", { cwd: "/tmp/project" })
  * @param args - Full argument string after the executable, e.g. "validate --spec path".
  * @param options - Optional spawn options like `cwd`.
  * @returns Child process result with utf-8 encoded stdio.
@@ -153,11 +156,8 @@ export function runSpec(overrides: Record<string, unknown>, commandTemplate: str
   const spec = makeSpec(overrides)
   const isJson = /--format\s+json(\s|$)/.test(commandTemplate)
   const extension = isJson ? "json" : "yaml"
-  const tempFilePath = makeTempFile(spec, extension)
-  try {
-    const command = commandTemplate.replace(/SPEC_FILE/g, tempFilePath)
-    return runS4(command)
-  } finally {
-    cleanupTempFile(tempFilePath)
-  }
+
+  using tempFile = createTempSpecFile(spec, extension)
+  const command = commandTemplate.replace(/SPEC_FILE/g, tempFile.path)
+  return runS4(command)
 }

@@ -1,20 +1,14 @@
-import { makeSpec, withTempSpecFile, withTempTextFile } from "../test-utils.ts"
+import { createTempSpecFile, createTempTextFile, makeSpec } from "../test-utils.ts"
 import validate from "./validate.ts"
 
 it("validate command should succeed with valid spec", async () => {
-  await withTempSpecFile(makeSpec(), async tempFile => {
-    expect(await validate({ spec: tempFile, format: "yaml" })).toMatchObject({ exitCode: 0 })
-  })
+  using tempFile = createTempSpecFile(makeSpec())
+  expect(await validate({ spec: tempFile.path, format: "yaml" })).toMatchObject({ exitCode: 0 })
 })
 
 it("validate command should work with JSON format", async () => {
-  await withTempSpecFile(
-    makeSpec(),
-    async tempFile => {
-      expect(await validate({ spec: tempFile, format: "json" })).toMatchObject({ exitCode: 0 })
-    },
-    "json",
-  )
+  using tempFile = createTempSpecFile(makeSpec(), "json")
+  expect(await validate({ spec: tempFile.path, format: "json" })).toMatchObject({ exitCode: 0 })
 })
 
 it("validate command should handle file not found error", async () => {
@@ -22,15 +16,13 @@ it("validate command should handle file not found error", async () => {
 })
 
 it("validate command should handle invalid file formats", async () => {
-  await withTempTextFile("invalid: yaml: content: [", async tempFile => {
-    expect(await validate({ spec: tempFile, format: "yaml" })).toBeError("parse_error")
-  })
+  using tempFile = createTempTextFile("invalid: yaml: content: [")
+  expect(await validate({ spec: tempFile.path, format: "yaml" })).toBeError("parse_error")
 })
 
 it("validate command should handle invalid spec schema", async () => {
-  await withTempTextFile("title: Invalid Spec\n", async tempFile => {
-    expect(await validate({ spec: tempFile, format: "yaml" })).toBeError("parse_error")
-  })
+  using tempFile = createTempTextFile("title: Invalid Spec\n")
+  expect(await validate({ spec: tempFile.path, format: "yaml" })).toBeError("parse_error")
 })
 
 it("validate command should report validation issues", async () => {
@@ -41,7 +33,6 @@ it("validate command should report validation issues", async () => {
     ],
   })
 
-  await withTempSpecFile(specWithDuplicateIds, async tempFile => {
-    expect(await validate({ spec: tempFile, format: "yaml" })).toBeError("duplicate_id")
-  })
+  using tempFile = createTempSpecFile(specWithDuplicateIds)
+  expect(await validate({ spec: tempFile.path, format: "yaml" })).toBeError("duplicate_id")
 })

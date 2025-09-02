@@ -1,4 +1,4 @@
-import { ARCHETYPAL_SPEC, makeSpec, withTempSpecFile } from "../test-utils.ts"
+import { ARCHETYPAL_SPEC, createTempSpecFile, makeSpec } from "../test-utils.ts"
 import runAts from "./run-ats.ts"
 
 it("run-ats command should render failing tests summary when there are failures", async () => {
@@ -13,12 +13,12 @@ it("run-ats command should render failing tests summary when there are failures"
       runAcceptanceTests: 'printf "not ok 1 - src/at/AT-0001.test.ts >\nok 2 - src/at/AT-0002.test.ts >\n1..2\n# A\n# B\n"',
     },
   })
-  await withTempSpecFile(spec, async tempFile => {
-    const result = await runAts({ spec: tempFile, format: "yaml" })
-    expect(result.exitCode).toBe(0)
-    expect(result.stdout).toContain("Here are the first few failing acceptance tests:")
-    expect(result.stdout).toContain("AT-0001")
-  })
+
+  using tempFile = createTempSpecFile(spec)
+  const result = await runAts({ spec: tempFile.path, format: "yaml" })
+  expect(result.exitCode).toBe(0)
+  expect(result.stdout).toContain("Here are the first few failing acceptance tests:")
+  expect(result.stdout).toContain("AT-0001")
 })
 
 it("run-ats command should fail with invalid spec", async () => {
@@ -32,10 +32,10 @@ it("run-ats should propagate adapter error when adapter returns left (simulated 
     ...ARCHETYPAL_SPEC,
     connectors: { ...ARCHETYPAL_SPEC.connectors, runAcceptanceTests: "bash -c 'exit 1'" },
   })
-  await withTempSpecFile(spec, async tempFile => {
-    const result = await runAts({ spec: tempFile, format: "yaml" })
-    // exit 0 because command returns passthrough rendering even on failures, but content should include status section
-    expect(result.exitCode).toBe(0)
-    expect(result.stdout.length).toBeGreaterThan(0)
-  })
+
+  using tempFile = createTempSpecFile(spec)
+  const result = await runAts({ spec: tempFile.path, format: "yaml" })
+  // exit 0 because command returns passthrough rendering even on failures, but content should include status section
+  expect(result.exitCode).toBe(0)
+  expect(result.stdout.length).toBeGreaterThan(0)
 })
