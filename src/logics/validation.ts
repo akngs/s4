@@ -123,7 +123,9 @@ export function validateUnusedConcepts(spec: S4): ValidationIssue[] {
   const usedConcepts = new Set<string>()
   items.forEach(item => {
     const refs = extractConceptReferences("description" in item ? item.description : `${item.given} ${item.when} ${item.then}`)
-    refs.forEach(ref => usedConcepts.add(ref))
+    refs.forEach(ref => {
+      usedConcepts.add(ref)
+    })
   })
 
   const unusedConcepts = [...conceptLabels].filter(label => !usedConcepts.has(label))
