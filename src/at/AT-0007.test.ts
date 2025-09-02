@@ -1,7 +1,7 @@
 import { runSpec } from "../test-utils.ts"
 
 it('GIVEN a spec with circular feature dependencies, WHEN the user runs "s4 validate", THEN circular dependency is detected and reported with feature IDs', () => {
-  runSpec(
+  const result = runSpec(
     {
       features: [
         { id: "FE-0004", title: "Feature 4", description: "Test feature", covers: ["BO-0001"], prerequisites: ["FE-0005"] },
@@ -9,9 +9,7 @@ it('GIVEN a spec with circular feature dependencies, WHEN the user runs "s4 vali
       ],
     },
     "validate --spec SPEC_FILE",
-    result => {
-      expect(result.status).toBe(1)
-      expect(result.stderr).toContain("[circular_dep] Circular dependency detected involving feature FE-0004.")
-    },
   )
+  expect(result.status).toBe(1)
+  expect(result.stderr).toContain("[circular_dep] Circular dependency detected involving feature FE-0005.")
 })

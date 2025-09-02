@@ -1,7 +1,7 @@
 import { ARCHETYPAL_SPEC, runSpec } from "../test-utils.ts"
 
 it('GIVEN a spec with dangling acceptance test files, WHEN the user runs "s4 status", THEN the system displays a message that dangling acceptance tests need to be removed first', () => {
-  runSpec(
+  const result = runSpec(
     {
       acceptanceTests: [{ id: "AT-0001", covers: "FE-0001", given: "Given A", when: "When B", then: "Then C" }],
       connectors: {
@@ -10,12 +10,6 @@ it('GIVEN a spec with dangling acceptance test files, WHEN the user runs "s4 sta
       },
     },
     "status --spec SPEC_FILE",
-    result => {
-      expect(result.stdout).toContainInOrder([
-        "There are 1 dangling acceptance tests",
-        "- AT-0002: src/at/AT-0002.test.ts",
-        "- Remove the test files",
-      ])
-    },
   )
+  expect(result.stdout).toContainInOrder(["There are 1 dangling acceptance tests", "- AT-0002: src/at/AT-0002.test.ts", "- Remove the test files"])
 })

@@ -1,7 +1,7 @@
 import { runSpec } from "../test-utils.ts"
 
 it('GIVEN a spec with tools where a preceding tool has stopOnError set to true and exits with non-zero, WHEN the user runs "s4 tools", THEN the system stops executing subsequent tools after the failing tool', () => {
-  runSpec(
+  const result = runSpec(
     {
       tools: [
         { id: "first", command: 'echo "FIRST"; false', stopOnError: true },
@@ -9,9 +9,7 @@ it('GIVEN a spec with tools where a preceding tool has stopOnError set to true a
       ],
     },
     "tools --spec SPEC_FILE",
-    result => {
-      expect(result.status).toBe(1)
-      expect(result.stdout).toContainInOrder(["✘ failure first", "⚠ skipped second"])
-    },
   )
+  expect(result.status).toBe(1)
+  expect(result.stdout).toContainInOrder(["✘ failure first", "⚠ skipped second"])
 })

@@ -1,7 +1,7 @@
 import { runSpec } from "../test-utils.ts"
 
 it('GIVEN a spec with duplicate IDs across business objectives, features, and acceptance tests, WHEN the user runs "s4 validate", THEN error messages show which IDs are duplicated and provide actionable guidance', () => {
-  runSpec(
+  const result = runSpec(
     {
       businessObjectives: [
         { id: "BO-0001", description: "Business Objective 1" },
@@ -17,13 +17,11 @@ it('GIVEN a spec with duplicate IDs across business objectives, features, and ac
       ],
     },
     "validate --spec SPEC_FILE",
-    result => {
-      expect(result.status).toBe(1)
-      expect(result.stderr).toContainInOrder([
-        "[duplicate_id] ID BO-0001 is duplicated.",
-        "[duplicate_id] ID FE-0001 is duplicated.",
-        "[duplicate_id] ID AT-0001 is duplicated.",
-      ])
-    },
   )
+  expect(result.status).toBe(1)
+  expect(result.stderr).toContainInOrder([
+    "[duplicate_id] ID BO-0001 is duplicated.",
+    "[duplicate_id] ID FE-0001 is duplicated.",
+    "[duplicate_id] ID AT-0001 is duplicated.",
+  ])
 })

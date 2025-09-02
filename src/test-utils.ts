@@ -143,21 +143,20 @@ export function runS4(args: string, options: SpawnSyncOptions = {}): SpawnSyncRe
  * - Creates a spec using `makeSpec(overrides)`
  * - Writes it to a temporary file
  * - Replaces all occurrences of the token `SPEC_FILE` in the provided command template with the temp file path
- * - Executes the command via `runS4()` and passes the result to the provided callback
- * - Ensures the temporary file is removed afterwards
+ * - Executes the command via `runS4()` and returns the result
+ * - Ensures the temporary file is removed after execution
  * @param overrides - Overrides to apply to the archetypal spec
  * @param commandTemplate - Command template where `SPEC_FILE` will be replaced by the temp spec file path
- * @param assertWith - Callback invoked with the CLI execution result
+ * @returns The CLI execution result
  */
-export function runSpec(overrides: Record<string, unknown>, commandTemplate: string, assertWith: (result: SpawnSyncReturns<string>) => void): void {
+export function runSpec(overrides: Record<string, unknown>, commandTemplate: string): SpawnSyncReturns<string> {
   const spec = makeSpec(overrides)
   const isJson = /--format\s+json(\s|$)/.test(commandTemplate)
   const extension = isJson ? "json" : "yaml"
   const tempFilePath = makeTempFile(spec, extension)
   try {
     const command = commandTemplate.replace(/SPEC_FILE/g, tempFilePath)
-    const result = runS4(command)
-    assertWith(result)
+    return runS4(command)
   } finally {
     cleanupTempFile(tempFilePath)
   }
