@@ -27,31 +27,6 @@ function writeTextFile(path: string, content: string): void {
 }
 
 /**
- * Creates a temporary file from a JavaScript object in YAML or JSON format.
- * @param obj - The JavaScript object to serialize
- * @param extension - The file extension (default: 'yaml', can be 'yaml', 'yml', 'json')
- * @returns The path to the created temporary file
- */
-export function makeTempFile(obj: unknown, extension = "yaml"): string {
-  const content = extension === "json" ? JSON.stringify(obj, null, 2) : stringify(obj)
-  const tempFile = generateTempFilePath(extension)
-  writeTextFile(tempFile, content)
-  return tempFile
-}
-
-/**
- * Cleans up a temporary file
- * @param filePath - The path to the temporary file to delete
- */
-export function cleanupTempFile(filePath: string): void {
-  try {
-    unlinkSync(filePath)
-  } catch {
-    // Ignore errors if file doesn't exist
-  }
-}
-
-/**
  * Archetypal spec object that can be used as a base for all acceptance tests
  */
 export const ARCHETYPAL_SPEC: S4 = {
@@ -76,49 +51,43 @@ export const ARCHETYPAL_SPEC: S4 = {
  * @param overrides - Object containing properties to override in the archetypal spec
  * @returns A new spec object with the overrides applied
  */
-export function makeSpec(overrides: Record<string, unknown> = {}): typeof ARCHETYPAL_SPEC {
+export function makeSpec(overrides: Record<string, unknown> = {}): S4 {
   return S4Schema.parse({ ...ARCHETYPAL_SPEC, ...overrides })
 }
 
 /**
- * Creates a temporary spec file and runs the provided callback, ensuring cleanup
- * @param spec - Spec object to serialize
- * @param fn - Callback receiving the temporary file path
- * @param extension - File extension (default: 'yaml')
+ * A disposable temporary file that automatically cleans up when disposed
  */
-export async function withTempSpecFile(spec: unknown, fn: (filePath: string) => Promise<void> | void, extension = "yaml"): Promise<void> {
-  const filePath = makeTempFile(spec, extension)
-  try {
-    await fn(filePath)
-  } finally {
-    cleanupTempFile(filePath)
+class TempFile implements Disposable {
+  constructor(public readonly path: string) {}
+
+  [Symbol.dispose](): void {
+    try {
+      unlinkSync(this.path)
+    } catch {
+      // Ignore errors if file doesn't exist
+    }
   }
 }
 
 /**
- * Creates a temporary text file and runs the provided callback, ensuring cleanup
- * @param content - Text content to write
- * @param fn - Callback receiving the temporary file path
+ * Creates a temporary spec file that will be automatically cleaned up
+ * @param overrides - Overrides to apply to the archetypal spec via makeSpec(), or undefined to use default archetypal spec
  * @param extension - File extension (default: 'yaml')
+ * @returns A disposable TempFile object
  */
-export async function withTempTextFile(content: string, fn: (filePath: string) => Promise<void> | void, extension = "yaml"): Promise<void> {
+export function createTempSpecFile(overrides?: Record<string, unknown>, extension = "yaml"): TempFile {
+  const spec = makeSpec(overrides)
+  const content = extension === "json" ? JSON.stringify(spec, null, 2) : stringify(spec)
   const filePath = generateTempFilePath(extension)
   writeTextFile(filePath, content)
-
-  try {
-    await fn(filePath)
-  } finally {
-    cleanupTempFile(filePath)
-  }
+  return new TempFile(filePath)
 }
 
 /**
  * Runs the s4 CLI with the provided argument string.
  * - Locally it executes the installed binary `s4`.
  * - In GitHub CI it executes `node dist/index.js` to avoid relying on PATH/bin linking.
- * Usage examples:
- * - runS4("validate --spec /abs/path/to/spec.yaml")
- * - runS4("status", { cwd: "/tmp/project" })
  * @param args - Full argument string after the executable, e.g. "validate --spec path".
  * @param options - Optional spawn options like `cwd`.
  * @returns Child process result with utf-8 encoded stdio.
@@ -143,22 +112,17 @@ export function runS4(args: string, options: SpawnSyncOptions = {}): SpawnSyncRe
  * - Creates a spec using `makeSpec(overrides)`
  * - Writes it to a temporary file
  * - Replaces all occurrences of the token `SPEC_FILE` in the provided command template with the temp file path
- * - Executes the command via `runS4()` and passes the result to the provided callback
- * - Ensures the temporary file is removed afterwards
+ * - Executes the command via `runS4()` and returns the result
+ * - Ensures the temporary file is removed after execution
  * @param overrides - Overrides to apply to the archetypal spec
  * @param commandTemplate - Command template where `SPEC_FILE` will be replaced by the temp spec file path
- * @param assertWith - Callback invoked with the CLI execution result
+ * @returns The CLI execution result
  */
-export function runSpec(overrides: Record<string, unknown>, commandTemplate: string, assertWith: (result: SpawnSyncReturns<string>) => void): void {
-  const spec = makeSpec(overrides)
+export function runSpec(overrides: Record<string, unknown>, commandTemplate: string): SpawnSyncReturns<string> {
   const isJson = /--format\s+json(\s|$)/.test(commandTemplate)
   const extension = isJson ? "json" : "yaml"
-  const tempFilePath = makeTempFile(spec, extension)
-  try {
-    const command = commandTemplate.replace(/SPEC_FILE/g, tempFilePath)
-    const result = runS4(command)
-    assertWith(result)
-  } finally {
-    cleanupTempFile(tempFilePath)
-  }
+
+  using tempFile = createTempSpecFile(overrides, extension)
+  const command = commandTemplate.replace(/SPEC_FILE/g, tempFile.path)
+  return runS4(command)
 }

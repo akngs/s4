@@ -1,5 +1,4 @@
-import { ARCHETYPAL_SPEC } from "../test-utils.ts"
-import type { S4 } from "../types.ts"
+import { makeSpec } from "../test-utils.ts"
 import {
   extractConceptReferences,
   findDuplicates,
@@ -77,24 +76,22 @@ describe("hasCircularDependency", () => {
 
 describe("validateFeatureCircularDependencies", () => {
   it("should return empty array when no circular dependencies exist", () => {
-    const spec: S4 = {
-      ...ARCHETYPAL_SPEC,
+    const spec = makeSpec({
       features: [
         { id: "FE-0001", title: "F1", description: "", covers: ["BO-0001"], prerequisites: ["FE-0002"] },
         { id: "FE-0002", title: "F2", description: "", covers: ["BO-0001"], prerequisites: [] },
       ],
-    }
+    })
     expect(validateFeatureCircularDependencies(spec)).toEqual([])
   })
 
   it("should detect features involved in circular dependencies", () => {
-    const spec: S4 = {
-      ...ARCHETYPAL_SPEC,
+    const spec = makeSpec({
       features: [
         { id: "FE-0001", title: "F1", description: "", covers: ["BO-0001"], prerequisites: ["FE-0002"] },
         { id: "FE-0002", title: "F2", description: "", covers: ["BO-0001"], prerequisites: ["FE-0001"] },
       ],
-    }
+    })
     expect(validateFeatureCircularDependencies(spec)).toEqual([
       { _tag: "circular_dep", id: "FE-0001" },
       { _tag: "circular_dep", id: "FE-0002" },
@@ -168,38 +165,35 @@ describe("validateReferenceExistence", () => {
 
 describe("validateBusinessObjectiveCoverage", () => {
   it("should detect uncovered business objectives", () => {
-    const spec: S4 = {
-      ...ARCHETYPAL_SPEC,
+    const spec = makeSpec({
       businessObjectives: [
         { id: "BO-0001", description: "Covered" },
         { id: "BO-0002", description: "Uncovered" },
       ],
       features: [{ id: "FE-0001", title: "Feature", description: "Description", covers: ["BO-0001"], prerequisites: [] }],
-    }
+    })
     expect(validateBusinessObjectiveCoverage(spec)).toEqual([{ _tag: "uncovered_item", id: "BO-0002", itemType: "BO" }])
   })
 })
 
 describe("validateFeatureCoverage", () => {
   it("should detect uncovered features", () => {
-    const spec: S4 = {
-      ...ARCHETYPAL_SPEC,
+    const spec = makeSpec({
       features: [
         { id: "FE-0001", title: "Covered", description: "Description", covers: ["BO-0001"], prerequisites: [] },
         { id: "FE-0002", title: "Uncovered", description: "Description", covers: ["BO-0001"], prerequisites: [] },
       ],
       acceptanceTests: [{ id: "AT-0001", covers: "FE-0001", given: "G", when: "W", then: "T" }],
-    }
+    })
     expect(validateFeatureCoverage(spec)).toEqual([{ _tag: "uncovered_item", id: "FE-0002", itemType: "FE" }])
   })
 })
 
 describe("validatePrerequisiteExistence", () => {
   it("should detect non-existent prerequisites", () => {
-    const spec: S4 = {
-      ...ARCHETYPAL_SPEC,
+    const spec = makeSpec({
       features: [{ id: "FE-0001", title: "Feature", description: "Description", covers: ["BO-0001"], prerequisites: ["FE-9999"] }],
-    }
+    })
     const result = validateRefExistence(
       spec.features,
       f => f.prerequisites,
@@ -212,71 +206,66 @@ describe("validatePrerequisiteExistence", () => {
 
 describe("validateIdUniqueness", () => {
   it("should detect duplicate IDs", () => {
-    const spec: S4 = {
-      ...ARCHETYPAL_SPEC,
+    const spec = makeSpec({
       businessObjectives: [
-        { id: "DUPLICATE", description: "First" },
-        { id: "DUPLICATE", description: "Second" },
+        { id: "BO-0001", description: "First" },
+        { id: "BO-0001", description: "Second" },
       ],
-    }
-    expect(validateIdUniqueness(spec)).toEqual([{ _tag: "duplicate_id", id: "DUPLICATE" }])
+    })
+    expect(validateIdUniqueness(spec)).toEqual([{ _tag: "duplicate_id", id: "BO-0001" }])
   })
 })
 
 describe("validateConceptLabelUniqueness", () => {
   it("should detect duplicate concept labels", () => {
-    const spec: S4 = {
-      ...ARCHETYPAL_SPEC,
+    const spec = makeSpec({
       concepts: [
         { id: "DUPLICATE", description: "First concept" },
         { id: "DUPLICATE", description: "Second concept" },
       ],
-    }
+    })
     expect(validateConceptLabelUniqueness(spec)).toEqual([{ _tag: "duplicate_concept", label: "DUPLICATE" }])
   })
 })
 
 describe("validateConceptReferences", () => {
   it("should detect invalid concept references", () => {
-    const spec: S4 = {
-      ...ARCHETYPAL_SPEC,
+    const spec = makeSpec({
       concepts: [{ id: "valid-concept", description: "Valid concept" }],
       features: [
         { id: "FE-0001", title: "Feature", description: "Uses [[valid-concept]] and [[invalid-concept]]", covers: ["BO-0001"], prerequisites: [] },
       ],
-    }
+    })
     expect(validateConceptReferences(spec)).toEqual([{ _tag: "invalid_concept_ref", id: "FE-0001", conceptLabel: "invalid-concept" }])
   })
 })
 
 describe("validateUnusedConcepts", () => {
   it("should detect unused concepts", () => {
-    const spec: S4 = {
-      ...ARCHETYPAL_SPEC,
+    const spec = makeSpec({
       concepts: [
         { id: "used-concept", description: "Used concept" },
         { id: "unused-concept", description: "Unused concept" },
       ],
       features: [{ id: "FE-0001", title: "Feature", description: "Uses [[used-concept]]", covers: ["BO-0001"], prerequisites: [] }],
-    }
+    })
     expect(validateUnusedConcepts(spec)).toEqual([{ _tag: "unused_concept", label: "unused-concept" }])
   })
 })
 
 describe("validateInternalConsistency", () => {
   it("should pass when all validations pass", () => {
-    expect(validateInternalConsistency(ARCHETYPAL_SPEC)).toEqual([])
+    expect(validateInternalConsistency(makeSpec())).toEqual([])
   })
 
   it("should collect all validation issues", () => {
-    const invalidSpec: S4 = {
-      ...ARCHETYPAL_SPEC,
+    const invalidSpec = makeSpec({
       businessObjectives: [
         { id: "BO-0001", description: "Covered" },
         { id: "BO-0002", description: "Uncovered" },
       ],
       features: [{ id: "FE-0001", title: "Feature", description: "Description", covers: ["BO-0001"], prerequisites: ["FE-9999"] }],
-    }
+    })
     const result = validateInternalConsistency(invalidSpec)
     expect(result).toContainEqual({ _tag: "uncovered_item", id: "BO-0002", itemType: "BO" })
     expect(result).toContainEqual({ _tag: "invalid_prereq", id: "FE-0001", referencedId: "FE-9999" })

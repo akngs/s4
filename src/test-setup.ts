@@ -5,7 +5,7 @@ expect.extend({
     const indices = parts.map(p => received.indexOf(p))
 
     // 1. Ensure all parts exist
-    const missingAt = indices.findIndex(i => i === -1)
+    const missingAt = indices.indexOf(-1)
     if (missingAt !== -1) return { pass: false, message: () => `toContainInOrder: missing substring at position ${missingAt}: ${parts[missingAt]}` }
 
     // 2. Ensure order is non-decreasing

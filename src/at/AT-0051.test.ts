@@ -1,7 +1,7 @@
 import { runSpec } from "../test-utils.ts"
 
 it('GIVEN a spec with multiple tools, WHEN the user runs "s4 status", THEN the system runs all tools at the end of the process', () => {
-  runSpec(
+  const result = runSpec(
     {
       tools: [
         { id: "t1", command: 'echo "T1"' },
@@ -9,9 +9,7 @@ it('GIVEN a spec with multiple tools, WHEN the user runs "s4 status", THEN the s
       ],
     },
     "status --spec SPEC_FILE",
-    result => {
-      expect(result.status).toBe(0)
-      expect(result.stdout).toContainInOrder(["## Features", "## Tools", "✔ success t1", "✔ success t2"])
-    },
   )
+  expect(result.status).toBe(0)
+  expect(result.stdout).toContainInOrder(["## Features", "## Tools", "✔ success t1", "✔ success t2"])
 })

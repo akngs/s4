@@ -1,10 +1,9 @@
-import { ARCHETYPAL_SPEC, makeSpec as makeArchetypalSpec } from "../test-utils.ts"
+import { makeSpec } from "../test-utils.ts"
 import type { S4 } from "../types.ts"
 import { unwrapLeft, unwrapRight } from "../types.ts"
 import { getAcceptanceTestDetail, getFeatureDetail } from "./details.ts"
 
-const VALID_SPEC: S4 = ARCHETYPAL_SPEC
-const QUERY_TEST_SPEC: S4 = makeArchetypalSpec({
+const QUERY_TEST_SPEC: S4 = makeSpec({
   businessObjectives: [
     { id: "BO-0001", description: "Business Objective 1" },
     { id: "BO-0002", description: "Business Objective 2" },
@@ -20,9 +19,7 @@ const QUERY_TEST_SPEC: S4 = makeArchetypalSpec({
     { id: "AT-0003", covers: "FE-0002", given: "G", when: "W", then: "T" },
   ],
   tools: [],
-  connectors: ARCHETYPAL_SPEC.connectors,
 })
-const makeSpec = (overrides: Partial<S4>): S4 => makeArchetypalSpec({ ...VALID_SPEC, ...overrides })
 
 describe("getFeatureDetail()", () => {
   it("should return feature information with all relationships", () => {

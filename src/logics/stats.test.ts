@@ -1,10 +1,8 @@
-import { ARCHETYPAL_SPEC, makeSpec as makeArchetypalSpec } from "../test-utils.ts"
+import { makeSpec } from "../test-utils.ts"
 import type { S4, TestResult } from "../types.ts"
 import { calcFeatureStats } from "./stats.ts"
 
 // Helper functions
-const VALID_SPEC: S4 = ARCHETYPAL_SPEC
-const makeSpec = (overrides: Partial<S4>): S4 => makeArchetypalSpec({ ...VALID_SPEC, ...overrides })
 const makeFeature = (id: string, prerequisites: string[] = [], covers: string[] = ["BO-0001"]) => ({
   id,
   title: id,

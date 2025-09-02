@@ -16,7 +16,7 @@ Here are the first few failing acceptance tests:
 <% }) %>
 Among these, the most important one to fix is <%= tests[0].id %>. Here are some details:
 
-- The test must strictly follow the GIVEN/WHEN/THEN structure.
+- The acceptance test must strictly follow the GIVEN/WHEN/THEN structure.
 - Use simple, concise examples in the GIVEN section for clarity.
 - The final code should read like a well-written specification.
 - When you implement the application code under test, keep the design clean and simple. Refactor the code whenever you can.
