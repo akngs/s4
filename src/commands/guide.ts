@@ -15,6 +15,7 @@ export default async function runGuide(section?: string): Promise<CommandReturn>
   if (isLeft(result)) return renderGuideError(result.L)
   const view = result.R
   if (view.kind === "unknown_section") return renderUnknownSection(section, view.allowed)
+
   return { stdout: renderGuide(view), stderr: "", exitCode: 0 }
 }
 

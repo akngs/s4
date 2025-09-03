@@ -64,22 +64,6 @@ export function errToCommandReturn(error: Left<SystemError | ValueError>): Comma
   }
 }
 
-/**
- * Shared helper to load spec and validate an acceptance test ID is provided
- * @param specPath - Path to spec file
- * @param format - Format of spec file
- * @param id - Acceptance test id
- * @returns Either a command-return error when id is invalid, or the loaded spec
- */
-export async function loadSpecAndValidateId(specPath: string, format: "json" | "yaml", id: unknown): Promise<CommandReturn | S4> {
-  const specOrErr = await loadSpec(specPath, format)
-  if (isLeft(specOrErr)) return errToCommandReturn(specOrErr)
-  if (typeof id !== "string" || id.length === 0) {
-    return { stdout: "", stderr: "value_error: Missing ID - Provide AT-nnnn", exitCode: 1 }
-  }
-  return specOrErr.R
-}
-
 async function readSpecFile(filePath: string): Promise<Either<SystemError, string>> {
   try {
     const content = await readFile(filePath, "utf-8")

@@ -71,20 +71,6 @@ class TempFile implements Disposable {
 }
 
 /**
- * Creates a temporary spec file that will be automatically cleaned up
- * @param overrides - Overrides to apply to the archetypal spec via makeSpec(), or undefined to use default archetypal spec
- * @param extension - File extension (default: 'yaml')
- * @returns A disposable TempFile object
- */
-export function createTempSpecFile(overrides?: Record<string, unknown>, extension = "yaml"): TempFile {
-  const spec = makeSpec(overrides)
-  const content = extension === "json" ? JSON.stringify(spec, null, 2) : stringify(spec)
-  const filePath = generateTempFilePath(extension)
-  writeTextFile(filePath, content)
-  return new TempFile(filePath)
-}
-
-/**
  * Runs the s4 CLI with the provided argument string.
  * - Locally it executes the installed binary `s4`.
  * - In GitHub CI it executes `node dist/index.js` to avoid relying on PATH/bin linking.
@@ -125,4 +111,19 @@ export function runSpec(overrides: Record<string, unknown>, commandTemplate: str
   using tempFile = createTempSpecFile(overrides, extension)
   const command = commandTemplate.replace(/SPEC_FILE/g, tempFile.path)
   return runS4(command)
+}
+
+/**
+ * Creates a temporary spec file with the given overrides and returns the file path.
+ * The file will be automatically cleaned up when the returned TempFile is disposed.
+ * @param overrides - Overrides to apply to the archetypal spec
+ * @param extension - File extension (default: "yaml")
+ * @returns A TempFile object that can be disposed to clean up the file
+ */
+export function createTempSpecFile(overrides?: Record<string, unknown>, extension = "yaml"): TempFile {
+  const spec = makeSpec(overrides)
+  const content = extension === "json" ? JSON.stringify(spec, null, 2) : stringify(spec)
+  const filePath = generateTempFilePath(extension)
+  writeTextFile(filePath, content)
+  return new TempFile(filePath)
 }

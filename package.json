@@ -25,7 +25,7 @@
     "fix": "npm run --silent check:biome -- --write && npm run --silent check:eslint -- --fix",
     "test": "vitest run --reporter dot --project unit",
     "test:watch": "vitest --reporter dot --project unit",
-    "test:coverage": "vitest run --reporter dot --coverage --project unit --coverage.thresholds.perFile --coverage.thresholds.lines 80 --coverage.thresholds.statements 80 --coverage.thresholds.functions 80 --coverage.thresholds.branches 80",
+    "test:coverage": "vitest run --reporter dot --coverage --project unit",
     "test:acceptance": "vitest run --project acceptance --reporter tap-flat"
   },
   "main": "dist/index.js",

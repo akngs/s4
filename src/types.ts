@@ -29,7 +29,6 @@ const AcceptanceTestSchema = z.object({
   then: z.string(),
 })
 
-export type Tool = z.infer<typeof ToolSchema>
 const ToolSchema = z.object({
   id: z.string(),
   command: z.string(),

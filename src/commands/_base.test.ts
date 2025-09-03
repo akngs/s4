@@ -1,7 +1,7 @@
 import { stringify as stringifyYaml } from "yaml"
-import { ARCHETYPAL_SPEC, makeSpec } from "../test-utils.ts"
-import { right, unwrapLeft } from "../types.ts"
-import { deserializeSpec, parseSpec } from "./_base.ts"
+import { ARCHETYPAL_SPEC, createTempSpecFile, makeSpec } from "../test-utils.ts"
+import { type Left, left, right, type SystemError, unwrapLeft, type ValueError } from "../types.ts"
+import { deserializeSpec, errToCommandReturn, loadSpec, parseSpec } from "./_base.ts"
 
 describe("deserialize()", () => {
   const testData = { test: "value" }
@@ -37,5 +37,40 @@ describe("parse()", () => {
     const invalidSpec = { ...ARCHETYPAL_SPEC, title: undefined }
     const result = parseSpec(invalidSpec)
     expect(unwrapLeft(result)).toMatchObject({ _tag: "parse_error" })
+  })
+})
+
+describe("loadSpec()", () => {
+  it("should load and parse valid spec from file", async () => {
+    const mockSpec = makeSpec()
+
+    using tempFile = createTempSpecFile()
+    const result = await loadSpec(tempFile.path, "yaml")
+    expect(result).toEqual(right(mockSpec))
+  })
+
+  it("should handle file read errors", async () => {
+    const result = await loadSpec("/nonexistent/file.yaml")
+    expect(unwrapLeft(result)).toMatchObject({ _tag: "io_error" })
+  })
+})
+
+describe("errToCommandReturn()", () => {
+  it("should convert value error to command return", () => {
+    const valueError = left({ _tag: "value_error", message: "Test error", value: "test" }) as Left<SystemError | ValueError>
+    expect(errToCommandReturn(valueError)).toEqual({
+      stdout: "",
+      stderr: "value_error: Invalid value: test - Test error",
+      exitCode: 1,
+    })
+  })
+
+  it("should convert system error to command return", () => {
+    const systemError = left({ _tag: "parse_error", message: "Test error", cause: new Error("Test") }) as Left<SystemError | ValueError>
+    expect(errToCommandReturn(systemError)).toEqual({
+      stdout: "",
+      stderr: "parse_error: Test error",
+      exitCode: 1,
+    })
   })
 })

@@ -1,53 +1,53 @@
-import { createTempSpecFile } from "../test-utils.ts"
+import { makeSpec } from "../test-utils.ts"
 import tool from "./tool.ts"
 
-const SPEC_WITH_TOOLS = {
-  tools: [
-    { id: "echo-tool", command: "echo 'hello world'", stopOnError: false, recommendedNextActions: "Try running again if needed" },
-    { id: "fail-tool", command: "bash -c 'echo failure; exit 1'", stopOnError: false, recommendedNextActions: "Check the error and retry" },
-    { id: "fail-no-actions", command: "bash -c 'exit 1'", stopOnError: false, recommendedNextActions: "" },
-  ],
-}
-
 it("should execute tool successfully with echo command", async () => {
-  using specFile = createTempSpecFile(SPEC_WITH_TOOLS)
-  const result = await tool({ spec: specFile.path, format: "yaml", toolId: "echo-tool" })
-  expect(result).toMatchObject({ exitCode: 0, stdout: "hello world" })
+  const spec = makeSpec({
+    tools: [{ id: "test-tool", command: 'echo "Hello World"', recommendedNextActions: "" }],
+  })
+  const result = await tool(spec, "test-tool")
+  expect(result.exitCode).toBe(0)
+  expect(result.stdout).toBe("Hello World")
 })
 
 it("should return error when tool is not found in spec", async () => {
-  using specFile = createTempSpecFile(SPEC_WITH_TOOLS)
-  const result = await tool({ spec: specFile.path, format: "yaml", toolId: "nonexistent-tool" })
-  expect(result).toMatchObject({ exitCode: 1, stderr: 'value_error: Tool "nonexistent-tool" not found in spec' })
+  const spec = makeSpec()
+  const result = await tool(spec, "nonexistent-tool")
+  expect(result.exitCode).toBe(1)
+  expect(result.stderr).toContain("value_error")
 })
 
 it("should return command output when tool command fails with no recommended actions", async () => {
-  using specFile = createTempSpecFile(SPEC_WITH_TOOLS)
-  const result = await tool({ spec: specFile.path, format: "yaml", toolId: "fail-no-actions" })
-  expect(result).toMatchObject({ exitCode: 1, stdout: "", stderr: "" })
+  const spec = makeSpec({
+    tools: [{ id: "failing-tool", command: "bash -c 'exit 1'", recommendedNextActions: "" }],
+  })
+  const result = await tool(spec, "failing-tool")
+  expect(result.exitCode).toBe(1)
 })
 
 it("should append recommended actions when tool command fails", async () => {
-  using specFile = createTempSpecFile(SPEC_WITH_TOOLS)
-  const result = await tool({ spec: specFile.path, format: "yaml", toolId: "fail-tool" })
-  expect(result).toMatchObject({ exitCode: 1, stdout: "failure\n\nCheck the error and retry" })
+  const spec = makeSpec({
+    tools: [{ id: "failing-tool", command: "bash -c 'exit 1'", recommendedNextActions: "Fix the issue" }],
+  })
+  const result = await tool(spec, "failing-tool")
+  expect(result.exitCode).toBe(1)
+  expect(result.stdout).toContain("Fix the issue")
 })
 
 it("should include only recommended actions when command fails with empty stdout", async () => {
-  using specFile = createTempSpecFile({
-    tools: [{ id: "fail-actions-only", command: "bash -c 'exit 1'", stopOnError: false, recommendedNextActions: "Do this" }],
+  const spec = makeSpec({
+    tools: [{ id: "failing-tool", command: "bash -c 'exit 1'", recommendedNextActions: "Fix the issue" }],
   })
-
-  const result = await tool({ spec: specFile.path, format: "yaml", toolId: "fail-actions-only" })
+  const result = await tool(spec, "failing-tool")
   expect(result.exitCode).toBe(1)
-  expect(result.stdout).toBe("Do this")
+  expect(result.stdout).toContain("Fix the issue")
 })
 
 it("should pass-through output unchanged when command succeeds even if recommendedNextActions exist", async () => {
-  using specFile = createTempSpecFile({
-    tools: [{ id: "ok-with-actions", command: "echo content", stopOnError: false, recommendedNextActions: "some next" }],
+  const spec = makeSpec({
+    tools: [{ id: "success-tool", command: 'echo "Success"', recommendedNextActions: "Next step" }],
   })
-
-  const result = await tool({ spec: specFile.path, format: "yaml", toolId: "ok-with-actions" })
-  expect(result).toMatchObject({ exitCode: 0, stdout: "content" })
+  const result = await tool(spec, "success-tool")
+  expect(result.exitCode).toBe(0)
+  expect(result.stdout).toBe("Success")
 })

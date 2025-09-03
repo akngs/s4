@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 
 import { Command, Option } from "@commander-js/extra-typings"
+import { errToCommandReturn, loadSpec } from "./commands/_base.ts"
 import { runAllTools, runAt, runAts, runGuide, runInfo, runLocateAt, runStatus, runTool, runValidate } from "./commands/index.ts"
-import type { CommandReturn } from "./types.ts"
+import type { CommandReturn, S4 } from "./types.ts"
+import { isLeft } from "./types.ts"
 
 // Default to running "s4 status" if no arguments are provided
 if (process.argv.length === 2) process.argv.push("status")
@@ -20,8 +22,8 @@ cli
   .description("Get the status of the project and the next action to take")
   .addOption(specOption)
   .addOption(formatOption)
-  .action(async options => {
-    handleResult(await runStatus(options))
+  .action(async opts => {
+    await withSpec(opts.spec, opts.format, runStatus)
   })
 
 cli
@@ -30,8 +32,8 @@ cli
   .description("Validate a spec from file")
   .addOption(specOption)
   .addOption(formatOption)
-  .action(async options => {
-    handleResult(await runValidate(options))
+  .action(async opts => {
+    await withSpec(opts.spec, opts.format, runValidate)
   })
 
 cli
@@ -40,8 +42,8 @@ cli
   .argument("<id>", "Acceptance test ID (e.g., AT-0001)")
   .addOption(specOption)
   .addOption(formatOption)
-  .action(async (id: string, options) => {
-    handleResult(await runLocateAt({ ...options, id }))
+  .action(async (id: string, opts) => {
+    await withSpec(opts.spec, opts.format, spec => runLocateAt(spec, id))
   })
 
 cli
@@ -50,8 +52,8 @@ cli
   .argument("<id>", "Acceptance test ID (e.g., AT-0001)")
   .addOption(specOption)
   .addOption(formatOption)
-  .action(async (id: string, options) => {
-    handleResult(await runAt({ ...options, id }))
+  .action(async (id: string, opts) => {
+    await withSpec(opts.spec, opts.format, spec => runAt(spec, id))
   })
 
 cli
@@ -59,8 +61,8 @@ cli
   .description("Run all acceptance tests")
   .addOption(specOption)
   .addOption(formatOption)
-  .action(async options => {
-    handleResult(await runAts(options))
+  .action(async opts => {
+    await withSpec(opts.spec, opts.format, runAts)
   })
 
 cli
@@ -70,8 +72,8 @@ cli
   .argument("<id>", "Feature ID (e.g., FE-0001) or Acceptance Test ID (e.g., AT-0001)")
   .addOption(specOption)
   .addOption(formatOption)
-  .action(async (id: string, options) => {
-    handleResult(await runInfo({ ...options, id }))
+  .action(async (id: string, opts) => {
+    await withSpec(opts.spec, opts.format, spec => runInfo(spec, id))
   })
 
 cli
@@ -80,8 +82,8 @@ cli
   .argument("<toolId>", "tool id as defined in spec.tools")
   .addOption(specOption)
   .addOption(formatOption)
-  .action(async (toolId: string, options) => {
-    handleResult(await runTool({ ...options, toolId }))
+  .action(async (toolId: string, opts) => {
+    await withSpec(opts.spec, opts.format, spec => runTool(spec, toolId))
   })
 
 cli
@@ -89,8 +91,8 @@ cli
   .description("Run all tools in defined order")
   .addOption(specOption)
   .addOption(formatOption)
-  .action(async options => {
-    handleResult(await runAllTools(options))
+  .action(async opts => {
+    await withSpec(opts.spec, opts.format, runAllTools)
   })
 
 cli
@@ -101,10 +103,16 @@ cli
     handleResult(await runGuide(section))
   })
 
-/**
- * Handle command result by outputting to console and exiting with appropriate code
- * @param result - The command result to handle
- */
+async function withSpec(specPath: string, format: "json" | "yaml", commandFn: (spec: S4) => CommandReturn | Promise<CommandReturn>): Promise<void> {
+  const specOrErr = await loadSpec(specPath, format)
+  if (isLeft(specOrErr)) {
+    handleResult(errToCommandReturn(specOrErr))
+    return
+  }
+  const result = await commandFn(specOrErr.R)
+  handleResult(result)
+}
+
 function handleResult(result: CommandReturn): void {
   if (result.stdout) console.log(result.stdout)
   if (result.stderr) console.error(result.stderr)

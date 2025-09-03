@@ -1,5 +1,5 @@
 import { getInstance as getListAtsAdapter } from "../adapters/list-ats.ts"
-import type { Either, S4, SyncIssue, SystemError } from "../types.ts"
+import { type Either, isLeft, right, type S4, type SyncIssue, type SystemError } from "../types.ts"
 import { executeCommand } from "./exec.ts"
 
 /**
@@ -8,13 +8,13 @@ import { executeCommand } from "./exec.ts"
  * @returns Either a system error or an array of synchronization issues (missing, dangling, or mismatching tests)
  */
 export async function checkSyncIssues(spec: S4): Promise<Either<SystemError, SyncIssue[]>> {
-  if (spec.connectors.listAcceptanceTests === "") return { _tag: "right", R: [] }
+  if (spec.connectors.listAcceptanceTests === "") return right([])
 
   const rawResult = await executeCommand(spec.connectors.listAcceptanceTests)
   if (rawResult.exitCode !== 0) return { _tag: "left", L: { _tag: "exec_error", command: "listAcceptanceTests", cause: new Error(rawResult.stderr) } }
 
   const parsedTestsResult = getListAtsAdapter("default").parse(rawResult.stdout)
-  if (parsedTestsResult._tag === "left") return parsedTestsResult
+  if (isLeft(parsedTestsResult)) return parsedTestsResult
 
   const implementedTestIds = parsedTestsResult.R.map(test => test.id)
   const implementedTestMap = new Map(parsedTestsResult.R.map(test => [test.id, test.description]))
@@ -23,7 +23,7 @@ export async function checkSyncIssues(spec: S4): Promise<Either<SystemError, Syn
   const danglingTestIssues = await findDanglingTests(spec, implementedTestIds)
   const mismatchingTestIssues = await findMismatchingTests(spec, implementedTestMap)
 
-  return { _tag: "right", R: [...missingTestIssues, ...danglingTestIssues, ...mismatchingTestIssues] }
+  return right([...missingTestIssues, ...danglingTestIssues, ...mismatchingTestIssues])
 }
 
 /**

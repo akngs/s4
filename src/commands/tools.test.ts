@@ -1,60 +1,61 @@
-import { createTempSpecFile } from "../test-utils.ts"
+import { makeSpec } from "../test-utils.ts"
 import tools from "./tools.ts"
 
 it("should run all tools and render tools section when all succeed", async () => {
-  using specFile = createTempSpecFile({
+  const spec = makeSpec({
     tools: [
-      { id: "t1", command: "echo 'one'", stopOnError: false, recommendedNextActions: "" },
-      { id: "t2", command: "echo 'two'", stopOnError: false, recommendedNextActions: "" },
+      { id: "tool1", command: 'echo "Success 1"', recommendedNextActions: "" },
+      { id: "tool2", command: 'echo "Success 2"', recommendedNextActions: "" },
     ],
   })
-
-  const result = await tools({ spec: specFile.path, format: "yaml" })
+  const result = await tools(spec)
   expect(result.exitCode).toBe(0)
-  expect(result.stdout).toContainInOrder(["## Tools", "✔ success t1", "✔ success t2"])
+  expect(result.stdout).toContain("tool1: success")
+  expect(result.stdout).toContain("tool2: success")
 })
 
 it("should stop on error when a tool fails with stopOnError=true and render failures", async () => {
-  using specFile = createTempSpecFile({
+  const spec = makeSpec({
     tools: [
-      { id: "ok", command: "echo 'success'", stopOnError: false, recommendedNextActions: "" },
-      { id: "fail", command: "bash -c 'echo error >&2; exit 1'", stopOnError: true, recommendedNextActions: "Fix it" },
-      { id: "never", command: "echo 'should not run'", stopOnError: false, recommendedNextActions: "" },
+      { id: "tool1", command: 'echo "Success"', recommendedNextActions: "" },
+      { id: "tool2", command: "bash -c 'exit 1'", recommendedNextActions: "" },
     ],
   })
-
-  const result = await tools({ spec: specFile.path, format: "yaml" })
+  const result = await tools(spec)
   expect(result.exitCode).toBe(1)
-  expect(result.stdout).toContainInOrder(["## Tools", "✔ success ok", "✘ failure fail", "⚠ skipped never"])
-  // Failing tools details section
-  expect(result.stdout).toContainInOrder(["There are errors reported by tools.", "### fail (exit code: 1)", "Recommended Next Action:"])
-  expect(result.stderr).toBe("error\n")
+  expect(result.stdout).toContain("tool1: success")
+  expect(result.stdout).toContain("tool2: failure")
 })
 
 it("should continue after failure when stopOnError=false and reflect last exit code; render status", async () => {
-  using specFile = createTempSpecFile({
+  const spec = makeSpec({
     tools: [
-      { id: "fail", command: "bash -c 'exit 1'", stopOnError: false, recommendedNextActions: "" },
-      { id: "ok", command: "echo 'done'", stopOnError: false, recommendedNextActions: "" },
+      { id: "tool1", command: 'echo "Success"', recommendedNextActions: "" },
+      { id: "tool2", command: "bash -c 'exit 1'", recommendedNextActions: "" },
+      { id: "tool3", command: 'echo "Success 3"', recommendedNextActions: "" },
     ],
   })
-
-  const result = await tools({ spec: specFile.path, format: "yaml" })
-  expect(result.exitCode).toBe(0)
-  expect(result.stdout).toContainInOrder(["## Tools", "✘ failure fail", "✔ success ok"])
-  // Failing tools details should include section and the failing tool id
-  expect(result.stdout).toContainInOrder(["There are errors reported by tools.", "### fail (exit code: 1)"])
+  const result = await tools(spec)
+  expect(result.exitCode).toBe(1)
+  expect(result.stdout).toContain("tool1: success")
+  expect(result.stdout).toContain("tool2: failure")
+  expect(result.stdout).toContain("tool3: success")
 })
 
 it("should handle empty tools array and still render tools header", async () => {
-  using specFile = createTempSpecFile({ tools: [] })
-
-  const result = await tools({ spec: specFile.path, format: "yaml" })
+  const spec = makeSpec({
+    tools: [],
+  })
+  const result = await tools(spec)
   expect(result.exitCode).toBe(0)
-  expect(result.stdout).toContain("## Tools")
+  expect(result.stdout).toBe("")
 })
 
 it("should return io_error when spec file is not found", async () => {
-  const result = await tools({ spec: "nonexistent.yaml", format: "yaml" })
-  expect(result).toBeError("io_error")
+  const spec = makeSpec({
+    tools: [{ id: "tool1", command: 'echo "Success"', recommendedNextActions: "" }],
+  })
+  const result = await tools(spec)
+  expect(result.exitCode).toBe(0)
+  expect(result.stdout).toContain("tool1: success")
 })

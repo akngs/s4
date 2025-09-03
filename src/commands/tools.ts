@@ -1,33 +1,20 @@
-import { runAllToolsDetailed } from "../logics/tools.ts"
-import { renderFailingTools, renderTools } from "../render/index.ts"
-import type { CommandReturn, ToolRunResult } from "../types.ts"
-import { isLeft } from "../types.ts"
-import { errToCommandReturn, loadSpec } from "./_base.ts"
+import { executeCommand } from "../logics/exec.ts"
+import type { CommandReturn, S4 } from "../types.ts"
 
 /**
- * Run all user-defined tools
- * @param opts - Command options
- * @param opts.spec - Path to the spec file
- * @param opts.format - Format of the spec file
- * @returns Command result with all tools execution output
+ * Run all tools in defined order
+ * @param spec - The loaded S4 spec instance
+ * @returns Command result with tool execution output
  */
-export default async function (opts: { spec: string; format: "yaml" | "json" }): Promise<CommandReturn> {
-  const specOrErr = await loadSpec(opts.spec, opts.format)
-  if (isLeft(specOrErr)) return errToCommandReturn(specOrErr)
-  const spec = specOrErr.R
+export default async function (spec: S4): Promise<CommandReturn> {
+  const results: string[] = []
+  let hasErrors = false
 
-  const toolResults: ToolRunResult[] = await runAllToolsDetailed(spec)
-  const stdout = (() => {
-    const header = renderTools(spec.tools, toolResults)
-    const failures = toolResults.filter(r => r.exitCode !== 0)
-    if (failures.length === 0) return header
-    const details = renderFailingTools(failures)
-    return `${header}\n${details}`
-  })()
-  const stderr = toolResults
-    .map(r => r.stderr)
-    .filter(s => s.length > 0)
-    .join("\n")
-  const exitCode = toolResults.length === 0 ? 0 : (toolResults[toolResults.length - 1]?.exitCode ?? 0)
-  return { stdout, stderr, exitCode }
+  for (const tool of spec.tools) {
+    const result = await executeCommand(tool.command)
+    results.push(`${tool.id}: ${result.exitCode === 0 ? "success" : "failure"}`)
+    if (result.exitCode !== 0) hasErrors = true
+  }
+
+  return { stdout: results.join("\n"), stderr: "", exitCode: hasErrors ? 1 : 0 }
 }

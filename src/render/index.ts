@@ -9,7 +9,6 @@ import type {
   S4,
   SystemError,
   TestResult,
-  Tool,
   ToolRunResult,
   ValidationIssue,
   ValueError,
@@ -34,30 +33,11 @@ eta.configure({
 export function renderStatus(spec: S4, featureStats: FeatureStats, issues: Issue[], tools: ToolRunResult[]): string {
   const features = spec.features.map(f => ({ ...f, ...(featureStats.get(f.id) ?? {}) }))
   const summary = render("project-summary", { spec, features })
-  const toolsSection = renderTools(spec.tools, tools)
+  const toolsSection = render("tools", { allTools: spec.tools, results: tools })
   const overallIssues = renderOverallIssues(issues, featureStats)
   const parts = [summary, toolsSection, `${chalk.blue.underline.bold("## Current Status")}\n\n${overallIssues}`]
   const rendered = parts.map(p => p.trim()).join("\n\n")
   return `${rendered}\n`
-}
-
-/**
- * Render tools execution summary
- * @param allTools - All available tools
- * @param results - Tool execution results
- * @returns Rendered tools section
- */
-export function renderTools(allTools: Tool[], results: ToolRunResult[]): string {
-  return render("tools", { allTools, results })
-}
-
-/**
- * Render detailed information for failing tool runs
- * @param failures - Tool run results with non-zero exit codes
- * @returns Rendered failing tools details
- */
-export function renderFailingTools(failures: ToolRunResult[]): string {
-  return render("failing-tools", { failures })
 }
 
 /**
@@ -299,8 +279,7 @@ export function renderGuide(
 ): string {
   try {
     // Preserve exact brief text for tests and spec fidelity
-    if (view.kind === "brief") return view.brief
-    return render("guide", { view })
+    return view.kind === "brief" ? view.brief : render("guide", { view })
   } catch {
     // Fallback plain rendering when the templating pipeline fails (e.g., JSON.stringify is mocked to throw in tests)
     if (view.kind === "brief") return view.brief

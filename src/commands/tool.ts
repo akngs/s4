@@ -1,25 +1,15 @@
 import { executeCommand } from "../logics/exec.ts"
-import type { CommandReturn } from "../types.ts"
-import { isLeft } from "../types.ts"
-import { errToCommandReturn, loadSpec } from "./_base.ts"
+import type { CommandReturn, S4 } from "../types.ts"
 
 /**
- * Run a user-defined tool
- * @param opts - Command options
- * @param opts.spec - Path to the spec file
- * @param opts.format - Format of the spec file
- * @param opts.toolId - ID of the tool to run
+ * Run a tool defined in spec
+ * @param spec - The loaded S4 spec instance
+ * @param toolId - Tool ID as defined in spec.tools
  * @returns Command result with tool execution output
  */
-export default async function (opts: { spec: string; format: "yaml" | "json"; toolId: string }): Promise<CommandReturn> {
-  const specOrErr = await loadSpec(opts.spec, opts.format)
-  if (isLeft(specOrErr)) return errToCommandReturn(specOrErr)
-  const spec = specOrErr.R
-
-  const tool = spec.tools.find(t => t.id === opts.toolId)
-  if (tool === undefined) {
-    return { stdout: "", stderr: `value_error: Tool "${opts.toolId}" not found in spec`, exitCode: 1 }
-  }
+export default async function (spec: S4, toolId: string): Promise<CommandReturn> {
+  const tool = spec.tools.find(t => t.id === toolId)
+  if (!tool) return { stdout: "", stderr: `value_error: Tool "${toolId}" not found in spec`, exitCode: 1 }
 
   const result: CommandReturn = await executeCommand(tool.command)
   if (result.exitCode !== 0 && tool.recommendedNextActions.length > 0) {

@@ -338,14 +338,14 @@ tools:
     command: npm run --silent check:eslint
   - id: depcruise
     command: npm run --silent check:depcruise
-  - id: knip
-    command: npm run --silent check:knip
-  - id: jscpd
-    command: npm run --silent check:jscpd
   - id: unittest
     command: npm run --silent test
     recommendedNextActions: |-
       There are failing tests. Run `npm run test` to see the details.
+  - id: knip
+    command: npm run --silent check:knip
+  - id: jscpd
+    command: npm run --silent check:jscpd
   - id: coverage
     command: npm run --silent test:coverage
   - id: tloc

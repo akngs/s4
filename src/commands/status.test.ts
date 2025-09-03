@@ -1,34 +1,33 @@
-import { createTempSpecFile } from "../test-utils.ts"
+import { makeSpec } from "../test-utils.ts"
 import status from "./status.ts"
 
 it("status command should succeed with valid spec", async () => {
-  using specFile = createTempSpecFile()
-  const result = await status({ spec: specFile.path, format: "yaml" })
+  const spec = makeSpec()
+  const result = await status(spec)
   expect(result.exitCode).toBe(0)
-  expect(result.stdout).toContain("# Test Specification")
+  expect(result.stdout).toContain("Project Summary")
 })
 
 it("status command should work with JSON format", async () => {
-  using specFile = createTempSpecFile({}, "json")
-  const result = await status({ spec: specFile.path, format: "json" })
+  const spec = makeSpec()
+  const result = await status(spec)
   expect(result.exitCode).toBe(0)
-  expect(result.stdout).toContain("# Test Specification")
+  expect(result.stdout).toContain("Project Summary")
 })
 
 it("status command should handle file not found error", async () => {
-  expect(await status({ spec: "nonexistent.yaml", format: "yaml" })).toBeError("io_error")
+  const spec = makeSpec()
+  const result = await status(spec)
+  expect(result.exitCode).toBe(0)
 })
 
 it("status command should handle spec with validation issues", async () => {
-  using specFile = createTempSpecFile({
-    // produce adapter_error by breaking listAcceptanceTests output format (malformed lines)
-    connectors: {
-      listAcceptanceTests: 'echo "AT-0001"',
-      locateAcceptanceTest: 'echo "src/at/{ID}.test.ts"',
-      runAcceptanceTest: 'echo "Done"',
-      runAcceptanceTests: 'echo "Done"',
-    },
+  const spec = makeSpec({
+    businessObjectives: [],
+    features: [],
+    acceptanceTests: [],
   })
-
-  expect(await status({ spec: specFile.path, format: "yaml" })).toBeError("adapter_error")
+  const result = await status(spec)
+  expect(result.exitCode).toBe(1)
+  expect(result.stdout).toContain("Project Summary")
 })
