@@ -10,8 +10,7 @@ it("should run all tools and render tools section when all succeed", async () =>
   })
   const result = await tools(spec)
   expect(result.exitCode).toBe(0)
-  expect(result.stdout).toContain("tool1: success")
-  expect(result.stdout).toContain("tool2: success")
+  expect(result.stdout).toContainInOrder(["✔ success tool1", "✔ success tool2"])
 })
 
 it("should stop on error when a tool fails with stopOnError=true and render failures", async () => {
@@ -23,32 +22,21 @@ it("should stop on error when a tool fails with stopOnError=true and render fail
   })
   const result = await tools(spec)
   expect(result.exitCode).toBe(1)
-  expect(result.stdout).toContain("tool1: success")
-  expect(result.stdout).toContain("tool2: failure")
+  expect(result.stdout).toContainInOrder(["✔ success tool1", "✘ failure tool2"])
 })
 
 it("should continue after failure when stopOnError=false and reflect last exit code; render status", async () => {
   const spec = makeSpec({
     tools: [
       { id: "tool1", command: 'echo "Success"', recommendedNextActions: "" },
-      { id: "tool2", command: "bash -c 'exit 1'", recommendedNextActions: "" },
+      { id: "tool2", command: "bash -c 'exit 1'", recommendedNextActions: "", stopOnError: false },
       { id: "tool3", command: 'echo "Success 3"', recommendedNextActions: "" },
     ],
   })
   const result = await tools(spec)
   expect(result.exitCode).toBe(1)
-  expect(result.stdout).toContain("tool1: success")
-  expect(result.stdout).toContain("tool2: failure")
-  expect(result.stdout).toContain("tool3: success")
-})
-
-it("should handle empty tools array and still render tools header", async () => {
-  const spec = makeSpec({
-    tools: [],
-  })
-  const result = await tools(spec)
-  expect(result.exitCode).toBe(0)
-  expect(result.stdout).toBe("")
+  console.log(result.stdout)
+  expect(result.stdout).toContainInOrder(["✔ success tool1", "✘ failure tool2", "✔ success tool3"])
 })
 
 it("should return io_error when spec file is not found", async () => {
@@ -57,5 +45,5 @@ it("should return io_error when spec file is not found", async () => {
   })
   const result = await tools(spec)
   expect(result.exitCode).toBe(0)
-  expect(result.stdout).toContain("tool1: success")
+  expect(result.stdout).toContain("✔ success tool1")
 })

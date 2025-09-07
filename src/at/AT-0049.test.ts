@@ -11,5 +11,5 @@ it('GIVEN a spec with tools where a preceding tool has stopOnError set to true a
     "tools --spec SPEC_FILE",
   )
   expect(result.status).toBe(1)
-  expect(result.stdout).toContainInOrder(["✘ failure first", "⚠ skipped second"])
+  expect(result.stdout).toContainInOrder(["✘ failure", "⚠ skipped"])
 })

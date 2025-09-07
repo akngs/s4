@@ -41,6 +41,16 @@ export function renderStatus(spec: S4, featureStats: FeatureStats, issues: Issue
 }
 
 /**
+ * Render tools section
+ * @param spec - The S4 specification
+ * @param results - Array of tool results
+ * @returns Rendered tools section
+ */
+export function renderTools(spec: S4, results: ToolRunResult[]): string {
+  return render("tools", { allTools: spec.tools, results })
+}
+
+/**
  * Render overall status check issues
  * @param issues - Array of project issues
  * @param featureStats - Feature completion statistics
