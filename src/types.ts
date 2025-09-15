@@ -245,26 +245,6 @@ export function isRight<LEFT, RIGHT>(either: Either<LEFT, RIGHT>): either is { _
 }
 
 /**
- * Map over the Right value, leaving Left unchanged
- * @param either - The Either value to map over
- * @param fn - The function to apply to the right value
- * @returns A new Either with the mapped right value or the original left value
- */
-export function map<LEFT, RIGHT, RIGHT2>(either: Either<LEFT, RIGHT>, fn: (value: RIGHT) => RIGHT2): Either<LEFT, RIGHT2> {
-  return isRight(either) ? right(fn(either.R)) : either
-}
-
-/**
- * Map over the Left value (issue/error), leaving Right unchanged
- * @param either - The Either value to map over
- * @param fn - The function to apply to the left value
- * @returns A new Either with the mapped left value or the original right value
- */
-export function mapLeft<LEFT, RIGHT, LEFT2>(either: Either<LEFT, RIGHT>, fn: (issue: LEFT) => LEFT2): Either<LEFT2, RIGHT> {
-  return isLeft(either) ? left(fn(either.L)) : either
-}
-
-/**
  * Unwrap the left value from an Either
  * @param e - The Either value to unwrap
  * @returns The left value
