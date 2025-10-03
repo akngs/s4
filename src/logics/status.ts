@@ -1,16 +1,7 @@
+import type { Either } from "fp-ts/lib/Either.js"
+import { isLeft, left, right } from "fp-ts/lib/Either.js"
 import { getInstance as getRunAtsAdapter } from "../adapters/run-ats.ts"
-import {
-  type Either,
-  type Issue,
-  isLeft,
-  left,
-  right,
-  type S4,
-  type StatusReport,
-  type SystemError,
-  type TestResult,
-  type ToolRunResult,
-} from "../types.ts"
+import type { Issue, S4, StatusReport, SystemError, TestResult, ToolRunResult } from "../types.ts"
 import { executeCommand } from "./exec.ts"
 import { calcFeatureStats } from "./stats.ts"
 import { checkSyncIssues } from "./sync.ts"
@@ -26,13 +17,13 @@ export async function performOverallStatusCheck(spec: S4): Promise<Either<System
   const issues: Issue[] = []
 
   const testsOrErr = await getAcceptanceTestResults(spec)
-  if (isLeft(testsOrErr)) return left(testsOrErr.L)
-  const { testResults, failingIssue } = testsOrErr.R
+  if (isLeft(testsOrErr)) return left(testsOrErr.left)
+  const { testResults, failingIssue } = testsOrErr.right
   if (failingIssue) issues.push(failingIssue)
 
   const syncIssuesOrErr = await checkSyncIssues(spec)
-  if (isLeft(syncIssuesOrErr)) return left(syncIssuesOrErr.L)
-  issues.push(...syncIssuesOrErr.R)
+  if (isLeft(syncIssuesOrErr)) return left(syncIssuesOrErr.left)
+  issues.push(...syncIssuesOrErr.right)
 
   // Internal consistency
   issues.push(...validateInternalConsistency(spec))
@@ -54,8 +45,8 @@ async function getAcceptanceTestResults(
 ): Promise<Either<SystemError, { testResults: TestResult[]; failingIssue?: { _tag: "failing_tests"; testResults: TestResult[] } }>> {
   const rawResult = await executeCommand(spec.connectors.runAcceptanceTests)
   const testResultsOrErr = getRunAtsAdapter("default").parse(spec.acceptanceTests, rawResult)
-  if (isLeft(testResultsOrErr)) return left(testResultsOrErr.L)
-  const testResults = testResultsOrErr.R
+  if (isLeft(testResultsOrErr)) return left(testResultsOrErr.left)
+  const testResults = testResultsOrErr.right
   const failingIssue = testResults.some(r => !r.passed) ? { _tag: "failing_tests" as const, testResults } : undefined
   return right({ testResults, failingIssue })
 }

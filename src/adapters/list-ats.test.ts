@@ -1,5 +1,5 @@
 import dedent from "dedent"
-import { unwrapLeft, unwrapRight } from "../types.ts"
+import { unwrapLeft, unwrapRight } from "../test-utils.ts"
 import { getInstance } from "./list-ats.ts"
 
 describe("DefaultAdapter.parse()", () => {
@@ -8,8 +8,7 @@ describe("DefaultAdapter.parse()", () => {
       AT-0001: GIVEN A, WHEN B, THEN C
       AT-0002: GIVEN D, WHEN E, THEN F
     `
-    const results = unwrapRight(getInstance("default").parse(raw))
-    expect(results).toEqual([
+    expect(unwrapRight(getInstance("default").parse(raw))).toEqual([
       { id: "AT-0001", description: "GIVEN A, WHEN B, THEN C" },
       { id: "AT-0002", description: "GIVEN D, WHEN E, THEN F" },
     ])
@@ -25,8 +24,7 @@ describe("DefaultAdapter.parse()", () => {
       Invalid line without colon
       AT-0002: Another valid test
     `
-    const result = getInstance("default").parse(raw)
-    expect(unwrapLeft(result)).toEqual({
+    expect(unwrapLeft(getInstance("default").parse(raw))).toEqual({
       _tag: "adapter_error",
       adapter: "at-listing-tool",
       cause: "Malformed lines found at line numbers: 2",

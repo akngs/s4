@@ -1,7 +1,7 @@
 // Tests for performOverallStatusCheck focusing on branch coverage
+
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import { makeSpec } from "../test-utils.ts"
-import { isRight, unwrapRight } from "../types.ts"
+import { makeSpec, unwrapRight } from "../test-utils.ts"
 import * as execMod from "./exec.ts"
 import { performOverallStatusCheck } from "./status.ts"
 
@@ -41,11 +41,7 @@ describe("performOverallStatusCheck()", () => {
     // 3) tool execution → fail
     execSpy.mockResolvedValueOnce({ stdout: "", stderr: "e", exitCode: 1 })
 
-    const result = await performOverallStatusCheck(spec)
-    expect(isRight(result)).toBe(true)
-
-    const issues = unwrapRight(result).issues
-    const tags = new Set(issues.map(i => i._tag))
+    const tags = new Set(unwrapRight(await performOverallStatusCheck(spec)).issues.map(i => i._tag))
     expect(tags.has("failing_tests")).toBe(true)
     expect(tags.has("failing_tools")).toBe(true)
   })
@@ -66,6 +62,6 @@ describe("performOverallStatusCheck()", () => {
     execSpy.mockResolvedValueOnce({ stdout: "", stderr: "err", exitCode: 1 })
 
     const result = await performOverallStatusCheck(spec)
-    expect(result._tag).toBe("left")
+    expect(result._tag).toBe("Left")
   })
 })

@@ -1,5 +1,6 @@
+import { type Either, isLeft, left, right } from "fp-ts/lib/Either.js"
 import { getInstance as getListAtsAdapter } from "../adapters/list-ats.ts"
-import { type Either, isLeft, right, type S4, type SyncIssue, type SystemError } from "../types.ts"
+import type { S4, SyncIssue, SystemError } from "../types.ts"
 import { executeCommand } from "./exec.ts"
 
 /**
@@ -11,13 +12,13 @@ export async function checkSyncIssues(spec: S4): Promise<Either<SystemError, Syn
   if (spec.connectors.listAcceptanceTests === "") return right([])
 
   const rawResult = await executeCommand(spec.connectors.listAcceptanceTests)
-  if (rawResult.exitCode !== 0) return { _tag: "left", L: { _tag: "exec_error", command: "listAcceptanceTests", cause: new Error(rawResult.stderr) } }
+  if (rawResult.exitCode !== 0) return left({ _tag: "exec_error", command: "listAcceptanceTests", cause: new Error(rawResult.stderr) })
 
   const parsedTestsResult = getListAtsAdapter("default").parse(rawResult.stdout)
   if (isLeft(parsedTestsResult)) return parsedTestsResult
 
-  const implementedTestIds = parsedTestsResult.R.map(test => test.id)
-  const implementedTestMap = new Map(parsedTestsResult.R.map(test => [test.id, test.description]))
+  const implementedTestIds = parsedTestsResult.right.map(test => test.id)
+  const implementedTestMap = new Map(parsedTestsResult.right.map(test => [test.id, test.description]))
 
   const missingTestIssues = await findMissingTests(spec, implementedTestIds)
   const danglingTestIssues = await findDanglingTests(spec, implementedTestIds)
@@ -74,37 +75,50 @@ export function topologicalSortFeatures(features: { id: string; prerequisites: s
 
 async function findMissingTests(spec: S4, implementedTestIds: string[]): Promise<SyncIssue[]> {
   const testOrderMap = getAcceptanceTestDependencyOrder(spec)
-  const sortedMissingTests = spec.acceptanceTests
+  const missingTests = spec.acceptanceTests
     .filter(test => !implementedTestIds.includes(test.id))
-    .toSorted((a, b) => {
-      const orderA = testOrderMap.get(a.id) ?? Infinity
-      const orderB = testOrderMap.get(b.id) ?? Infinity
-      return orderA - orderB
-    })
-    .map(async test => ({ _tag: "missing_at" as const, id: test.id, filePath: await resolveAcceptanceTestPath(spec, test.id) }))
+    .toSorted((a, b) => (testOrderMap.get(a.id) ?? Infinity) - (testOrderMap.get(b.id) ?? Infinity))
 
-  return Promise.all(sortedMissingTests)
+  return Promise.all(
+    missingTests.map(async test => ({
+      _tag: "missing_at" as const,
+      id: test.id,
+      filePath: await resolveAcceptanceTestPath(spec, test.id),
+    })),
+  )
 }
 
 async function findDanglingTests(spec: S4, implementedTestIds: string[]): Promise<SyncIssue[]> {
   const definedTestIds = new Set(spec.acceptanceTests.map(test => test.id))
-  const danglingTests = implementedTestIds.filter((id: string) => !definedTestIds.has(id))
+  const danglingTests = implementedTestIds.filter(id => !definedTestIds.has(id))
 
   return Promise.all(
-    danglingTests.map(async (id: string) => ({ _tag: "dangling_at" as const, id, filePath: await resolveAcceptanceTestPath(spec, id) })),
+    danglingTests.map(async id => ({
+      _tag: "dangling_at" as const,
+      id,
+      filePath: await resolveAcceptanceTestPath(spec, id),
+    })),
   )
 }
 
 async function findMismatchingTests(spec: S4, implementedTestMap: Map<string, string>): Promise<SyncIssue[]> {
-  const mismatchingTests = spec.acceptanceTests.map(async test => {
-    const actual = implementedTestMap.get(test.id)
-    const expected = `GIVEN ${test.given}, WHEN ${test.when}, THEN ${test.then}`
-    if (actual === undefined || actual === expected) return null
+  const mismatchingTests = await Promise.all(
+    spec.acceptanceTests.map(async test => {
+      const actual = implementedTestMap.get(test.id)
+      const expected = `GIVEN ${test.given}, WHEN ${test.when}, THEN ${test.then}`
+      if (actual === undefined || actual === expected) return null
 
-    const filePath = await resolveAcceptanceTestPath(spec, test.id)
-    return { _tag: "mismatching_at" as const, id: test.id, expected, actual, filePath }
-  })
-  return (await Promise.all(mismatchingTests)).filter((t): t is NonNullable<typeof t> => t !== null)
+      return {
+        _tag: "mismatching_at" as const,
+        id: test.id,
+        expected,
+        actual,
+        filePath: await resolveAcceptanceTestPath(spec, test.id),
+      }
+    }),
+  )
+
+  return mismatchingTests.filter((t): t is NonNullable<typeof t> => t !== null)
 }
 
 async function resolveAcceptanceTestPath(spec: S4, testId: string): Promise<string> {

@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
 import { Command, Option } from "@commander-js/extra-typings"
+import { isLeft } from "fp-ts/lib/Either.js"
 import { errToCommandReturn, loadSpec } from "./commands/_base.ts"
 import { runAllTools, runAt, runAts, runGuide, runInfo, runLocateAt, runStatus, runTool, runValidate } from "./commands/index.ts"
 import type { CommandReturn, S4 } from "./types.ts"
-import { isLeft } from "./types.ts"
 
 // Default to running "s4 status" if no arguments are provided
 if (process.argv.length === 2) process.argv.push("status")
@@ -112,7 +112,7 @@ async function withSpec(specPath: string, format: "json" | "yaml", commandFn: (s
     handleResult(errToCommandReturn(specOrErr))
     return
   }
-  const result = await commandFn(specOrErr.R)
+  const result = await commandFn(specOrErr.right)
   handleResult(result)
 }
 

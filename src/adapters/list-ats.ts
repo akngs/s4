@@ -1,4 +1,5 @@
-import { type AdapterError, type Either, left, right } from "../types.ts"
+import { type Either, left, right } from "fp-ts/lib/Either.js"
+import type { AdapterError } from "../types.ts"
 
 type AcceptanceTestInfo = { id: string; description: string }
 

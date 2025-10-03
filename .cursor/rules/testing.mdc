@@ -10,4 +10,7 @@ When writing tests, always follow these best practices:
 - Quality of tests should be the same as the code they test. Remove duplication and make tests as simple as possible.
 - Avoid mock whenever possible. It is a sign of a bad design. Try to refactor the code to make it easier to test.
 - When writing example data for tests, use the simplest possible data that still covers the test case to keep clarity.
+- Use `describe()` to group tests into logical units, while don't make too many `describe()` needlessly.
+- Never nest `describe()` into other `describe()` blocks.
+- Never wrap single test in `describe()` block.
 - When writing acceptance tests, do not use `describe()` since you just write a single test per file.

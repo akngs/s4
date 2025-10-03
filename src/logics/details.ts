@@ -1,5 +1,6 @@
-import type { AcceptanceTestDetail, Either, FeatureDetail, S4, ValueError } from "../types.ts"
-import { left, right } from "../types.ts"
+import type { Either } from "fp-ts/lib/Either.js"
+import { left, right } from "fp-ts/lib/Either.js"
+import type { AcceptanceTestDetail, FeatureDetail, S4, ValueError } from "../types.ts"
 
 /**
  * Gets detailed information about a specific feature including its relationships

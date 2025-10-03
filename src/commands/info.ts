@@ -1,7 +1,7 @@
+import { isLeft } from "fp-ts/lib/Either.js"
 import { getAcceptanceTestDetail, getFeatureDetail } from "../logics/details.ts"
 import { renderAcceptanceTestDetail, renderFeatureDetail } from "../render/index.ts"
 import type { CommandReturn, S4 } from "../types.ts"
-import { isLeft } from "../types.ts"
 import { errToCommandReturn } from "./_base.ts"
 
 /**
@@ -14,14 +14,14 @@ export default function runInfo(spec: S4, id: string): CommandReturn {
   if (id.startsWith("FE-")) {
     const featureDetailOrErr = getFeatureDetail(spec, id)
     if (isLeft(featureDetailOrErr)) return errToCommandReturn(featureDetailOrErr)
-    const featureDetail = featureDetailOrErr.R
+    const featureDetail = featureDetailOrErr.right
     return { stdout: renderFeatureDetail(featureDetail), stderr: "", exitCode: 0 }
   }
 
   if (id.startsWith("AT-")) {
     const acceptanceTestDetailOrErr = getAcceptanceTestDetail(spec, id)
     if (isLeft(acceptanceTestDetailOrErr)) return errToCommandReturn(acceptanceTestDetailOrErr)
-    const acceptanceTestDetail = acceptanceTestDetailOrErr.R
+    const acceptanceTestDetail = acceptanceTestDetailOrErr.right
     return { stdout: renderAcceptanceTestDetail(acceptanceTestDetail), stderr: "", exitCode: 0 }
   }
 

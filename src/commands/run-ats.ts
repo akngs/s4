@@ -1,8 +1,8 @@
+import { isLeft } from "fp-ts/lib/Either.js"
 import { getInstance as getRunAtsAdapter } from "../adapters/run-ats.ts"
 import { executeCommand } from "../logics/exec.ts"
 import { renderFailingTests } from "../render/index.ts"
 import type { CommandReturn, S4 } from "../types.ts"
-import { isLeft } from "../types.ts"
 import { errToCommandReturn } from "./_base.ts"
 
 /**
@@ -14,7 +14,7 @@ export default async function runAts(spec: S4): Promise<CommandReturn> {
   const commandResult = await executeCommand(spec.connectors.runAcceptanceTests)
   const testResultsOrErr = getRunAtsAdapter("default").parse(spec.acceptanceTests, commandResult)
   if (isLeft(testResultsOrErr)) return errToCommandReturn(testResultsOrErr)
-  const testResults = testResultsOrErr.R
+  const testResults = testResultsOrErr.right
 
   const renderedResult = renderFailingTests(testResults)
   return { stdout: renderedResult, stderr: "", exitCode: 0 }

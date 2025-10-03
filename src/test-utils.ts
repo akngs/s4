@@ -3,6 +3,8 @@ import { unlinkSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { fileURLToPath } from "node:url"
+import { type Either, fold } from "fp-ts/lib/Either.js"
+import { pipe } from "fp-ts/lib/function.js"
 import { stringify } from "yaml"
 import { type S4, S4Schema } from "./types.ts"
 
@@ -126,4 +128,38 @@ export function createTempSpecFile(overrides?: Record<string, unknown>, extensio
   const filePath = generateTempFilePath(extension)
   writeTextFile(filePath, content)
   return new TempFile(filePath)
+}
+
+/**
+ * Unwrap the left value from an Either (throws if Right)
+ * @param e - The Either value to unwrap
+ * @returns The left value
+ */
+export function unwrapLeft<L, R>(e: Either<L, R>): L {
+  return pipe(
+    e,
+    fold(
+      left => left,
+      right => {
+        throw new Error(`Expected left value, got right: ${JSON.stringify(right)}`)
+      },
+    ),
+  )
+}
+
+/**
+ * Unwrap the right value from an Either (throws if Left)
+ * @param e - The Either value to unwrap
+ * @returns The right value
+ */
+export function unwrapRight<L, R>(e: Either<L, R>): R {
+  return pipe(
+    e,
+    fold(
+      left => {
+        throw new Error(`Expected right value, got left: ${JSON.stringify(left)}`)
+      },
+      right => right,
+    ),
+  )
 }

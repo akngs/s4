@@ -1,12 +1,10 @@
 import { describe, expect, it } from "vitest"
-import { isRight, unwrapRight } from "../types.ts"
+import { unwrapLeft, unwrapRight } from "../test-utils.ts"
 import { getGuidelineView } from "./guide.ts"
 
 describe("getGuidelineView()", () => {
   it("returns brief guidance when no section is provided", async () => {
     const res = await getGuidelineView()
-    expect(isRight(res)).toBe(true)
-
     const view = unwrapRight(res)
     if (view._tag !== "brief") throw new Error(`Expected brief, got ${view._tag}`)
 
@@ -16,17 +14,12 @@ describe("getGuidelineView()", () => {
 
   it("returns unknown_section with allowed keys when section is invalid", async () => {
     const res = await getGuidelineView("not-a-real-section")
-    expect(isRight(res)).toBe(true)
-
-    const view = unwrapRight(res)
-    if (view._tag !== "unknown_section") throw new Error(`Expected unknown_section, got ${view._tag}`)
-    expect.arrayContaining(["title", "mission", "vision", "businessObjective", "feature", "acceptanceTest", "connectors", "tools"])
+    const err = unwrapLeft(res)
+    expect(err._tag).toBe("unknown_section")
   })
 
   it("returns section text and examples for a valid scalar section (title)", async () => {
     const res = await getGuidelineView("title")
-    expect(isRight(res)).toBe(true)
-
     const view = unwrapRight(res)
     if (view._tag !== "section") throw new Error(`Expected section, got ${view._tag}`)
 

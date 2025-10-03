@@ -206,65 +206,8 @@ export type AcceptanceTestDetail = {
 /** Result type for status command */
 export type StatusReport = { issues: Issue[]; featureStats: FeatureStats; toolResults: ToolRunResult[] }
 
-export type Either<LEFT, RIGHT> = { _tag: "left"; L: LEFT } | { _tag: "right"; R: RIGHT }
-
-export type Left<LEFT> = { _tag: "left"; L: LEFT }
-
-/**
- * Create a Left (issue/error) value
- * @param value - The left value to wrap
- * @returns An Either with the left value
- */
-export function left<LEFT, RIGHT>(value: LEFT): Either<LEFT, RIGHT> {
-  return { _tag: "left", L: value }
-}
-
-/**
- * Create a Right (success) value
- * @param value - The right value to wrap
- * @returns An Either with the right value
- */
-export function right<LEFT, RIGHT>(value: RIGHT): Either<LEFT, RIGHT> {
-  return { _tag: "right", R: value }
-}
-
-/**
- * Check if an Either is Left (issue/error)
- * @param either - The Either value to check
- * @returns True if the Either is Left, false otherwise
- */
-export function isLeft<LEFT, RIGHT>(either: Either<LEFT, RIGHT>): either is { _tag: "left"; L: LEFT } {
-  return either._tag === "left"
-}
-
-/**
- * Check if an Either is Right (success)
- * @param either - The Either value to check
- * @returns True if the Either is Right, false otherwise
- */
-export function isRight<LEFT, RIGHT>(either: Either<LEFT, RIGHT>): either is { _tag: "right"; R: RIGHT } {
-  return either._tag === "right"
-}
-
-/**
- * Unwrap the left value from an Either
- * @param e - The Either value to unwrap
- * @returns The left value
- */
-export function unwrapLeft<L, R>(e: Either<L, R>): L {
-  if (!isLeft(e)) throw new Error(`Expected left value, got right: ${JSON.stringify(e)}`)
-  return e.L
-}
-
-/**
- * Unwrap the right value from an Either
- * @param e - The Either value to unwrap
- * @returns The right value
- */
-export function unwrapRight<L, R>(e: Either<L, R>): R {
-  if (!isRight(e)) throw new Error(`Expected right value, got left: ${JSON.stringify(e)}`)
-  return e.R
-}
+// Type alias for Left (fp-ts doesn't export this directly)
+export type Left<L> = { _tag: "Left"; left: L }
 
 /**
  * Assert that a value is never (exhaustiveness check)

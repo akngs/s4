@@ -1,12 +1,11 @@
 import js from "@eslint/js"
-import { globalIgnores } from "eslint/config"
+import { defineConfig, globalIgnores } from "eslint/config"
 import importPlugin from "eslint-plugin-import"
 import jsdoc from "eslint-plugin-jsdoc"
 import sonarjs from "eslint-plugin-sonarjs"
 import ts from "typescript-eslint"
 
-// eslint.defineConfig() has a types incompatibility issue
-export default ts.config([
+export default defineConfig([
   // global ignores
   globalIgnores([".cursor/", ".github/", "dist/", "coverage/", ".dependency-cruiser.cjs", "eslint.config.js"]),
 
@@ -91,11 +90,12 @@ export default ts.config([
   // tests (overrides previous rules)
   {
     name: "s4/test",
-    files: ["src/**/*.test.ts"],
+    files: ["src/**/*.test.ts", "src/test-utils.ts"],
     rules: {
       "max-statements": ["error", { max: 20 }],
       "sonarjs/cognitive-complexity": ["error", 3],
       "sonarjs/max-lines": ["error", { maximum: 300 }],
+      "import/max-dependencies": ["error", { max: 10, ignoreTypeImports: false }],
     },
   },
 ])

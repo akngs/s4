@@ -63,11 +63,7 @@ function renderOverallIssues(issues: Issue[], featureStats: FeatureStats): strin
     return "Project is in good state. You don't need to run any other checks since I've already checked everything. You may consult your human colleagues to find out what to do next."
   }
 
-  if (issues.length === 0 && failingFeatures.length > 0) {
-    return renderFailingFeaturesMessage(failingFeatures)
-  }
-
-  return renderIssues(issues)
+  return issues.length === 0 ? renderFailingFeaturesMessage(failingFeatures) : renderIssues(issues)
 }
 
 /**
@@ -95,83 +91,61 @@ function renderFailingFeaturesMessage(failingFeatures: Array<[string, { passed: 
  * @returns Rendered issues summary
  */
 function renderIssues(issues: Issue[]): string {
-  const attempts: Array<(issues: Issue[]) => string | undefined> = [
-    tryRenderFailingTests,
-    tryRenderFailingTools,
-    tryRenderValidationIssues,
-    tryRenderMissingTests,
-    tryRenderDanglingTests,
-    tryRenderMismatchingTests,
-  ]
-
-  for (const attempt of attempts) {
-    const rendered = attempt(issues)
+  for (const renderer of issueRenderers) {
+    const rendered = renderer.render(issues)
     if (rendered !== undefined) return rendered
   }
 
   return `Unknown issues:\n\n${issues.map(i => i._tag).join("\n")}`
 }
 
-/**
- * Try to render failing tests issues
- * @param issues - Array of project issues
- * @returns Rendered failing tests or undefined if no failing tests
- */
-function tryRenderFailingTests(issues: Issue[]): string | undefined {
-  const failing = issues.find(e => e._tag === "failing_tests")
-  return failing ? renderFailingTests(failing.testResults) : undefined
-}
-
-/**
- * Try to render failing tools issues
- * @param issues - Array of project issues
- * @returns Rendered failing tools or undefined if no failing tools
- */
-function tryRenderFailingTools(issues: Issue[]): string | undefined {
-  const failingTools = issues.find(e => e._tag === "failing_tools")
-  if (!failingTools || !("failures" in failingTools)) return undefined
-  return render("failing-tools", { failures: failingTools.failures })
-}
-
-/**
- * Try to render validation issues
- * @param issues - Array of project issues
- * @returns Rendered validation issues or undefined if no validation issues
- */
-function tryRenderValidationIssues(issues: Issue[]): string | undefined {
-  const validation = issues.filter(isValidationIssue)
-  return validation.length > 0 ? renderValidationIssues(validation) : undefined
-}
-
-/**
- * Try to render missing tests issues
- * @param issues - Array of project issues
- * @returns Rendered missing tests or undefined if no missing tests
- */
-function tryRenderMissingTests(issues: Issue[]): string | undefined {
-  const missing = issues.filter(e => e._tag === "missing_at")
-  return missing.length > 0 ? renderMissingTests(missing) : undefined
-}
-
-/**
- * Try to render dangling tests issues
- * @param issues - Array of project issues
- * @returns Rendered dangling tests or undefined if no dangling tests
- */
-function tryRenderDanglingTests(issues: Issue[]): string | undefined {
-  const dangling = issues.filter(e => e._tag === "dangling_at")
-  return dangling.length > 0 ? renderDanglingTests(dangling) : undefined
-}
-
-/**
- * Try to render mismatching tests issues
- * @param issues - Array of project issues
- * @returns Rendered mismatching tests or undefined if no mismatching tests
- */
-function tryRenderMismatchingTests(issues: Issue[]): string | undefined {
-  const mismatching = issues.filter(e => e._tag === "mismatching_at")
-  return mismatching.length > 0 ? renderMismatchingTests(mismatching) : undefined
-}
+const issueRenderers: Array<{
+  tag: string
+  render: (issues: Issue[]) => string | undefined
+}> = [
+  {
+    tag: "failing_tests",
+    render: issues => {
+      const failing = issues.find(e => e._tag === "failing_tests")
+      return failing ? renderFailingTests(failing.testResults) : undefined
+    },
+  },
+  {
+    tag: "failing_tools",
+    render: issues => {
+      const failingTools = issues.find(e => e._tag === "failing_tools")
+      return failingTools && "failures" in failingTools ? render("failing-tools", { failures: failingTools.failures }) : undefined
+    },
+  },
+  {
+    tag: "validation",
+    render: issues => {
+      const validation = issues.filter(isValidationIssue)
+      return validation.length > 0 ? renderValidationIssues(validation) : undefined
+    },
+  },
+  {
+    tag: "missing_at",
+    render: issues => {
+      const missing = issues.filter(e => e._tag === "missing_at")
+      return missing.length > 0 ? renderMissingTests(missing) : undefined
+    },
+  },
+  {
+    tag: "dangling_at",
+    render: issues => {
+      const dangling = issues.filter(e => e._tag === "dangling_at")
+      return dangling.length > 0 ? renderDanglingTests(dangling) : undefined
+    },
+  },
+  {
+    tag: "mismatching_at",
+    render: issues => {
+      const mismatching = issues.filter(e => e._tag === "mismatching_at")
+      return mismatching.length > 0 ? renderMismatchingTests(mismatching) : undefined
+    },
+  },
+]
 
 /**
  * Render failing tests action details
@@ -288,16 +262,13 @@ export function renderGuide(
     | { _tag: "unknown_section"; allowed: string[] },
 ): string {
   try {
-    // Preserve exact brief text for tests and spec fidelity
     return view._tag === "brief" ? view.brief : render("guide", { view })
   } catch {
-    // Fallback plain rendering when the templating pipeline fails (e.g., JSON.stringify is mocked to throw in tests)
     if (view._tag === "brief") return view.brief
     if (view._tag === "unknown_section") return `Unknown section. Allowed: ${view.allowed.join(", ")}`
     const examples = view.examples
       .map(ex => {
         if (ex._tag === "scalar") return `- ${ex.text}`
-        // Render block scalars with a YAML block indicator
         const indented = ex.text
           .split("\n")
           .map(line => `  ${line}`)

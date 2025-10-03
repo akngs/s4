@@ -1,6 +1,5 @@
-import { makeSpec } from "../test-utils.ts"
+import { makeSpec, unwrapLeft, unwrapRight } from "../test-utils.ts"
 import type { S4 } from "../types.ts"
-import { unwrapLeft, unwrapRight } from "../types.ts"
 import { getAcceptanceTestDetail, getFeatureDetail } from "./details.ts"
 
 const QUERY_TEST_SPEC: S4 = makeSpec({
@@ -21,47 +20,43 @@ const QUERY_TEST_SPEC: S4 = makeSpec({
   tools: [],
 })
 
-describe("getFeatureDetail()", () => {
-  it("should return feature information with all relationships", () => {
-    const info = unwrapRight(getFeatureDetail(QUERY_TEST_SPEC, "FE-0002"))
-    expect(info.feature.id).toBe("FE-0002")
-    expect(info.businessObjectives).toHaveLength(2)
-    expect(info.prerequisites.map(p => p.id)).toEqual(["FE-0001"])
-    expect(info.dependentFeatures.map(p => p.id)).toEqual(["FE-0003"])
-    expect(info.acceptanceTests).toHaveLength(2)
-  })
-
-  it("should handle feature with no prerequisites or dependents", () => {
-    const info = unwrapRight(getFeatureDetail(QUERY_TEST_SPEC, "FE-0001"))
-    expect(info.prerequisites).toHaveLength(0)
-    expect(info.dependentFeatures).toHaveLength(1)
-  })
-
-  it("should return error when feature not found", () => {
-    const err = unwrapLeft(getFeatureDetail(QUERY_TEST_SPEC, "FE-9999"))
-    expect(err._tag).toBe("value_error")
-    expect(err.message).toContain("FE-9999")
-  })
+it("should return feature information with all relationships", () => {
+  const info = unwrapRight(getFeatureDetail(QUERY_TEST_SPEC, "FE-0002"))
+  expect(info.feature.id).toBe("FE-0002")
+  expect(info.businessObjectives).toHaveLength(2)
+  expect(info.prerequisites.map(p => p.id)).toEqual(["FE-0001"])
+  expect(info.dependentFeatures.map(p => p.id)).toEqual(["FE-0003"])
+  expect(info.acceptanceTests).toHaveLength(2)
 })
 
-describe("getAcceptanceTestDetail()", () => {
-  it("should return acceptance test information with relationships", () => {
-    const info = unwrapRight(getAcceptanceTestDetail(QUERY_TEST_SPEC, "AT-0002"))
-    expect(info.acceptanceTest.id).toBe("AT-0002")
-    expect(info.coveredFeature.id).toBe("FE-0002")
-    expect(info.relatedBusinessObjectives).toHaveLength(2)
-  })
+it("should handle feature with no prerequisites or dependents", () => {
+  const info = unwrapRight(getFeatureDetail(QUERY_TEST_SPEC, "FE-0001"))
+  expect(info.prerequisites).toHaveLength(0)
+  expect(info.dependentFeatures).toHaveLength(1)
+})
 
-  it("should return error when acceptance test not found", () => {
-    const err = unwrapLeft(getAcceptanceTestDetail(QUERY_TEST_SPEC, "AT-9999"))
-    expect(err._tag).toBe("value_error")
-    expect(err.message).toContain("AT-9999")
-  })
+it("should return error when feature not found", () => {
+  const err = unwrapLeft(getFeatureDetail(QUERY_TEST_SPEC, "FE-9999"))
+  expect(err._tag).toBe("value_error")
+  expect(err.message).toContain("FE-9999")
+})
 
-  it("should return error when covered feature not found", () => {
-    const spec = makeSpec({ acceptanceTests: [{ id: "AT-0001", covers: "FE-9999", given: "G", when: "W", then: "T" }] })
-    const err = unwrapLeft(getAcceptanceTestDetail(spec, "AT-0001"))
-    expect(err._tag).toBe("value_error")
-    expect(err.message).toContain("FE-9999")
-  })
+it("should return acceptance test information with relationships", () => {
+  const info = unwrapRight(getAcceptanceTestDetail(QUERY_TEST_SPEC, "AT-0002"))
+  expect(info.acceptanceTest.id).toBe("AT-0002")
+  expect(info.coveredFeature.id).toBe("FE-0002")
+  expect(info.relatedBusinessObjectives).toHaveLength(2)
+})
+
+it("should return error when acceptance test not found", () => {
+  const err = unwrapLeft(getAcceptanceTestDetail(QUERY_TEST_SPEC, "AT-9999"))
+  expect(err._tag).toBe("value_error")
+  expect(err.message).toContain("AT-9999")
+})
+
+it("should return error when covered feature not found", () => {
+  const spec = makeSpec({ acceptanceTests: [{ id: "AT-0001", covers: "FE-9999", given: "G", when: "W", then: "T" }] })
+  const err = unwrapLeft(getAcceptanceTestDetail(spec, "AT-0001"))
+  expect(err._tag).toBe("value_error")
+  expect(err.message).toContain("FE-9999")
 })

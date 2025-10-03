@@ -6,41 +6,39 @@ import type { S4, ValidationIssue } from "../types.ts"
  * @returns Array of internal consistency issues found
  */
 export function validateInternalConsistency(spec: S4): ValidationIssue[] {
-  const issues: ValidationIssue[] = []
-
-  // Missing sections
-  if (spec.businessObjectives.length === 0) {
-    issues.push({ _tag: "missing_section", section: "businessObjectives" })
-  }
-
-  return [
-    ...issues,
-    ...validateBusinessObjectiveCoverage(spec),
-    ...validateFeatureCoverage(spec),
-    ...validateRefExistence(
-      spec.features,
-      f => f.prerequisites,
-      spec.features.map(f => f.id),
-      "invalid_prereq",
-    ),
-    ...validateRefExistence(
-      spec.features,
-      f => f.covers,
-      spec.businessObjectives.map(bo => bo.id),
-      "invalid_bo",
-    ),
-    ...validateRefExistence(
-      spec.acceptanceTests,
-      at => [at.covers],
-      spec.features.map(f => f.id),
-      "invalid_fe",
-    ),
-    ...validateFeatureCircularDependencies(spec),
-    ...validateConceptReferences(spec),
-    ...validateIdUniqueness(spec),
-    ...validateConceptLabelUniqueness(spec),
-    ...validateUnusedConcepts(spec),
+  const validators: Array<() => ValidationIssue[]> = [
+    () => (spec.businessObjectives.length === 0 ? [{ _tag: "missing_section" as const, section: "businessObjectives" }] : []),
+    () => validateBusinessObjectiveCoverage(spec),
+    () => validateFeatureCoverage(spec),
+    () =>
+      validateRefExistence(
+        spec.features,
+        f => f.prerequisites,
+        spec.features.map(f => f.id),
+        "invalid_prereq",
+      ),
+    () =>
+      validateRefExistence(
+        spec.features,
+        f => f.covers,
+        spec.businessObjectives.map(bo => bo.id),
+        "invalid_bo",
+      ),
+    () =>
+      validateRefExistence(
+        spec.acceptanceTests,
+        at => [at.covers],
+        spec.features.map(f => f.id),
+        "invalid_fe",
+      ),
+    () => validateFeatureCircularDependencies(spec),
+    () => validateConceptReferences(spec),
+    () => validateIdUniqueness(spec),
+    () => validateConceptLabelUniqueness(spec),
+    () => validateUnusedConcepts(spec),
   ]
+
+  return validators.flatMap(validator => validator())
 }
 
 /**
@@ -138,11 +136,7 @@ export function findDuplicates<T>(data: T[]): T[] {
   const duplicates = new Set<T>()
 
   for (const item of data) {
-    if (seen.has(item)) {
-      duplicates.add(item)
-    } else {
-      seen.add(item)
-    }
+    ;(seen.has(item) ? duplicates : seen).add(item)
   }
 
   return [...duplicates]
@@ -193,12 +187,8 @@ export function hasCircularDependency(
  */
 export function validateCoverage(items: { id: string }[], coveringItems: { covers: string[] }[]): ValidationIssue[] {
   const covered = new Set(coveringItems.flatMap(item => item.covers))
-  const uncovered = items.filter(item => !covered.has(item.id))
-  return uncovered.map(item => ({
-    _tag: "uncovered_item",
-    id: item.id,
-    itemType: items.length > 0 && items[0]?.id.startsWith("BO-") ? "BO" : "FE",
-  }))
+  const itemType = items[0]?.id.startsWith("BO-") ? "BO" : "FE"
+  return items.filter(item => !covered.has(item.id)).map(item => ({ _tag: "uncovered_item" as const, id: item.id, itemType }))
 }
 
 /**
@@ -216,8 +206,9 @@ export function validateRefExistence<T extends { id: string }>(
   issueTag: "invalid_prereq" | "invalid_bo" | "invalid_fe",
 ): ValidationIssue[] {
   const validIdSet = new Set(validIds)
-  return items.flatMap(item => {
-    const references = getReferences(item)
-    return references.filter(ref => !validIdSet.has(ref)).map(ref => ({ _tag: issueTag, id: item.id, referencedId: ref }))
-  })
+  return items.flatMap(item =>
+    getReferences(item)
+      .filter(ref => !validIdSet.has(ref))
+      .map(ref => ({ _tag: issueTag, id: item.id, referencedId: ref })),
+  )
 }

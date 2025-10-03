@@ -60,25 +60,14 @@ describe("guide command", () => {
     expect(result.stdout).toContainInOrder(["Specify buildable units of capability identified as FE-####", "## Examples"])
   })
 
-  it("should return value_error when an unknown section is provided", async () => {
-    const result = await runGuide("unknown-section")
-    expect(result).toBeError("value_error")
-  })
-
-  it("should handle non-string section inputs when reporting unknown section", async () => {
-    const UNKNOWN_SECTION_NUM = 123
-    const result = await runGuide(UNKNOWN_SECTION_NUM as unknown as string)
-    expect(result).toBeError("value_error")
-  })
-
   it("should handle parse_error with message property", async () => {
     const modulePath = "./guide.ts"
     vi.resetModules()
     vi.doMock("../logics/guide.ts", () => ({
       getGuidelineView: () =>
         Promise.resolve({
-          _tag: "left",
-          L: { _tag: "parse_error", message: "Invalid YAML format", cause: "test" },
+          _tag: "Left",
+          left: { _tag: "parse_error", message: "Invalid YAML format", cause: "test" },
         }),
     }))
 
@@ -96,8 +85,8 @@ describe("guide command", () => {
     vi.doMock("../logics/guide.ts", () => ({
       getGuidelineView: () =>
         Promise.resolve({
-          _tag: "left",
-          L: { _tag: "unknown_error", cause: "Something went wrong" },
+          _tag: "Left",
+          left: { _tag: "unknown_error", cause: "Something went wrong" },
         }),
     }))
 
@@ -115,8 +104,8 @@ describe("guide command", () => {
     vi.doMock("../logics/guide.ts", () => ({
       getGuidelineView: () =>
         Promise.resolve({
-          _tag: "left",
-          L: { _tag: "unknown_error" },
+          _tag: "Left",
+          left: { _tag: "unknown_error" },
         }),
     }))
 

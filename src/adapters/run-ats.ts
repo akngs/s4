@@ -1,4 +1,5 @@
-import { type AcceptanceTest, type AdapterError, type CommandReturn, type Either, right, type TestResult } from "../types.ts"
+import { type Either, right } from "fp-ts/lib/Either.js"
+import type { AcceptanceTest, AdapterError, CommandReturn, TestResult } from "../types.ts"
 
 interface Adapter {
   parse: (tests: AcceptanceTest[], raw: CommandReturn) => Either<AdapterError, TestResult[]>
@@ -29,27 +30,17 @@ class TapFlatAdapter implements Adapter {
     const noComment = this.stripComment(rawLine)
     const trimmed = noComment.trim()
     const header = this.matchHeader(trimmed)
+
     if (header) {
-      this.handleTestHeader(header, results, tests, state)
+      this.flush(results, tests, state)
+      state.id = header.testId
+      state.passed = header.passed
+      state.output = []
     } else {
-      this.collectTestOutput(state, noComment, trimmed)
+      if (state.id !== null && !this.isTapNoise(trimmed)) {
+        state.output.push(noComment)
+      }
     }
-  }
-
-  private handleTestHeader(
-    header: { testId: string; passed: boolean },
-    results: TestResult[],
-    tests: AcceptanceTest[],
-    state: { id: string | null; passed: boolean | null; output: string[] },
-  ): void {
-    this.flush(results, tests, state)
-    state.id = header.testId
-    state.passed = header.passed
-    state.output = []
-  }
-
-  private collectTestOutput(state: { id: string | null; passed: boolean | null; output: string[] }, noComment: string, trimmed: string): void {
-    if (state.id !== null && !this.isTapNoise(trimmed)) state.output.push(noComment)
   }
 
   private stripComment(line: string): string {
@@ -65,13 +56,9 @@ class TapFlatAdapter implements Adapter {
     if (!trimmed) return null
 
     const m = TapFlatAdapter.LINE_RE.exec(trimmed)
-    if (!m) return null
+    if (!m || !m[1] || !m[2]) return null
 
-    const status = m[1]
-    const testId = m[2]
-    if (status === undefined || testId === undefined) return null
-
-    return { testId, passed: status === "ok" }
+    return { testId: m[2], passed: m[1] === "ok" }
   }
 
   private flush(results: TestResult[], tests: AcceptanceTest[], s: { id: string | null; passed: boolean | null; output: string[] }): void {
@@ -80,13 +67,13 @@ class TapFlatAdapter implements Adapter {
     const test = tests.find(t => t.id === s.id)
     if (!test) return
 
-    if (s.passed) {
-      results.push({ id: s.id, test, passed: true })
-      return
-    }
-
     const outputText = s.output.join("\n")
-    results.push({ id: s.id, test, passed: false, output: outputText.length > 0 ? outputText : undefined })
+    results.push({
+      id: s.id,
+      test,
+      passed: s.passed,
+      output: s.passed || outputText.length === 0 ? undefined : outputText,
+    })
   }
 }
 

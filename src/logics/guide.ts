@@ -1,9 +1,11 @@
 import { readFile } from "node:fs/promises"
 import { dirname, join } from "node:path"
 import { fileURLToPath } from "node:url"
+import type { Either } from "fp-ts/lib/Either.js"
+import { isLeft, left, right } from "fp-ts/lib/Either.js"
 import * as yaml from "yaml"
-import type { Either, Guideline, SystemError } from "../types.ts"
-import { GuidelineSchema, isLeft, left, right } from "../types.ts"
+import type { Guideline, SystemError } from "../types.ts"
+import { GuidelineSchema } from "../types.ts"
 
 /**
  * Build data for the guide command by reading and validating `guideline.yaml`.
@@ -17,20 +19,18 @@ export async function getGuidelineView(
   section?: string,
 ): Promise<
   Either<
-    SystemError,
-    | { _tag: "brief"; brief: string }
-    | { _tag: "section"; sectionText: string; examples: { _tag: "scalar" | "block"; text: string }[] }
-    | { _tag: "unknown_section"; allowed: string[] }
+    SystemError | { _tag: "unknown_section" },
+    { _tag: "brief"; brief: string } | { _tag: "section"; sectionText: string; examples: { _tag: "scalar" | "block"; text: string }[] }
   >
 > {
   const dataOrErr = await loadGuideline()
-  if (isLeft(dataOrErr)) return left(dataOrErr.L)
-  const data = dataOrErr.R
+  if (isLeft(dataOrErr)) return left(dataOrErr.left)
+  const data = dataOrErr.right
 
   if (!section) return right({ _tag: "brief", brief: data.brief })
   const allowedSections = Object.keys(data.sections)
 
-  if (!allowedSections.includes(section)) return right({ _tag: "unknown_section", allowed: allowedSections })
+  if (!allowedSections.includes(section)) return left({ _tag: "unknown_section" })
 
   const sectionText = data.sections[section as keyof typeof data.sections]
   const rawValues = data.examples.map(ex => ex[section as keyof (typeof data.examples)[number]])
@@ -47,28 +47,21 @@ export async function getGuidelineView(
 async function loadGuideline(): Promise<Either<SystemError, Guideline>> {
   const moduleDir = dirname(fileURLToPath(import.meta.url))
   const candidatePaths = [
-    // When running from sources (vitest, dev start)
-    join(moduleDir, "guideline.yaml"),
-    // When running from built artifacts (dist/logics/*.js)
-    join(moduleDir, "..", "guideline.yaml"),
+    join(moduleDir, "guideline.yaml"), // sources (vitest, dev start)
+    join(moduleDir, "..", "guideline.yaml"), // built artifacts (dist/logics/*.js)
   ]
-
-  let raw: string | undefined
-  let lastError: unknown
 
   for (const filePath of candidatePaths) {
     try {
-      raw = await readFile(filePath, "utf-8")
-      break
-    } catch (err) {
-      lastError = err
+      const raw = await readFile(filePath, "utf-8")
+      const parsed = GuidelineSchema.safeParse(yaml.parse(raw) as unknown)
+      return parsed.success ? right(parsed.data) : left({ _tag: "parse_error", message: parsed.error.message, cause: parsed.error })
+    } catch {
+      // Continue to next path
     }
   }
 
-  if (raw === undefined) return left({ _tag: "io_error", filePath: "guideline.yaml", cause: lastError })
-
-  const parsed = GuidelineSchema.safeParse(yaml.parse(raw) as unknown)
-  return parsed.success ? right(parsed.data) : left({ _tag: "parse_error", message: parsed.error.message, cause: parsed.error })
+  return left({ _tag: "io_error", filePath: "guideline.yaml", cause: new Error("File not found in any candidate path") })
 }
 
 /**
@@ -77,10 +70,10 @@ async function loadGuideline(): Promise<Either<SystemError, Guideline>> {
  * @returns Renderable entry specifying whether it's scalar or a YAML block.
  */
 function formatExampleToRenderable(item: unknown): { _tag: "scalar" | "block"; text: string } {
-  const isScalar = typeof item === "string" || typeof item === "number" || typeof item === "boolean"
-  if (isScalar) return { _tag: "scalar", text: String(item) }
+  if (typeof item === "string" || typeof item === "number" || typeof item === "boolean") {
+    return { _tag: "scalar", text: String(item) }
+  }
   try {
-    JSON.stringify(item)
     const yamlText = yaml.stringify(item).trimEnd()
     return { _tag: "block", text: yamlText }
   } catch {

@@ -1,7 +1,8 @@
 import { readFile } from "node:fs/promises"
+import { type Either, isLeft, left, right } from "fp-ts/lib/Either.js"
 import { parse as parseYaml } from "yaml"
 import { renderSystemError, renderValueError } from "../render/index.ts"
-import { type CommandReturn, type Either, isLeft, type Left, left, right, type S4, S4Schema, type SystemError, type ValueError } from "../types.ts"
+import { type CommandReturn, type Left, type S4, S4Schema, type SystemError, type ValueError } from "../types.ts"
 
 /**
  * Deserializes a string into an object based on the specified format
@@ -40,15 +41,15 @@ export function parseSpec(obj: unknown): Either<SystemError, S4> {
  */
 export async function loadSpec(specPath: string, format: "json" | "yaml" = "yaml"): Promise<Either<SystemError, S4>> {
   const rawResult = await readSpecFile(specPath)
-  if (isLeft(rawResult)) return left(rawResult.L)
+  if (isLeft(rawResult)) return left(rawResult.left)
 
-  const objResult = deserializeSpec(rawResult.R, format)
-  if (isLeft(objResult)) return left(objResult.L)
+  const objResult = deserializeSpec(rawResult.right, format)
+  if (isLeft(objResult)) return left(objResult.left)
 
-  const specResult = parseSpec(objResult.R)
-  if (isLeft(specResult)) return left(specResult.L)
+  const specResult = parseSpec(objResult.right)
+  if (isLeft(specResult)) return left(specResult.left)
 
-  return right(specResult.R)
+  return right(specResult.right)
 }
 
 /**
@@ -57,10 +58,10 @@ export async function loadSpec(specPath: string, format: "json" | "yaml" = "yaml
  * @returns Command return with error information
  */
 export function errToCommandReturn(error: Left<SystemError | ValueError>): CommandReturn {
-  if (error.L._tag === "value_error") {
-    return { stdout: "", stderr: `${error.L._tag}: ${renderValueError(error.L)}`, exitCode: 1 }
+  if (error.left._tag === "value_error") {
+    return { stdout: "", stderr: `${error.left._tag}: ${renderValueError(error.left)}`, exitCode: 1 }
   } else {
-    return { stdout: "", stderr: `${error.L._tag}: ${renderSystemError(error.L)}`, exitCode: 1 }
+    return { stdout: "", stderr: `${error.left._tag}: ${renderSystemError(error.left)}`, exitCode: 1 }
   }
 }
 
