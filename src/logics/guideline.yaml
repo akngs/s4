@@ -1,7 +1,11 @@
 brief: |-
   # Writing S4 Specifications
 
-  An s4.yaml is the single source of truth that aligns humans and AI agents on what to build and how to validate it. It must be clear enough for agents to act without guesswork, and reviewable enough for humans to understand scope, priorities, and rationale.
+  An `s4.yaml` file is the project's single source of truth. It is designed for a **neuro-symbolic workflow**, which separates tasks between the `s4` CLI (symbolic engine) and an AI agent (neural engine). The CLI handles deterministic work like validating the spec's structure, while the AI handles tasks requiring natural language interpretation and implementation.
+
+  The workflow uses **inversion of control**. The AI agent does not determine its own strategy. It runs `s4 status` to receive a precise, prioritized task from the CLI. This makes the development process sequential and predictable, with the AI acting as an executor for tasks defined by the framework.
+
+  Your goal is to write a specification that is clear enough for an AI to act on, and reviewable enough for humans to understand the project's scope, priorities, and rationale.
 
   ## Quick Start
 

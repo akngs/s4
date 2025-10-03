@@ -1,45 +1,51 @@
 title: >-
   S4: A Framework for AI-Driven Software Development
 mission: >-
-  Enable an AI-driven yet human-steerable software development methodology by unifying specifications, tools, and processes into a cohesive framework.
+  Enable stateless AI-human collaboration in software development through semi-structured specifications that provide complete project context on demand.
 vision: >-
-  A world where the complexity of software creation is automated away, allowing innovators to translate their vision into working software effortlessly and reliably.
+  A world where every development session is self-contained and context-complete, eliminating the need for chat history or context preservation while maintaining full traceability from business goals to working code.
 businessObjectives:
   - id: BO-0001
     description: >-
-      Enable AI agents to work more effectively by providing a [[Semi-Structured Software Specification]] and tools optimized for [[AI-Driven Development]].
+      Eliminate context decay in AI-assisted development by providing complete project context through [[Semi-Structured Software Specification]]s that enable stateless [[AI-Driven Development]] collaboration.
   - id: BO-0002
     description: >-
-      Ensure consistent understanding between humans and AI agents through [[Specification as Single Source of Truth]] that eliminates ambiguity and misalignment.
+      Ensure consistent understanding between humans and AI agents through [[Specification as Single Source of Truth]] that eliminates ambiguity and maintains alignment across development sessions.
   - id: BO-0003
     description: >-
-      Maintain complete [[Traceability]] from business goals to implementation, ensuring every line of code serves a documented business purpose.
+      Maintain complete [[Traceability]] from business goals to implementation, ensuring every line of code serves a documented business purpose and can be validated against acceptance criteria.
 # MARK: Concepts
 concepts:
   - id: Semi-Structured Software Specification
     description: >-
-      A structured document format that describes software projects with clear [[Business Objective]]s, [[Feature]]s, and [[Acceptance Test]]s. It is designed to be both human-readable and machine-parseable. AI coding agents use this format to understand requirements and implement the [[Acceptance Test]]s and [[Feature]]s. Agents can also use CLI tools to validate the spec and keep it synchronized with the implementation.
+      A YAML-based document format that serves as the single source of truth for software projects, containing [[Business Objective]]s, [[Feature]]s, [[Acceptance Test]]s, and supporting metadata. Designed for both human readability and AI agent consumption, it enables stateless development by providing complete project context without requiring conversation history or external documentation.
   - id: Business Objective
     description: >-
-      A high-level goal that the business wants to achieve, identified by a "BO-####" ID format, representing the "why" behind feature development and providing context to AI agents and human stakeholders.
+      A high-level strategic goal that defines the business value and purpose behind software development efforts, identified by a "BO-####" ID format. These objectives provide the foundational "why" that drives feature prioritization and implementation decisions, ensuring all development work serves documented business purposes.
   - id: Feature
     description: >-
-      A concrete functionality that will be built to achieve business objectives, identified by a "FE-####" ID format, representing the "what" to be built and enabling AI agents and human stakeholders to understand the implementation scope.
+      A concrete, implementable functionality that delivers specific business value, identified by a "FE-####" ID format. Features represent the "what" to be built and must be directly traceable to one or more [[Business Objective]]s, providing clear implementation scope and acceptance criteria for AI agents and development teams.
   - id: Acceptance Test
     description: >-
-      A specific, testable condition that a feature must meet to be considered complete, identified by an "AT-####" ID format, written in Given-When-Then style. AI agents and human stakeholders use this to understand the acceptance criteria for a feature.
+      A specific, executable test case that defines the exact conditions a [[Feature]] must satisfy to be considered complete, identified by an "AT-####" ID format and written in Given-When-Then style. These tests serve as the definitive acceptance criteria, enabling automated validation and providing clear implementation guidance for AI agents and developers.
   - id: Traceability
     description: >-
-      The ability to track and verify the relationships between [[Business Objective]]s, [[Feature]]s, [[Acceptance Test]]s, and actual implementation code, ensuring that every business objective is covered by at least one feature, every feature is covered by at least one acceptance test, every acceptance test is implemented in code, and all dependencies are properly documented and validated throughout the entire AI-driven development lifecycle.
+      The systematic ability to track and verify complete coverage relationships between [[Business Objective]]s, [[Feature]]s, [[Acceptance Test]]s, and implementation code. This ensures that every business objective is covered by features, every feature is covered by acceptance tests, every acceptance test is implemented and executable, and all dependencies are properly documented and validated throughout the development lifecycle.
   - id: Human-in-the-Loop
     description: >-
-      A development process in which AI agents autonomously execute development tasks while human stakeholders provide validation, oversight, and decision-making at critical junctures, ensuring business alignment and quality control.
+      A collaborative development methodology where AI agents autonomously execute implementation tasks while human stakeholders maintain strategic control through validation, oversight, and decision-making at critical junctures, ensuring business alignment and quality standards are maintained.
   - id: AI-Driven Development
     description: >-
-      A software development methodology where AI agents drive the entire development process from spec interpretation to implementation and testing, with humans providing strategic direction and validation in a [[Human-in-the-Loop]] manner.
+      A development methodology where an AI agent's actions are directed by the `s4` CLI. It follows the [[Neuro-Symbolic Development]] model and uses [[Inversion of Control]] to assign tasks. The AI agent executes the specific implementation steps provided by the CLI, while a human provides strategic oversight as part of a [[Human-in-the-Loop]] process.
+  - id: Inversion of Control
+    description: >-
+      A design pattern where the `s4` CLI (the framework) controls the development workflow, not the AI agent (the tool). The agent calls `s4 status` to be assigned its next task. This delegates process control to the symbolic engine, which follows a deterministic order of operations (validation, synchronization, testing).
+  - id: Neuro-Symbolic Development
+    description: >-
+      A hybrid development model that separates responsibilities between a symbolic engine (the `s4` CLI) and a neural engine (an AI agent). The symbolic engine manages structured validation, traceability, and process control. The neural engine is responsible for tasks involving natural language understanding and code generation, operating within the boundaries set by the symbolic engine.
   - id: Specification as Single Source of Truth
     description: >-
-      The [[Semi-Structured Software Specification]] serves as the authoritative source for all project requirements, design decisions, and development guidance. Code is a derived artifact that must conform to and implement the spec. When discrepancies arise between the spec and the code, the spec takes precedence and the code must be modified to align with it.
+      The principle that the [[Semi-Structured Software Specification]] serves as the definitive, authoritative source for all project requirements, design decisions, and development guidance. Code is treated as a derived artifact that must conform to and implement the specification. When discrepancies arise between the specification and implementation, the specification takes precedence and the code must be modified to align with it, ensuring consistency and preventing drift.
 # MARK: Features
 features:
   - id: FE-0001
@@ -54,7 +60,7 @@ features:
     covers: [BO-0002, BO-0003]
     prerequisites: [FE-0001]
   - id: FE-0003
-    title: Show overvall status of the project with comprehensive context and recommended next actions
+    title: Show overall status of the project with comprehensive context and recommended next actions
     description: >-
       The CLI analyzes the current state of the project and provides actionable guidance on the next actions. It first shows a summarized context containing the project title, mission, vision, business objectives, and a list of features with completion stats based on passing acceptance tests. After this summary, it recommends specific next steps, helping AI agents and humans prioritize their work by addressing validation, synchronization, tests, and code quality issues in order of priority.
     covers: [BO-0001, BO-0002, BO-0003]
@@ -62,7 +68,7 @@ features:
   - id: FE-0004
     title: Display detailed feature information
     description: >-
-      The CLI can display detailed information about a specific feature including including its title, description, covered business objectives, prerequisites, dependent features, and acceptance tests in a well-formatted markdown output.
+      The CLI can display detailed information about a specific feature including its title, description, covered business objectives, prerequisites, dependent features, and acceptance tests in a well-formatted markdown output.
     covers: [BO-0001, BO-0002]
     prerequisites: [FE-0002]
   - id: FE-0005
@@ -75,19 +81,19 @@ features:
     title: Locate acceptance test files
     description: >-
       The CLI can locate acceptance test files by ID using the tools configuration, helping developers quickly find their implementations.
-    covers: [BO-0001]
+    covers: [BO-0001, BO-0002]
     prerequisites: [FE-0002]
   - id: FE-0009
     title: Run individual acceptance tests
     description: >-
       The CLI can execute individual acceptance tests by ID using the tools configuration, enabling targeted test execution during development.
-    covers: [BO-0001]
+    covers: [BO-0001, BO-0002, BO-0003]
     prerequisites: [FE-0002]
   - id: FE-0010
     title: Run all acceptance tests
     description: >-
       The CLI can execute all acceptance tests defined in a spec using the tools configuration, enabling comprehensive test execution.
-    covers: [BO-0001]
+    covers: [BO-0001, BO-0002, BO-0003]
     prerequisites: [FE-0002]
   - id: FE-0013
     title: Run user-defined tools
