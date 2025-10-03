@@ -1,6 +1,6 @@
-<% if (view.kind === "brief") { %>
+<% if (view._tag === "brief") { %>
 <%= view.brief %>
-<% } else if (view.kind === "unknown_section") { %>
+<% } else if (view._tag === "unknown_section") { %>
 Unknown section. Allowed: <%= view.allowed.join(", ") %>
 <% } else { %>
 <%= view.sectionText %>
@@ -10,7 +10,7 @@ Unknown section. Allowed: <%= view.allowed.join(", ") %>
 <%= chalk.blue.underline.bold("## Examples\n") %>
 
 <% view.examples.forEach(ex => { %>
-<% if (ex.kind === "scalar") { %>
+<% if (ex._tag === "scalar") { %>
 - <%= chalk.green(ex.text) %>
 <% } else { %>
 ```yaml

@@ -7,7 +7,7 @@ import type { CommandReturn, S4 } from "../types.ts"
  * @param spec - The loaded S4 spec instance
  * @returns Command result with validation information
  */
-export default function (spec: S4): CommandReturn {
+export default function runValidate(spec: S4): CommandReturn {
   const inconsistencies = validateInternalConsistency(spec)
   if (inconsistencies.length === 0) return { stdout: "", stderr: "", exitCode: 0 }
 

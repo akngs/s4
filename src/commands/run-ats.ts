@@ -10,7 +10,7 @@ import { errToCommandReturn } from "./_base.ts"
  * @param spec - The loaded S4 spec instance
  * @returns Command result with test execution output
  */
-export default async function (spec: S4): Promise<CommandReturn> {
+export default async function runAts(spec: S4): Promise<CommandReturn> {
   const commandResult = await executeCommand(spec.connectors.runAcceptanceTests)
   const testResultsOrErr = getRunAtsAdapter("default").parse(spec.acceptanceTests, commandResult)
   if (isLeft(testResultsOrErr)) return errToCommandReturn(testResultsOrErr)

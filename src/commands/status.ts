@@ -8,7 +8,7 @@ import { errToCommandReturn } from "./_base.ts"
  * @param spec - The loaded S4 spec instance
  * @returns Command result with project status information
  */
-export default async function (spec: S4): Promise<CommandReturn> {
+export default async function runStatus(spec: S4): Promise<CommandReturn> {
   const statusOrErr = await performOverallStatusCheck(spec)
   if (isLeft(statusOrErr)) return errToCommandReturn(statusOrErr)
   const status = statusOrErr.R

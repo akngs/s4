@@ -18,26 +18,26 @@ export async function getGuidelineView(
 ): Promise<
   Either<
     SystemError,
-    | { kind: "brief"; brief: string }
-    | { kind: "section"; sectionText: string; examples: { kind: "scalar" | "block"; text: string }[] }
-    | { kind: "unknown_section"; allowed: string[] }
+    | { _tag: "brief"; brief: string }
+    | { _tag: "section"; sectionText: string; examples: { _tag: "scalar" | "block"; text: string }[] }
+    | { _tag: "unknown_section"; allowed: string[] }
   >
 > {
   const dataOrErr = await loadGuideline()
   if (isLeft(dataOrErr)) return left(dataOrErr.L)
   const data = dataOrErr.R
 
-  if (!section) return right({ kind: "brief", brief: data.brief })
+  if (!section) return right({ _tag: "brief", brief: data.brief })
   const allowedSections = Object.keys(data.sections)
 
-  if (!allowedSections.includes(section)) return right({ kind: "unknown_section", allowed: allowedSections })
+  if (!allowedSections.includes(section)) return right({ _tag: "unknown_section", allowed: allowedSections })
 
   const sectionText = data.sections[section as keyof typeof data.sections]
   const rawValues = data.examples.map(ex => ex[section as keyof (typeof data.examples)[number]])
   const valuesForRendering = rawValues.flat(1)
   const examples = valuesForRendering.map((item: unknown) => formatExampleToRenderable(item))
 
-  return right({ kind: "section", sectionText, examples })
+  return right({ _tag: "section", sectionText, examples })
 }
 
 /**
@@ -76,14 +76,14 @@ async function loadGuideline(): Promise<Either<SystemError, Guideline>> {
  * @param item Any example value from the guideline examples array.
  * @returns Renderable entry specifying whether it's scalar or a YAML block.
  */
-function formatExampleToRenderable(item: unknown): { kind: "scalar" | "block"; text: string } {
+function formatExampleToRenderable(item: unknown): { _tag: "scalar" | "block"; text: string } {
   const isScalar = typeof item === "string" || typeof item === "number" || typeof item === "boolean"
-  if (isScalar) return { kind: "scalar", text: String(item) }
+  if (isScalar) return { _tag: "scalar", text: String(item) }
   try {
     JSON.stringify(item)
     const yamlText = yaml.stringify(item).trimEnd()
-    return { kind: "block", text: yamlText }
+    return { _tag: "block", text: yamlText }
   } catch {
-    return { kind: "scalar", text: Object.prototype.toString.call(item) }
+    return { _tag: "scalar", text: Object.prototype.toString.call(item) }
   }
 }

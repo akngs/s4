@@ -7,7 +7,7 @@ import type { CommandReturn, S4 } from "../types.ts"
  * @param spec - The loaded S4 spec instance
  * @returns Command result with tool execution output
  */
-export default async function (spec: S4): Promise<CommandReturn> {
+export default async function runTools(spec: S4): Promise<CommandReturn> {
   const results = await runAllToolsDetailed(spec)
   const rendered = renderTools(spec, results)
   return { stdout: rendered, stderr: "", exitCode: results.some(r => r.exitCode !== 0) ? 1 : 0 }

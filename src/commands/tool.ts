@@ -7,7 +7,7 @@ import type { CommandReturn, S4 } from "../types.ts"
  * @param toolId - Tool ID as defined in spec.tools
  * @returns Command result with tool execution output
  */
-export default async function (spec: S4, toolId: string): Promise<CommandReturn> {
+export default async function runTool(spec: S4, toolId: string): Promise<CommandReturn> {
   const tool = spec.tools.find(t => t.id === toolId)
   if (!tool) return { stdout: "", stderr: `value_error: Tool "${toolId}" not found in spec`, exitCode: 1 }
 

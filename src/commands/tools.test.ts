@@ -35,7 +35,6 @@ it("should continue after failure when stopOnError=false and reflect last exit c
   })
   const result = await tools(spec)
   expect(result.exitCode).toBe(1)
-  console.log(result.stdout)
   expect(result.stdout).toContainInOrder(["✔ success tool1", "✘ failure tool2", "✔ success tool3"])
 })
 

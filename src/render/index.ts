@@ -283,20 +283,20 @@ function render(templateId: string, data: Record<string, unknown>): string {
  */
 export function renderGuide(
   view:
-    | { kind: "brief"; brief: string }
-    | { kind: "section"; sectionText: string; examples: { kind: "scalar" | "block"; text: string }[] }
-    | { kind: "unknown_section"; allowed: string[] },
+    | { _tag: "brief"; brief: string }
+    | { _tag: "section"; sectionText: string; examples: { _tag: "scalar" | "block"; text: string }[] }
+    | { _tag: "unknown_section"; allowed: string[] },
 ): string {
   try {
     // Preserve exact brief text for tests and spec fidelity
-    return view.kind === "brief" ? view.brief : render("guide", { view })
+    return view._tag === "brief" ? view.brief : render("guide", { view })
   } catch {
     // Fallback plain rendering when the templating pipeline fails (e.g., JSON.stringify is mocked to throw in tests)
-    if (view.kind === "brief") return view.brief
-    if (view.kind === "unknown_section") return `Unknown section. Allowed: ${view.allowed.join(", ")}`
+    if (view._tag === "brief") return view.brief
+    if (view._tag === "unknown_section") return `Unknown section. Allowed: ${view.allowed.join(", ")}`
     const examples = view.examples
       .map(ex => {
-        if (ex.kind === "scalar") return `- ${ex.text}`
+        if (ex._tag === "scalar") return `- ${ex.text}`
         // Render block scalars with a YAML block indicator
         const indented = ex.text
           .split("\n")

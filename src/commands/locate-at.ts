@@ -7,7 +7,7 @@ import type { CommandReturn, S4 } from "../types.ts"
  * @param id - Acceptance test ID
  * @returns Command result with file location information
  */
-export default async function (spec: S4, id: string): Promise<CommandReturn> {
+export default async function runLocateAt(spec: S4, id: string): Promise<CommandReturn> {
   const connector = spec.connectors.locateAcceptanceTest
   return executeCommand(connector.replace("{ID}", id))
 }

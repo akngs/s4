@@ -10,7 +10,7 @@ import { errToCommandReturn } from "./_base.ts"
  * @param id - Feature ID (e.g., FE-0001) or Acceptance Test ID (e.g., AT-0001)
  * @returns Command result with detailed information
  */
-export default function (spec: S4, id: string): CommandReturn {
+export default function runInfo(spec: S4, id: string): CommandReturn {
   if (id.startsWith("FE-")) {
     const featureDetailOrErr = getFeatureDetail(spec, id)
     if (isLeft(featureDetailOrErr)) return errToCommandReturn(featureDetailOrErr)

@@ -8,7 +8,7 @@ describe("getGuidelineView()", () => {
     expect(isRight(res)).toBe(true)
 
     const view = unwrapRight(res)
-    if (view.kind !== "brief") throw new Error(`Expected brief, got ${view.kind}`)
+    if (view._tag !== "brief") throw new Error(`Expected brief, got ${view._tag}`)
 
     expect(typeof view.brief).toBe("string")
     expect(view.brief.length).toBeGreaterThan(10)
@@ -19,7 +19,7 @@ describe("getGuidelineView()", () => {
     expect(isRight(res)).toBe(true)
 
     const view = unwrapRight(res)
-    if (view.kind !== "unknown_section") throw new Error(`Expected unknown_section, got ${view.kind}`)
+    if (view._tag !== "unknown_section") throw new Error(`Expected unknown_section, got ${view._tag}`)
     expect.arrayContaining(["title", "mission", "vision", "businessObjective", "feature", "acceptanceTest", "connectors", "tools"])
   })
 
@@ -28,9 +28,9 @@ describe("getGuidelineView()", () => {
     expect(isRight(res)).toBe(true)
 
     const view = unwrapRight(res)
-    if (view.kind !== "section") throw new Error(`Expected section, got ${view.kind}`)
+    if (view._tag !== "section") throw new Error(`Expected section, got ${view._tag}`)
 
-    expect(view.examples.every(e => e.kind === "scalar")).toBe(true)
+    expect(view.examples.every(e => e._tag === "scalar")).toBe(true)
     expect(view.examples.map(e => e.text)).toEqual(expect.arrayContaining(["HabitFlow", "NoteNest"]))
   })
 })
