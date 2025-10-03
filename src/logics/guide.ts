@@ -10,7 +10,7 @@ import { GuidelineSchema, isLeft, left, right } from "../types.ts"
  * When no section is provided, returns the brief guidance text.
  * When a section is provided, validates the key and returns the section text
  * along with flattened, YAML-formatted example entries suitable for rendering.
- * @param section Optional section key (e.g., "title", "mission", "vision", "businessObjective", "feature", "acceptanceTest", "connectors", "tools").
+ * @param section Optional section key (e.g., "title", "mission", "vision", "concepts", "businessObjective", "feature", "acceptanceTest", "connectors", "tools").
  * @returns Either a system error or a view model for rendering the guide.
  */
 export async function getGuidelineView(

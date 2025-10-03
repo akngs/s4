@@ -98,7 +98,10 @@ cli
 cli
   .command("guide")
   .description("Display the spec authoring guide or a specific section with examples")
-  .argument("[section]", "Optional section to display (e.g., title, mission, vision, businessObjective, feature, acceptanceTest, connectors, tools)")
+  .argument(
+    "[section]",
+    "Optional section to display (e.g., title, mission, vision, concepts, businessObjective, feature, acceptanceTest, connectors, tools)",
+  )
   .action(async (section?: string) => {
     handleResult(await runGuide(section))
   })

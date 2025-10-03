@@ -4,34 +4,78 @@ vision: A lightweight web app that makes memorization effortless through focused
 
 businessObjectives:
   - id: BO-0001
-    description: Enable users to create and review flash cards to improve knowledge recall.
+    description: Enable users to create and manage [[Flash Card]] collections to improve knowledge retention.
+  - id: BO-0002
+    description: Provide effective study sessions that adapt to user performance and optimize learning outcomes.
+
+concepts:
+  - id: Flash Card
+    description: A learning tool consisting of a question on one side and an answer on the other, used for memorization and knowledge testing.
+  - id: Deck
+    description: A collection of [[Flash Card]]s organized around a specific topic or subject matter.
+  - id: Study Session
+    description: A focused practice period where users review [[Flash Card]]s from a [[Deck]], with the system tracking performance and progress.
 
 features:
   - id: FE-0001
-    title: Create and review flash cards
-    description: Users can add cards with a question and an answer, and review them in a study session.
+    title: Create and manage flash cards
+    description: Users can create new [[Flash Card]]s with questions and answers, and organize them into [[Deck]]s.
     covers: [BO-0001]
     prerequisites: []
+  - id: FE-0002
+    title: Conduct study sessions
+    description: Users can start [[Study Session]]s to review [[Flash Card]]s, with the system showing questions and tracking correct/incorrect answers.
+    covers: [BO-0002]
+    prerequisites: [FE-0001]
+  - id: FE-0003
+    title: Track study progress
+    description: The system tracks which [[Flash Card]]s users answer correctly and provides progress feedback during [[Study Session]]s.
+    covers: [BO-0002]
+    prerequisites: [FE-0002]
 
 acceptanceTests:
   - id: AT-0001
     covers: FE-0001
-    given: a deck with one card exists
-    when: the user starts a study session and answers the card
-    then: the system shows whether the answer is correct
+    given: a user wants to create a new [[Flash Card]]
+    when: they enter a question and answer and click "Create Card"
+    then: the card is added to their current [[Deck]]
+  - id: AT-0002
+    covers: FE-0001
+    given: a user has created multiple [[Flash Card]]s
+    when: they view their [[Deck]]
+    then: all cards are displayed in a list format
+  - id: AT-0003
+    covers: FE-0002
+    given: a [[Deck]] with at least one [[Flash Card]] exists
+    when: the user starts a [[Study Session]]
+    then: the first card's question is displayed
+  - id: AT-0004
+    covers: FE-0002
+    given: a [[Study Session]] is active and showing a question
+    when: the user submits their answer
+    then: the system shows whether the answer is correct and displays the correct answer
+  - id: AT-0005
+    covers: FE-0003
+    given: a [[Study Session]] with multiple [[Flash Card]]s
+    when: the user completes the session
+    then: the system displays a summary showing correct/incorrect counts and overall progress
 
 connectors:
-  listAcceptanceTests: |-
-    echo "AT-0001: GIVEN a deck with one card exists, WHEN the user starts a study session and answers the card, THEN the system shows whether the answer is correct"
+  listAcceptanceTests: |- # Prints ATs in the format: "AT-0001: TITLE"
+    npx vitest list --project=acceptance | awk -F'> ' '{split($1, parts, "/"); id=parts[length(parts)]; print id ": " $2}' | sed 's/\.test\.ts : /: /'
   locateAcceptanceTest: |-
     echo "src/at/{ID}.test.ts"
-  runAcceptanceTest: |-
-    echo "ok 1 - src/at/AT-0001.test.ts > GIVEN a deck with one card exists, WHEN the user starts a study session and answers the card, THEN the system shows whether the answer is correct"
-  runAcceptanceTests: |-
-    echo "ok 1 - src/at/AT-0001.test.ts > GIVEN a deck with one card exists, WHEN the user starts a study session and answers the card, THEN the system shows whether the answer is correct"
+  runAcceptanceTest: |-  # TAP-flat format
+    npm run --silent test:acceptance -- src/at/{ID}.test.ts
+  runAcceptanceTests: |-  # TAP-flat format
+    npm run --silent test:acceptance
 
 tools:
-  - id: echo-ok
-    command: echo "ok"
-  - id: some-other-tool
-    command: echo "ok"
+  - id: lint
+    command: npm run lint
+  - id: test
+    command: npm run test
+    recommendedNextActions: |-
+      There are failing tests. Run `npm run test` to see the details.
+  - id: build
+    command: npm run build

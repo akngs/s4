@@ -1,9 +1,42 @@
 brief: |-
-  An s4.yaml is the single source of truth that aligns humans and AI agents on what to build and how to validate it. It must be clear enough for agents to act without guesswork, and reviewable enough for humans to understand scope, priorities, and rationale. Favor precise language, stable IDs, and explicit relationships so changes are intentional and traceable.
+  # Writing S4 Specifications
 
-  Structure the spec around identity and intent (title, mission, vision), a shared glossary of concepts, outcome-focused Business Objectives (BO-####), buildable Features (FE-####) that cover those objectives, and deterministic Acceptance Tests (AT-####) that verify a single feature each using GIVEN/WHEN/THEN. Keep cross-references valid and avoid duplication. Treat IDs as stable references; append new ones rather than renumbering.
+  An s4.yaml is the single source of truth that aligns humans and AI agents on what to build and how to validate it. It must be clear enough for agents to act without guesswork, and reviewable enough for humans to understand scope, priorities, and rationale.
 
-  Make the spec executable with non-interactive tools to list, locate, and run acceptance tests locally and in CI. Use `s4 validate` to ensure internal consistency and `s4 status` to surface sync issues and next actions. Prefer small, focused features and tests that run fast and produce reliable signals.
+  ## Quick Start
+
+  1. Define your project identity: `title`, `mission`, and `vision`
+  2. Create a `concepts` glossary for domain-specific terms
+  3. List `businessObjectives` (BO-####) - the "why" of your project
+  4. Define `features` (FE-####) - the "what" to build, covering business objectives
+  5. Write `acceptanceTests` (AT-####) - GIVEN/WHEN/THEN tests that verify features
+  6. Configure `connectors` to run your tests
+  7. Add `tools` for code quality checks (linting, testing, etc.)
+
+  ## Key Principles
+
+  - **Traceability**: Every BO must be covered by features, every feature by acceptance tests
+  - **Stability**: IDs are permanent references - append new ones, never renumber
+  - **Clarity**: Use [[Concept]] references for precise, shared terminology
+  - **Executable**: Specs must be runnable with `s4 status` and `s4 validate`
+  - **Focused**: Prefer small, independently testable features over large monolithic ones
+
+  ## Common Anti-Patterns
+
+  - ❌ Writing features as tasks ("Refactor database" → ✅ "Query optimization for faster search")
+  - ❌ Testing implementation details ("UserService.hashPassword works" → ✅ "User passwords are securely stored")
+  - ❌ Creating long prerequisite chains (keep dependencies ≤ 2 levels deep)
+  - ❌ Vague GIVEN clauses ("System ready" → ✅ "Database contains 3 active users")
+  - ❌ Multiple behaviors in one AT (split into separate ATs for clarity)
+
+  ## Getting Stuck?
+
+  - Struggling with features? → `s4 guide feature`
+  - Tests failing validation? → `s4 guide acceptanceTest`
+  - Connector format issues? → `s4 guide connectors`
+  - Circular dependencies? → `s4 validate` shows specific issues
+
+  Use `s4 validate` to check internal consistency and `s4 status` to get complete project context and next actions. Run `s4 guide <section>` for detailed guidance on any section.
 sections:
   title: |-
     Provide a single, memorable project name. Aim for 3-7 words without punctuation, versions, or niche acronyms. The title should describe what the project is, not how it is implemented or which stack it uses.
@@ -26,6 +59,23 @@ sections:
     
     - Do: articulate a concrete future state and long-term value.
     - Avoid: timelines, metrics, or specific solution details.
+  concepts: |-
+    Define a shared glossary of domain terms that can be referenced throughout the spec using [[Concept]] notation. Each concept should have a unique `id` (the term itself) and a clear `description` that defines what it means in your project context.
+
+    When to create concepts:
+    - Domain-specific terms that appear 3+ times (e.g., [[Streak]], [[Tag]], [[Habit]])
+    - Terms needing precise definition in your context (e.g., [[Completion]] vs. "done")
+    - Concepts with relationships to other concepts (e.g., [[Note]] has [[Tag]]s)
+
+    When NOT to create concepts:
+    - Common UI elements everyone understands (Button, Form, Click)
+    - Standard programming terms (Array, Function, API)
+    - One-off mentions that won't recur
+
+    Reference concepts in descriptions using double square brackets: [[Concept Name]]. This creates a semantic link that helps maintain consistency and clarity.
+
+    - Do: define concepts for domain-specific terms used multiple times; keep descriptions clear and context-specific; use [[Concept]] references in feature and AT descriptions.
+    - Avoid: defining obvious terms everyone knows; circular definitions that reference undefined concepts; creating concepts used only once.
   businessObjective: |-
     Define coarse-grained, outcome-oriented goals identified as BO-####. Each objective should state the user or business value being delivered and, when helpful, the signals that indicate progress without prescribing solutions.
 
@@ -41,67 +91,102 @@ sections:
     - Do: keep descriptions outcome-focused; prefer small, independently testable features.
     - Avoid: long dependency chains and embedding designs/data models in the description.
   acceptanceTest: |-
-    Author deterministic, atomic tests identified as AT-####. Each AT must cover exactly one Feature via `covers: FE-####` and consist of concise GIVEN, WHEN, and THEN statements that describe preconditions action, and observable result.
+    Author deterministic, atomic tests identified as AT-####. Each AT must cover exactly one Feature via `covers: FE-####` and consist of concise GIVEN, WHEN, and THEN statements that describe preconditions, action, and observable result.
+
+    Acceptance tests verify FEATURES from a user's perspective (black-box), not implementation details (white-box). They define WHAT to test; your unit/integration tests are HOW you test it. One AT may require multiple unit tests to fully implement.
 
     The canonical test title must be exactly: `GIVEN {given}, WHEN {when}, THEN {then}`. Keep tests independent, fast, and repeatable, avoiding reliance on global state or flaky external systems. Prefer several small ATs over one broad scenario.
 
-    - Do: keep one behavior per AT; make setup explicit in GIVEN and outcomes explicit in THEN.
-    - Avoid: compound assertions that mask failures; reliance on global state or flaky systems.
+    Each acceptance test should be independently runnable - setup should be explicit in GIVEN, the action clear in WHEN, and the expected outcome verifiable in THEN. Use [[Concept]] references to maintain precise terminology.
+
+    - Do: keep one behavior per AT; make setup explicit in GIVEN and outcomes explicit in THEN; ensure tests can run in any order; focus on user-visible outcomes.
+    - Avoid: compound assertions that mask failures; reliance on global state or flaky systems; testing multiple features in one AT; checking implementation internals.
+
+    Common mistakes:
+    - Testing implementation ("UserService.hashPassword encrypts" → user-facing: "passwords are stored securely")
+    - Vague GIVEN conditions ("system ready" → "database contains 3 active users")
+    - WHEN clauses describing outcomes instead of actions
+    - Covering multiple features in one AT (violates single responsibility)
   connectors: |-
-    Define non-interactive, deterministic, and fast shell commands that make the spec executable locally and in CI. Commands must:
+    Define non-interactive, deterministic, and fast shell commands that make the spec executable locally and in CI. Commands must print stable parseable outputs, exit with accurate codes (0 = success), avoid prompts, and be portable (macOS/Linux).
 
-    - Print stable, parseable outputs
-    - Exit with accurate exit codes (0 on success, non-zero on failure)
-    - Avoid prompts and rely on project-local dependencies when possible
-    - Be portable across environments (macOS/Linux)
+    Required connectors:
 
-    Required commands:
+    - `listAcceptanceTests`: Prints one line per test in exact format `AT-####: TITLE` where TITLE is the canonical test title (`GIVEN ..., WHEN ..., THEN ...`).
+    - `locateAcceptanceTest`: Echoes the relative path using `{ID}` placeholder (e.g., `echo "src/at/{ID}.test.ts"`).
+    - `runAcceptanceTest`: Executes a single test by `{ID}` using the `{ID}` placeholder in your command.
+    - `runAcceptanceTests`: Executes the full suite and returns stdout/stderr/exit code as-is.
 
-    - `listAcceptanceTests`: Prints one line per test in the exact format `AT-####: TITLE`. The TITLE should be the canonical test title (`GIVEN ..., WHEN ..., THEN ...`).
-    - `locateAcceptanceTest`: Echoes the relative path for `{ID}` using the `{ID}` placeholder (e.g., `echo "src/at/{ID}.test.ts"`).
-    - `runAcceptanceTest`: Executes a single test by `{ID}` and returns the tool's stdout/stderr and exit code as-is.
-    - `runAcceptanceTests`: Executes the full suite and returns the tool's stdout/stderr and exit code as-is.
+    The `{ID}` placeholder is replaced with the actual test ID (e.g., AT-0001) when executed.
 
-    Keep commands stable and fast so agents can rely on them for local runs and CI.
+    - Do: use project-local test runners; ensure commands work from project root; verify output format matches requirements exactly.
+    - Avoid: interactive prompts; hard-coded file paths; commands requiring global dependencies; slow operations.
+
+    Common issues:
+    - Wrong format → verify `listAcceptanceTests` output matches `AT-####: TITLE` exactly
+    - Tests not found → check `{ID}` placeholder is used (not hardcoded) in `runAcceptanceTest`
+    - CI failures → ensure no interactive prompts and paths are relative to project root
   tools: |-
-    Define a list of user tools that the CLI can run to assess or improve project health. Each tool must specify:
+    Define user tools that the CLI can run to assess or improve project health. Each tool specifies:
 
     - `id`: Unique identifier used on the CLI (`s4 tool <id>`)
     - `command`: Non-interactive shell command to execute
-    - `stopOnError`: If true, `s4 tools` stops running subsequent tools when this tool exits non-zero
-    - `recommendedNextActions`: A short message shown when the tool fails to guide remediation
+    - `stopOnError`: If true, `s4 tools` stops when this tool fails (use for foundational checks)
+    - `recommendedNextActions`: Concise guidance shown on failure (include HOW to fix, not just "fix and retry")
+
+    Best practices:
+    - Order tools fastest-first (type-check before integration tests)
+    - Use `stopOnError: true` for foundational checks (TypeScript, syntax) that block further work
+    - Use `stopOnError: false` for quality metrics (coverage, complexity) that are informational
+    - Keep tools fast (<30s) so they can run frequently without friction
 
     Behavior:
-
     - `s4 tool <id>` runs a single tool and surfaces stdout/stderr/exit code as-is
-    - `s4 tools` runs all tools in the order defined; honors `stopOnError`
-    - `s4 status` runs all tools at the end and includes failing tool outputs and recommended next actions
+    - `s4 tools` runs all tools in order; honors `stopOnError`
+    - `s4 status` runs all tools at the end and includes failing outputs with recommended next actions
 examples:
   - title: HabitFlow
     mission: Help users build and maintain daily habits via lightweight tracking and adaptive reminders.
     vision: Make habit formation effortless with timely nudges and insightful progress feedback.
     businessObjective:
       - id: BO-0001
-        description: Increase habit completion rates through streak reinforcement and timely reminders.
+        description: Increase habit completion rates through [[Streak]] reinforcement and timely reminders.
       - id: BO-0002
         description: Provide actionable insights with weekly trends to sustain long-term adherence.
+    concepts:
+      - id: Habit
+        description: A user-defined activity or behavior to be performed regularly according to a schedule.
+      - id: Streak
+        description: The count of consecutive days a [[Habit]] has been completed without missing the scheduled occurrence.
+      - id: Completion
+        description: User action marking a [[Habit]] as done for a specific scheduled occurrence, which increments the [[Streak]].
     feature:
       - id: FE-0001
         title: Create and manage habits
-        description: Users can add, edit, archive, and delete habits with schedules and goals.
+        description: Users can add, edit, archive, and delete [[Habit]]s with schedules and goals.
         covers: [BO-0001]
         prerequisites: []
       - id: FE-0002
-        title: Daily reminders and streak tracking
-        description: Sends reminders and tracks streaks to motivate completions; shows streak status.
+        title: Send reminders and track streaks
+        description: Sends reminders and tracks [[Streak]]s to motivate [[Completion]]s; shows streak status.
         covers: [BO-0001, BO-0002]
         prerequisites: [FE-0001]
     acceptanceTest:
       - id: AT-0001
+        covers: FE-0001
+        given: a logged-in user is on the habits dashboard
+        when: they enter a name, schedule, and goal and click save
+        then: the new [[Habit]] appears in their habit list
+      - id: AT-0002
         covers: FE-0002
-        given: a habit with daily schedule exists and reminders are enabled
-        when: the reminder time passes without completion
-        then: the user receives a notification and the streak remains unchanged
+        given: a [[Habit]] with daily schedule exists and reminders are enabled
+        when: the reminder time passes without [[Completion]]
+        then: the user receives a notification and the [[Streak]] remains unchanged
+      - id: AT-0003
+        covers: FE-0002
+        given: a [[Habit]] with a 3-day [[Streak]]
+        when: the user marks today's occurrence as complete
+        then: the [[Streak]] increases to 4 days
     connectors:
       listAcceptanceTests: |
         npx --yes vitest list --project acceptance | awk '/^AT-\d{4}/ {print}'
@@ -115,40 +200,55 @@ examples:
       - id: tsc
         command: npm run --silent check:tsc
         stopOnError: true
-        recommendedNextActions: Fix the TypeScript errors and run the tool again
+        recommendedNextActions: Review the type errors in the output above. Add missing type annotations or fix type mismatches, then re-run `s4 tools`
       - id: eslint
         command: npm run --silent check:eslint
         stopOnError: true
-        recommendedNextActions: Fix the ESLint issues and run the tool again
+        recommendedNextActions: Run `npm run lint:fix` to auto-fix issues, or manually address the violations shown above
       - id: depcruise
         command: npm run --silent check:depcruise
         stopOnError: true
-        recommendedNextActions: Fix the dependency violations and run the tool again
+        recommendedNextActions: Check .dependency-cruiser.cjs rules and refactor imports to respect module boundaries
   - title: NoteNest
     mission: Help users capture, organize, and retrieve notes quickly with tags and full-text search.
     vision: A second brain where ideas become instantly findable and meaningfully connected.
     businessObjective:
       - id: BO-0001
-        description: Enable rapid note capture across devices with minimal friction.
+        description: Enable rapid [[Note]] capture across devices with minimal friction.
       - id: BO-0002
-        description: Improve retrieval accuracy via full-text search and tag-based organization.
+        description: Improve retrieval accuracy via full-text search and [[Tag]]-based organization.
+    concepts:
+      - id: Note
+        description: A markdown document containing user content, metadata, and optional [[Tag]]s for organization.
+      - id: Tag
+        description: A label attached to a [[Note]] to categorize and filter content, enabling quick retrieval of related notes.
     feature:
       - id: FE-0001
         title: Create and edit notes
-        description: Fast markdown note creation and editing with autosave.
+        description: Fast markdown [[Note]] creation and editing with autosave.
         covers: [BO-0001]
         prerequisites: []
       - id: FE-0002
-        title: Full-text search with tags and filters
-        description: Search notes by content, tags, and date ranges; supports boolean operators.
+        title: Search notes by content and tags
+        description: Search [[Note]]s by content, [[Tag]]s, and date ranges; supports boolean operators.
         covers: [BO-0002]
         prerequisites: [FE-0001]
     acceptanceTest:
       - id: AT-0001
+        covers: FE-0001
+        given: a user is on the notes page with no notes created
+        when: they enter markdown content and click save
+        then: the new [[Note]] appears in the note list
+      - id: AT-0002
         covers: FE-0002
-        given: three notes exist, two tagged "project-x" and one untagged
-        when: the user searches for tag "project-x"
+        given: three [[Note]]s exist, two tagged "project-x" and one untagged
+        when: the user searches for [[Tag]] "project-x"
         then: only the two tagged notes appear in the results
+      - id: AT-0003
+        covers: FE-0002
+        given: multiple [[Note]]s containing the word "meeting"
+        when: the user performs full-text search for "meeting"
+        then: all notes containing that word are returned ranked by relevance
     connectors:
       listAcceptanceTests: |
         npx --yes vitest list --project acceptance | awk '/^AT-\d{4}/ {print}'
@@ -162,12 +262,12 @@ examples:
       - id: biome
         command: npm run --silent check:biome
         stopOnError: true
-        recommendedNextActions: Fix the biome issues and run the tool again
+        recommendedNextActions: Run `npm run format` to auto-fix formatting, or check the violations above for manual fixes
       - id: jscpd
         command: npm run --silent check:jscpd
-        stopOnError: true
-        recommendedNextActions: Reduce duplication and run the tool again
+        stopOnError: false
+        recommendedNextActions: Extract duplicated code into shared functions or modules. See jscpd report for specific locations
       - id: unittest
         command: npm run --silent test
         stopOnError: true
-        recommendedNextActions: Fix failing tests and run the tool again
+        recommendedNextActions: Check the test output above for failures. Fix the failing tests or the code they're testing

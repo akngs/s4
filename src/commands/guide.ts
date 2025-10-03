@@ -7,7 +7,7 @@ import { isLeft } from "../types.ts"
  * Display the spec authoring guidance from `guideline.yaml`.
  * When no section is provided, returns the brief guidance text.
  * When a section is provided, returns that section's content along with examples.
- * @param section - Optional section key to display (e.g., "title", "mission", "vision", "businessObjective", "feature", "acceptanceTest", "connectors", "tools")
+ * @param section - Optional section key to display (e.g., "title", "mission", "vision", "concepts", "businessObjective", "feature", "acceptanceTest", "connectors", "tools")
  * @returns Command outcome containing stdout on success or stderr on error.
  */
 export default async function runGuide(section?: string): Promise<CommandReturn> {
