@@ -3,7 +3,7 @@
 import { Command, Option } from "@commander-js/extra-typings"
 import { isLeft } from "fp-ts/lib/Either.js"
 import { errToCommandReturn, loadSpec } from "./commands/_base.ts"
-import { runAllTools, runAt, runAts, runGuide, runInfo, runLocateAt, runStatus, runTool, runValidate } from "./commands/index.ts"
+import { runAllTools, runAt, runAts, runExample, runGuide, runInfo, runLocateAt, runStatus, runTool, runValidate } from "./commands/index.ts"
 import type { CommandReturn, S4 } from "./types.ts"
 
 // Default to running "s4 status" if no arguments are provided
@@ -104,6 +104,13 @@ cli
   )
   .action(async (section?: string) => {
     handleResult(await runGuide(section))
+  })
+
+cli
+  .command("example")
+  .description("Display a simple example specification in YAML format")
+  .action(async () => {
+    handleResult(await runExample())
   })
 
 async function withSpec(specPath: string, format: "json" | "yaml", commandFn: (spec: S4) => CommandReturn | Promise<CommandReturn>): Promise<void> {

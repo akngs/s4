@@ -1,5 +1,6 @@
 /* eslint-disable import/max-dependencies */
 /* v8 ignore start */
+export { default as runExample } from "./example.ts"
 export { default as runGuide } from "./guide.ts"
 export { default as runInfo } from "./info.ts"
 export { default as runLocateAt } from "./locate-at.ts"

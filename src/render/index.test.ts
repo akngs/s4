@@ -61,7 +61,7 @@ it("should show happy path when no issues and no failing features", () => {
     ["FE-0001", { passed: 1, total: 1 }],
     ["FE-0002", { passed: 1, total: 1 }],
   ])
-  expect(renderStatus(VALID_SPEC, featureRates, [], [])).toContain("Project is in good state")
+  expect(renderStatus(VALID_SPEC, featureRates, [], [])).toContain("No structural issues found")
 })
 
 it("should show failing features message when no issues but failing features exist", () => {

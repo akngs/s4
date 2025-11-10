@@ -107,6 +107,12 @@ features:
       The CLI can guide AI agent and human spec authors to write a spec that is easy to understand and maintain.
     covers: [BO-0001, BO-0002]
     prerequisites: [FE-0002]
+  - id: FE-0015
+    title: Show example specifications
+    description: >-
+      The CLI can display example specifications to help users understand the structure and format of s4.yaml files, enabling faster learning and adoption.
+    covers: [BO-0001, BO-0002]
+    prerequisites: [FE-0002]
 # MARK: Acceptance Tests
 acceptanceTests:
   - id: AT-0001
@@ -324,6 +330,11 @@ acceptanceTests:
     given: in any occasion
     when: the user runs "s4 guide SECTION-NAME"
     then: the system displays the content of the section from `guideline.yaml` with examples
+  - id: AT-0065
+    covers: FE-0015
+    given: in any occasion
+    when: the user runs "s4 example"
+    then: the system displays a simple example specification in YAML format
 # MARK: Connectors
 connectors:
   listAcceptanceTests: |- # Prints ATs in the format: "AT-0001: TITLE"

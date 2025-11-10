@@ -9,7 +9,7 @@
   "scripts": {
     "start": "node src/index.ts",
     "build": "tsup src/index.ts --format esm --dts --sourcemap --clean --shims --target node18 --out-dir dist",
-    "postbuild": "mkdir -p dist/templates && cp -R src/render/templates/* dist/templates/ && cp src/logics/guideline.yaml dist/guideline.yaml || true",
+    "postbuild": "mkdir -p dist/templates dist/examples && cp -R src/render/templates/* dist/templates/ && cp src/logics/guideline.yaml dist/guideline.yaml && cp -R examples/* dist/examples/ || true",
     "prepare": "npm run build",
     "prepublishOnly": "npm run build",
     "check:biome": "biome check --error-on-warnings .",

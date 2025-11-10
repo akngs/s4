@@ -1,12 +1,17 @@
-title: Flash Cards
-mission: Help users study efficiently by practicing with simple flash cards.
-vision: A lightweight web app that makes memorization effortless through focused practice sessions.
+title: >-
+  Flash Cards: A Simple Study Tool
+mission: >-
+  Enable students and lifelong learners to build custom [[Flash Card]] collections and practice effectively through focused [[Study Session]]s.
+vision: >-
+  A world where anyone can easily create, organize, and review knowledge using digital flash cards, making learning accessible and measurable.
 
 businessObjectives:
   - id: BO-0001
-    description: Enable users to create and manage [[Flash Card]] collections to improve knowledge retention.
+    description: >-
+      Enable users to build and maintain personalized [[Deck]]s of [[Flash Card]]s, ensuring their study material is organized and easily accessible for review.
   - id: BO-0002
-    description: Provide effective study sessions that adapt to user performance and optimize learning outcomes.
+    description: >-
+      Provide an effective practice experience through [[Study Session]]s that present questions, validate answers, and track performance to optimize learning outcomes.
 
 concepts:
   - id: Flash Card
@@ -18,47 +23,66 @@ concepts:
 
 features:
   - id: FE-0001
-    title: Create and manage flash cards
-    description: Users can create new [[Flash Card]]s with questions and answers, and organize them into [[Deck]]s.
+    title: Create and view flash cards
+    description: >-
+      Users can create new [[Flash Card]]s by entering a question and its corresponding answer. Created cards are automatically added to a [[Deck]] and displayed in a list view, allowing users to review their collection at any time.
     covers: [BO-0001]
     prerequisites: []
   - id: FE-0002
-    title: Conduct study sessions
-    description: Users can start [[Study Session]]s to review [[Flash Card]]s, with the system showing questions and tracking correct/incorrect answers.
-    covers: [BO-0002]
+    title: Edit and delete flash cards
+    description: >-
+      Users can modify the question or answer text of existing [[Flash Card]]s to correct mistakes or improve clarity. Users can also permanently remove cards from their [[Deck]] when they are no longer needed.
+    covers: [BO-0001]
     prerequisites: [FE-0001]
   - id: FE-0003
-    title: Track study progress
-    description: The system tracks which [[Flash Card]]s users answer correctly and provides progress feedback during [[Study Session]]s.
+    title: Conduct study sessions
+    description: >-
+      Users can initiate a [[Study Session]] that presents each [[Flash Card]] question one at a time. After the user submits their answer, the system reveals the correct answer and allows the user to continue to the next card.
     covers: [BO-0002]
-    prerequisites: [FE-0002]
+    prerequisites: [FE-0001]
+  - id: FE-0004
+    title: Track study performance
+    description: >-
+      During a [[Study Session]], the system records whether each answer was correct or incorrect. When the session completes, users receive a summary showing their total correct answers, incorrect answers, and overall accuracy percentage.
+    covers: [BO-0002]
+    prerequisites: [FE-0003]
 
 acceptanceTests:
   - id: AT-0001
     covers: FE-0001
-    given: a user wants to create a new [[Flash Card]]
-    when: they enter a question and answer and click "Create Card"
-    then: the card is added to their current [[Deck]]
+    given: the user is on the card creation page
+    when: they enter question "What is 2+2?" and answer "4", then click "Create Card"
+    then: the new card appears in the [[Deck]] list
   - id: AT-0002
     covers: FE-0001
-    given: a user has created multiple [[Flash Card]]s
-    when: they view their [[Deck]]
-    then: all cards are displayed in a list format
+    given: the [[Deck]] contains cards with questions "Q1", "Q2", and "Q3"
+    when: the user opens the [[Deck]] view
+    then: all three cards are displayed showing "Q1", "Q2", and "Q3"
   - id: AT-0003
     covers: FE-0002
-    given: a [[Deck]] with at least one [[Flash Card]] exists
-    when: the user starts a [[Study Session]]
-    then: the first card's question is displayed
+    given: a card exists with question "Capital of France?" and answer "Paris"
+    when: the user edits the answer to "Paris, France" and saves
+    then: the card now shows answer "Paris, France"
   - id: AT-0004
     covers: FE-0002
-    given: a [[Study Session]] is active and showing a question
-    when: the user submits their answer
-    then: the system shows whether the answer is correct and displays the correct answer
+    given: the [[Deck]] contains 5 cards
+    when: the user deletes one card
+    then: the [[Deck]] contains 4 cards and the deleted card is not shown
   - id: AT-0005
     covers: FE-0003
-    given: a [[Study Session]] with multiple [[Flash Card]]s
-    when: the user completes the session
-    then: the system displays a summary showing correct/incorrect counts and overall progress
+    given: a [[Deck]] with one card having question "What is H2O?" and answer "Water"
+    when: the user starts a [[Study Session]]
+    then: the question "What is H2O?" is shown without revealing "Water"
+  - id: AT-0006
+    covers: FE-0003
+    given: a [[Study Session]] showing question "What is H2O?" with correct answer "Water"
+    when: the user submits answer "Water"
+    then: the system reveals "Water" and allows proceeding to the next card
+  - id: AT-0007
+    covers: FE-0004
+    given: a [[Study Session]] with 10 cards where the user answers 7 correctly
+    when: the session completes
+    then: the summary shows "7 correct, 3 incorrect, 70% accuracy"
 
 connectors:
   listAcceptanceTests: |- # Prints ATs in the format: "AT-0001: TITLE"
