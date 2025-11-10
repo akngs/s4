@@ -62,7 +62,7 @@ function renderOverallIssues(issues: Issue[], featureStats: FeatureStats): strin
   if (issues.length === 0 && failingFeatures.length === 0) {
     return `No structural issues found. Consider verifying semantic consistency in your specifications.
 
-${chalk.blue.underline.bold("Recommended Next Actions:")}\n> s4 info FE-xxxx         # Check semantic consistency across BO-FE-AT for a specific feature
+${chalk.blue.underline.bold("Recommended Next Actions:")}\n\n> s4 info FE-xxxx         # Check semantic consistency across BO-FE-AT for a specific feature
 > s4 locate-at AT-nnnn    # Verify that implemented test cases correctly reflect the specification`
   }
 
