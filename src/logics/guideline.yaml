@@ -1,11 +1,13 @@
 brief: |-
   # Writing S4 Specifications
 
-  An `s4.yaml` file is the project's single source of truth. It is designed for a **neuro-symbolic workflow**, which separates tasks between the `s4` CLI (symbolic engine) and an AI agent (neural engine). The CLI handles deterministic work like validating the spec's structure, while the AI handles tasks requiring natural language interpretation and implementation.
+  Semi-Structured Software Specification is a YAML-based document format that serves as the single source of truth for software projects, containing business objectives, features, acceptance tests, and supporting metadata. Designed for both human readability and AI agent consumption, it enables stateless development by providing complete project context without requiring conversation history or external documentation. Standard name for the file is `s4.yaml`.
 
-  The workflow uses **inversion of control**. The AI agent does not determine its own strategy. It runs `s4 status` to receive a precise, prioritized task from the CLI. This makes the development process sequential and predictable, with the AI acting as an executor for tasks defined by the framework.
+  A `s4` is a CLI tool that helps AI agents to analyze the spec and provide actionable guidance. The CLI handles deterministic work like validating the spec's structure, while the AI handles tasks requiring natural language interpretation and implementation.
 
-  Your goal is to write a specification that is clear enough for an AI to act on, and reviewable enough for humans to understand the project's scope, priorities, and rationale.
+  The AI agent should run `s4 status` to receive a precise, prioritized task from the CLI. This makes the development process sequential and predictable, with the AI acting as an executor for tasks defined by the framework.
+
+  Your current goal is to write a specification that is clear enough for an AI to act on, and reviewable enough for humans to understand the project's scope, priorities, and rationale.
 
   ## Quick Start
 
