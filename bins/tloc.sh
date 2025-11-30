@@ -36,10 +36,10 @@ if ! command -v jq &> /dev/null; then
 fi
 
 # Get LOC excluding tests
-code_loc=$(tokei --type TypeScript --output json --exclude '*.test.ts' | jq '.TypeScript.code // 0')
+code_loc=$(tokei --types TypeScript --output json --exclude '*.test.ts' | jq '.TypeScript.code // 0')
 
 # Get LOC including tests
-total_loc=$(tokei --type TypeScript --output json | jq '.TypeScript.code // 0')
+total_loc=$(tokei --types TypeScript --output json | jq '.TypeScript.code // 0')
 
 # Calculate test LOC
 test_loc=$((total_loc - code_loc))
