@@ -5,5 +5,5 @@ it('GIVEN in any occasion, WHEN the user runs "s4 guide", THEN the system displa
 
   expect(result.status).toBe(0)
   // Assert that a stable phrase from guideline.yaml brief is present in the output
-  expect(result.stdout).toContain("An `s4.yaml` file is the project's single source of truth.")
+  expect(result.stdout).toContain("Semi-Structured Software Specification is a YAML-based document format that serves as the single source of truth")
 })
